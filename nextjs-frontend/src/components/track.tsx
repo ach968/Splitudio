@@ -34,14 +34,14 @@ export default function Track({ fileUrl, waveColor, trackName, className, regist
     };
   
     return (
-      <div className={twMerge(className, volume == 0 && "filter brightness-50","w-full border-2 p-4 rounded-xl")}>
-        <p className="text-white font-bold text-lg">
-            {trackName}
-        </p>
+    <div className={twMerge(className, volume == 0 && "filter brightness-50", "bg-gray-900 w-full border-2 p-2 xl:p-4 rounded-md md:rounded-xl")}>
 
         <div className="flex items-center">
-            {/* Volume Control */}
+            {/* Left cluster */}
             <div className="mr-4 flex flex-col gap-5 items-center">
+                <p className="text-white font-bold text-md">
+                    {trackName}
+                </p>
                 <Slider
                     defaultValue={[1]}
                     max={1}
@@ -56,7 +56,7 @@ export default function Track({ fileUrl, waveColor, trackName, className, regist
             {/* Waveform Display */}
             <div className="flex-grow">
             <WavesurferPlayer
-                height={100}
+                height={70}
                 progressColor={waveColor}
                 waveColor="White"
                 url={fileUrl}
@@ -67,16 +67,15 @@ export default function Track({ fileUrl, waveColor, trackName, className, regist
             </div>
     
             {/* Action Buttons */}
-            <div className="ml-4 flex flex-col space-y-2">
-            <Button className="w-12 h-12 rounded-full group" variant='outline' >
-                <SheetMusic className="filter invert-0 group-hover:invert" />
-            </Button>
-            <Button className="w-12 h-12 rounded-full group" variant="outline">
-                <MusicNote className="filter invert-0 group-hover:invert" />
-            </Button>
+            <div className="ml-4 flex flex-col gap-2">
+                <Button className="w-10 h-10 rounded-full group" variant='outline' >
+                    <SheetMusic className="filter invert-0 group-hover:invert" />
+                </Button>
+                <Button className="w-10 h-10 rounded-full group" variant="outline">
+                    <MusicNote className="filter invert-0 group-hover:invert" />
+                </Button>
             </div>
         </div>
-        
-      </div>
+    </div>
     );
   }
