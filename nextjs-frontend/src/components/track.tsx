@@ -1,7 +1,10 @@
 import WavesurferPlayer, { WavesurferProps } from '@wavesurfer/react'
 import { useState } from 'react';
+import { Slider } from './ui/slider';
+import { Button } from './ui/button';
 import { twMerge } from 'tailwind-merge';
-
+import SheetMusic from '@/assets/sheet-music'
+import MusicNote from '@/assets/music-note'
 interface TrackProps {
     fileUrl: string;
     waveColor: string;
@@ -9,9 +12,10 @@ interface TrackProps {
     className: string;
     onUniversalSeek: (time: number) => void;
     registerWaveSurfer: (ws: any) => void;
+    setIsPlaying: (status: any) => void;
 }
 
-export default function Track({ fileUrl, waveColor, trackName, className, registerWaveSurfer, onUniversalSeek} : TrackProps) {
+export default function Track({ fileUrl, waveColor, trackName, className, registerWaveSurfer, onUniversalSeek, setIsPlaying} : TrackProps) {
 
     const [wavesurfer, setWavesurfer] = useState<any>(null);
     const [volume, setVolume] = useState(1);
@@ -22,48 +26,54 @@ export default function Track({ fileUrl, waveColor, trackName, className, regist
         registerWaveSurfer(ws);
     };
   
-    const onVolumeChange = (e: any) => {
-        const newVolume = Number(e.target.value);
+    const onVolumeChange = (e: Number) => {
+        const newVolume = Number(e)
         setVolume(newVolume);
         wavesurfer && wavesurfer.setVolume(newVolume);
     };
   
     return (
-      <div className={twMerge(className, " p-4 rounded-xl flex items-center")}>
-        {/* Volume Control */}
-        <div className="mr-4">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={volume}
-            onChange={onVolumeChange}
-            className="w-20 accent-black"
-          />
+      <div className={twMerge(className, "w-full border-2 p-4 rounded-xl")}>
+        <p className="text-white font-bold text-lg">
+            {trackName}
+        </p>
+
+        <div className="flex items-center">
+            {/* Volume Control */}
+            <div className="mr-4">
+            <Slider
+                defaultValue={[1]}
+                max={1}
+                step={0.01}
+                className='w-20'
+                onValueChange={(e)=>onVolumeChange(e[0])}
+            />
+            </div>
+    
+            {/* Waveform Display */}
+            <div className="flex-grow">
+            <WavesurferPlayer
+                height={100}
+                progressColor={waveColor}
+                waveColor="White"
+                url={fileUrl}
+                onFinish={()=>setIsPlaying(false)}
+                onReady={onReady}
+                onSeeking={(e: any)=> onUniversalSeek(e)}
+            />
+            </div>
+    
+            {/* Action Buttons */}
+            <div className="ml-4 flex flex-col space-y-2">
+            <Button className="w-12 h-12 rounded-full" variant='outline' >
+                <SheetMusic />
+            </Button>
+            <Button className="w-12 h-12 rounded-full" variant="outline">
+                <MusicNote />
+            </Button>
+            </div>
         </div>
-  
-        {/* Waveform Display */}
-        <div className="flex-grow">
-          <WavesurferPlayer
-            height={100}
-            progressColor={"black"}
-            waveColor={waveColor}
-            url={fileUrl}
-            onReady={onReady}
-            onSeeking={(e: any)=> onUniversalSeek(e)}
-          />
-        </div>
-  
-        {/* Action Buttons */}
-        <div className="ml-4 flex flex-col space-y-2">
-          <button className="bg-black text-white py-1 px-2 rounded ">
-            Get Sheet Music
-          </button>
-          <button className="bg-black text-white py-1 px-2 rounded">
-            Download MP3
-          </button>
-        </div>
+        
       </div>
     );
   }
