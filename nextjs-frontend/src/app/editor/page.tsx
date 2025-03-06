@@ -3,6 +3,9 @@ import Image from "next/image";
 import WavesurferPlayer, { WavesurferProps } from "@wavesurfer/react";
 import Track from "@/components/track";
 import { useState, useEffect } from "react";
+import { Toggle } from "@/components/ui/toggle";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Button } from "@/components/ui/button";
 export default function Home() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [waveSurfers, setWaveSurfers] = useState<any[]>([]);
@@ -49,51 +52,73 @@ export default function Home() {
   }, [waveSurfers]);
 
   return (
-  <section className="w-screen h-screen bg-black">
-        <div className="relative flex h-screen">
-            <div className="flex flex-col justify-center items-center w-full h-full">
-                <div className="container border border-gray-300 overflow-x-hidden ">
-                    <div className="flex flex-col gap-5 md:gap-6 mx-10 my-10">
-                        <Track
-                            className="border-red-400 shadow-[0px_0px_50px_#fb2c3655]"
-                            fileUrl="/vocals.wav"
-                            trackName="Vocal"
-                            waveColor="#fb2c36"
-                            registerWaveSurfer={registerWaveSurfer}
-                            onUniversalSeek={onUniversalSeek}
-                            setIsPlaying={setIsPlaying}
-                        />
-                        <Track
-                            className="border-yellow-400 shadow-[0px_0px_50px_#efb10055]"
-                            fileUrl="/drums.wav"
-                            trackName="Drums"
-                            waveColor="#efb100"
-                            registerWaveSurfer={registerWaveSurfer}
-                            onUniversalSeek={onUniversalSeek}
-                            setIsPlaying={setIsPlaying}
-                        />
-                        <Track
-                            className="border-lime-400 shadow-[0px_0px_50px_#7ccf0055]"
-                            fileUrl="/bass.wav"
-                            trackName="Bass"
-                            waveColor="#7ccf00"
-                            registerWaveSurfer={registerWaveSurfer}
-                            onUniversalSeek={onUniversalSeek}
-                            setIsPlaying={setIsPlaying}
-                        />
-                        <Track
-                            className="border-teal-400 shadow-[0px_0px_50px_#00bba755]"
-                            fileUrl="/other.wav"
-                            trackName="Guitar"
-                            waveColor="#00bba7"
-                            registerWaveSurfer={registerWaveSurfer}
-                            onUniversalSeek={onUniversalSeek}
-                            setIsPlaying={setIsPlaying}
-                        />
+  <section>
+        <div className="w-screen flex h-screen bg-black">
+            <div className="flex flex-col justify-center relative w-full h-full">
+                
+
+                {/* TRACK CONTAINER THING -- IT RESIZES */}
+                <div className="flex w-full justify-center overflow-x-hidden">
+                    <div className="container lg:p-5 p-3">
+                        <div className="flex flex-col gap-5 border border-gray-700 rounded-lg lg:gap-7 lg:p-5 p-3">
+                            <Track
+                                className="border-red-400 shadow-[0px_0px_50px_#fb2c3655]"
+                                fileUrl="/vocals.wav"
+                                trackName="Vocal"
+                                waveColor="#fb2c36"
+                                registerWaveSurfer={registerWaveSurfer}
+                                onUniversalSeek={onUniversalSeek}
+                                setIsPlaying={setIsPlaying}
+                            />
+                            <Track
+                                className="border-yellow-400 shadow-[0px_0px_50px_#efb10055]"
+                                fileUrl="/drums.wav"
+                                trackName="Drums"
+                                waveColor="#efb100"
+                                registerWaveSurfer={registerWaveSurfer}
+                                onUniversalSeek={onUniversalSeek}
+                                setIsPlaying={setIsPlaying}
+                            />
+                            <Track
+                                className="border-lime-400 shadow-[0px_0px_50px_#7ccf0055]"
+                                fileUrl="/bass.wav"
+                                trackName="Bass"
+                                waveColor="#7ccf00"
+                                registerWaveSurfer={registerWaveSurfer}
+                                onUniversalSeek={onUniversalSeek}
+                                setIsPlaying={setIsPlaying}
+                            />
+                            <Track
+                                className="border-teal-400 shadow-[0px_0px_50px_#00bba755]"
+                                fileUrl="/other.wav"
+                                trackName="Guitar"
+                                waveColor="#00bba7"
+                                registerWaveSurfer={registerWaveSurfer}
+                                onUniversalSeek={onUniversalSeek}
+                                setIsPlaying={setIsPlaying}
+                            />
+                            
+                        </div>
                     </div>
                 </div>
-
-                <div className="border-t-2 border-gray-500 bottom-0 w-full h-[100px]"></div>
+                <div className=" flex w-full justify-center mb-20">
+                    <div className="container lg:px-5 px-3">
+                        <div className="border-b border-t border-gray-700 py-1 w-full min-h-7 flex justify-center gap-2">
+                            <Button size="icon" variant="ghost" className="w-7 h-7">A</Button>
+                            <Button size="icon" variant="ghost" className="w-7 h-7"
+                                onClick={onUniversalPlayPause}
+                            >{isPlaying===true ? "||" : ">"}</Button>
+                            <Button size="icon" variant="ghost" className="w-7 h-7">C</Button>
+                        </div>
+                    </div>
+                </div>
+                <div className="border-2 bottom-0 border-gray-700 w-full min-h-7 rounded-md">
+                    <div className="container"></div>
+                </div>
+                <div className="border-2 bottom-0 border-gray-700 w-full min-h-7 rounded-md">
+                    <div className="container"></div>
+                </div>
+                
 
             </div>
         </div>

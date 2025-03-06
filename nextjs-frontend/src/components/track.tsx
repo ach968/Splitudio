@@ -34,7 +34,7 @@ export default function Track({ fileUrl, waveColor, trackName, className, regist
     };
   
     return (
-    <div className={twMerge(className, volume == 0 && "filter brightness-50", "bg-gray-900 w-full border-2 p-2 xl:p-4 rounded-md md:rounded-xl")}>
+    <div className={twMerge(className, volume == 0 && "filter brightness-50", "bg-gray-950 w-full border-2 p-2 lg:p-4 rounded-md lg:rounded-xl")}>
 
         <div className="flex items-center">
             {/* Left cluster */}
@@ -50,7 +50,7 @@ export default function Track({ fileUrl, waveColor, trackName, className, regist
                     onValueChange={(e)=>onVolumeChange(e[0])}
                     value={[volume]}
                 />
-                <Button className="w-7 h-7" variant={volume==0 ? "destructive" : "outline"} onClick={()=>{volume==0 ? onVolumeChange(1) : onVolumeChange(0)}}>M</Button>
+                <Button size="icon" className="w-7 h-7" variant={volume==0 ? "destructive" : "outline"} onClick={()=>{volume==0 ? onVolumeChange(1) : onVolumeChange(0)}}>M</Button>
             </div>
     
             {/* Waveform Display */}
@@ -68,10 +68,10 @@ export default function Track({ fileUrl, waveColor, trackName, className, regist
     
             {/* Action Buttons */}
             <div className="ml-4 flex flex-col gap-2">
-                <Button className="w-10 h-10 rounded-full group" variant='outline' >
+                <Button size="icon" className="w-9 h-9 rounded-full group" variant='outline' >
                     <SheetMusic className="filter invert-0 group-hover:invert" />
                 </Button>
-                <Button className="w-10 h-10 rounded-full group" variant="outline">
+                <Button size="icon" className="w-9 h-9 rounded-full group" variant="outline">
                     <MusicNote className="filter invert-0 group-hover:invert" />
                 </Button>
             </div>
