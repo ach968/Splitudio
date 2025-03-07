@@ -115,7 +115,24 @@ export default function Home() {
                                 onUniversalSeek={onUniversalSeek}
                                 setIsPlaying={setIsPlaying}
                             />
-                            
+                            <Track
+                                className="border-red-400 shadow-[0px_0px_50px_#fb2c3655]"
+                                fileUrl="/vocals.wav"
+                                trackName="Vocal"
+                                waveColor="#fb2c36"
+                                registerWaveSurfer={registerWaveSurfer}
+                                onUniversalSeek={onUniversalSeek}
+                                setIsPlaying={setIsPlaying}
+                            />
+                            <Track
+                                className="border-yellow-400 shadow-[0px_0px_50px_#efb10055]"
+                                fileUrl="/drums.wav"
+                                trackName="Drums"
+                                waveColor="#efb100"
+                                registerWaveSurfer={registerWaveSurfer}
+                                onUniversalSeek={onUniversalSeek}
+                                setIsPlaying={setIsPlaying}
+                            />
                         </div>
                     </div>
                 </div>
