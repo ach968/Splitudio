@@ -38,7 +38,7 @@ export default function Track({ fileUrl, waveColor, trackName, className, regist
 
         <div className="flex items-center">
             {/* Left cluster */}
-            <div className="mr-4 flex flex-col gap-5 items-center">
+            <div className="mr-4 flex flex-col gap-3 items-center">
                 <p className="select-none text-white font-bold text-md">
                     {trackName}
                 </p>
@@ -55,24 +55,24 @@ export default function Track({ fileUrl, waveColor, trackName, className, regist
     
             {/* Waveform Display */}
             <div className="flex-grow">
-            <WavesurferPlayer
-                height={70}
-                progressColor={waveColor}
-                waveColor="White"
-                url={fileUrl}
-                onFinish={()=>setIsPlaying(false)}
-                onReady={onReady}
-                onSeeking={(e: any)=> onUniversalSeek(e)}
-            />
+                <WavesurferPlayer
+                    height={70}
+                    progressColor={waveColor}
+                    waveColor="White"
+                    url={fileUrl}
+                    onFinish={()=>setIsPlaying(false)}
+                    onReady={onReady}
+                    onSeeking={(e: any)=> onUniversalSeek(e)}
+                />
             </div>
     
             {/* Action Buttons */}
             <div className="ml-4 flex flex-col gap-2">
                 <Button size="icon" className="w-9 h-9 rounded-full group" variant='outline' >
-                    <SheetMusic className="filter invert-0 group-hover:invert" />
+                    <SheetMusic className="invert-0 group-hover:invert" />
                 </Button>
                 <Button size="icon" className="w-9 h-9 rounded-full group" variant="outline">
-                    <MusicNote className="filter invert-0 group-hover:invert" />
+                    <MusicNote className="invert-0 group-hover:invert" />
                 </Button>
             </div>
         </div>
