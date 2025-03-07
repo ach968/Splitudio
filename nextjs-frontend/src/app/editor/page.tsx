@@ -36,6 +36,16 @@ export default function Home() {
         setIsPlaying((prev) => !prev);
     };
 
+    const onUniversalSkipForward = () => {
+        const newTime = waveSurfers[0].getCurrentTime() + 5;
+        waveSurfers.forEach((ws) => ws.setTime(newTime));
+    } 
+
+    const onUniversalSkipBackward = () => {
+        const newTime = waveSurfers[0].getCurrentTime() - 5;
+        waveSurfers.forEach((ws) => ws.setTime(newTime));
+    }
+
     useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
         if (e.keyCode === 32) {
@@ -55,7 +65,6 @@ export default function Home() {
   <section>
         <div className="w-screen flex h-screen bg-black">
             <div className="flex flex-col justify-center relative w-full h-full">
-                
 
                 {/* TRACK CONTAINER THING -- IT RESIZES */}
                 <div className="flex w-full justify-center overflow-x-hidden">
@@ -101,24 +110,30 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
+
+                {/* TOOLBAR */}
                 <div className=" flex w-full justify-center mb-20">
                     <div className="container lg:px-5 px-3">
                         <div className="border-b border-t border-gray-700 py-1 w-full min-h-7 flex justify-center gap-2">
-                            <Button size="icon" variant="ghost" className="w-7 h-7">A</Button>
-                            <Button size="icon" variant="ghost" className="w-7 h-7"
+                            <Button 
+                                size="icon" 
+                                variant="ghost" 
+                                className="w-7 h-7"
+                                onClick={onUniversalSkipBackward}>{"<"}</Button>
+                            <Button 
+                                size="icon" 
+                                variant="ghost" 
+                                className="w-7 h-7"
                                 onClick={onUniversalPlayPause}
-                            >{isPlaying===true ? "||" : ">"}</Button>
-                            <Button size="icon" variant="ghost" className="w-7 h-7">C</Button>
+                            >{isPlaying===true ? "||" : "PLAY"}</Button>
+                            <Button 
+                                size="icon" 
+                                variant="ghost" 
+                                className="w-7 h-7"
+                                onClick={onUniversalSkipForward}>{">"}</Button>
                         </div>
                     </div>
                 </div>
-                <div className="border-2 bottom-0 border-gray-700 w-full min-h-7 rounded-md">
-                    <div className="container"></div>
-                </div>
-                <div className="border-2 bottom-0 border-gray-700 w-full min-h-7 rounded-md">
-                    <div className="container"></div>
-                </div>
-                
 
             </div>
         </div>

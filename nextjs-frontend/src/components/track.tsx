@@ -39,7 +39,7 @@ export default function Track({ fileUrl, waveColor, trackName, className, regist
         <div className="flex items-center">
             {/* Left cluster */}
             <div className="mr-4 flex flex-col gap-5 items-center">
-                <p className="text-white font-bold text-md">
+                <p className="select-none text-white font-bold text-md">
                     {trackName}
                 </p>
                 <Slider
@@ -50,7 +50,7 @@ export default function Track({ fileUrl, waveColor, trackName, className, regist
                     onValueChange={(e)=>onVolumeChange(e[0])}
                     value={[volume]}
                 />
-                <Button size="icon" className="w-7 h-7" variant={volume==0 ? "destructive" : "outline"} onClick={()=>{volume==0 ? onVolumeChange(1) : onVolumeChange(0)}}>M</Button>
+                <Button size="icon" className="select-none w-7 h-7" variant={volume==0 ? "destructive" : "outline"} onClick={()=>{volume==0 ? onVolumeChange(1) : onVolumeChange(0)}}>M</Button>
             </div>
     
             {/* Waveform Display */}
