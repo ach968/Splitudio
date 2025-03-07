@@ -52,6 +52,15 @@ export default function Home() {
             e.preventDefault();
             onUniversalPlayPause();
         }
+        else if(e.keyCode === 37) {
+            e.preventDefault();
+            onUniversalSkipBackward();
+        }
+        else if(e.keyCode === 39) {
+            e.preventDefault();
+            onUniversalSkipForward();
+        }
+        
     };
 
     document.addEventListener("keydown", handleKeyDown);
