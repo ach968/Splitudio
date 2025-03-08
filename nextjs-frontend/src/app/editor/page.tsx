@@ -81,7 +81,7 @@ export default function Home() {
         <div className="w-screen flex h-screen bg-black">
             <div className="flex flex-col justify-center relative w-full h-full">
 
-                <div className="mt-3 flex w-full justify-center">
+                <div className="mt-5 flex w-full justify-center">
                     <div className="container lg:px-5 px-3">
                         <div className="border-b-2 border-gray-700 w-full">
                             <p className="text-xl font-semibold text-white pb-2">
@@ -155,7 +155,7 @@ export default function Home() {
                 </div>
 
                 {/* TOOLBAR */}
-                <div className=" flex w-full justify-center mb-20">
+                <div className=" flex w-full justify-center mb-5">
                     <div className="container lg:px-5 px-3">
                         <div className="border-b-2 border-t-2 border-gray-700 py-1 w-full min-h-7 flex justify-center gap-2">
                             <Button 
