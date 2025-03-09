@@ -13,7 +13,19 @@ import BackwardSVG from "@/assets/backward";
 import ListSVG from "@/assets/list"
 import MenuSVG from "@/assets/menu"
 import { Slider } from "@/components/ui/slider"
-import PreviousMap_ from "postcss/lib/previous-map";
+import Link from "next/link";
+import {
+    NavigationMenu,
+    NavigationMenuContent,
+    NavigationMenuIndicator,
+    NavigationMenuItem,
+    NavigationMenuLink,
+    NavigationMenuList,
+    NavigationMenuTrigger,
+    NavigationMenuViewport,
+    navigationMenuTriggerStyle 
+} from "@/components/ui/navigation-menu"
+
 
 interface TrackState {
     ws: any;
@@ -144,14 +156,73 @@ export default function Home() {
   return (
   <section>
         <div className="w-screen flex h-screen bg-black">
-            <div className="flex flex-col justify-center relative w-full h-full">
-                <div className="mt-5 flex w-full justify-center">
+            <div className="flex flex-col justify-center w-full h-full">
+                <div className="flex w-full justify-end px-6">
+                    <NavigationMenu className="fixed top-0 mt-6">
+                        <NavigationMenuList>
+                            <NavigationMenuItem>
+                                <NavigationMenuTrigger>My Projects</NavigationMenuTrigger>
+                                <NavigationMenuContent>
+                                    <div className="w-[200px] h-auto p-3 bg-black">
+                                        <p className="text-white mb-2 font-semibold">
+                                            Recent
+                                        </p>
+                                        <ul className="text-zinc-500">
+                                            <li className="truncate p-2 leading-5 transition ease-out hover:bg-zinc-900 rounded-sm">
+                                                <Link href="/projects" legacyBehavior passHref>
+                                                    Song Name 1 THIS IS LONG 
+                                                </Link>
+                                            </li>
+                                            <li className="truncate p-2 leading-5 transition ease-out hover:bg-zinc-900 rounded-sm">
+                                                <Link href="/projects" legacyBehavior passHref>
+                                                    Song Name 2 jkdajkldjklad
+                                                </Link>
+                                            </li>
+                                            <li className="truncate p-2 leading-5 transition ease-out hover:bg-zinc-900 rounded-sm">
+                                                <Link href="/projects" legacyBehavior passHref>
+                                                    Song Name 3 asodasidadak
+                                                </Link>
+                                            </li>
+                                            <li className="truncate p-2 leading-5 transition ease-out hover:bg-zinc-900 rounded-sm">
+                                                <Link href="/projects" legacyBehavior passHref>
+                                                    Song Name 4
+                                                </Link>
+                                            </li>
+                                        </ul>
+                                        <div className="w-full mt-5 flex justify-end font-semibold text-white">
+                                            <Link href="/projects" legacyBehavior passHref>
+                                                All Projects
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </NavigationMenuContent>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                <Link href="/" legacyBehavior passHref>
+                                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                                        + New Project
+                                    </NavigationMenuLink>
+                                </Link>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                <Link href="/logout" legacyBehavior passHref>
+                                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                                        Logout
+                                    </NavigationMenuLink>
+                                </Link>
+                            </NavigationMenuItem>
+                        </NavigationMenuList>
+                    </NavigationMenu>
+                </div>
+                
+
+                <div className="mt-20 flex w-full justify-center">
                     <div className="container lg:px-5 px-3">
                         <div className="lg:pb-5 pb-3 flex gap-3 place-items-baseline">
                             <p className="text-3xl lg:text-4xl font-semibold text-white truncate">
                                 {PROJECTNAME}
                             </p>
-                            <p className="text-base text-zinc-500 truncate ">
+                            <p className="text-base text-zinc-500 truncate">
                                 / {FILENAME}
                             </p>
                         </div>

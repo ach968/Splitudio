@@ -44,7 +44,7 @@ export default function Track({
     };
   
     return (
-    <div className={twMerge(className, (volume == 0 || focused && focused != id) && "filter brightness-50", "bg-gray-950 w-full border-2 p-2 lg:p-4 rounded-md lg:rounded-xl")}>
+    <div className={twMerge(className, (volume == 0 || focused && focused != id) && "filter brightness-50", "bg-black w-full border-2 p-2 lg:p-4 rounded-md lg:rounded-xl")}>
 
         <div className="flex items-center">
             {/* Left cluster */}
