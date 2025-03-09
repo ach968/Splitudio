@@ -68,24 +68,41 @@ export default function Track({
                     value={[focused && focused !=id ? 0 : volume]}
                 />
                 <div className="flex gap-2">
-                    <Button 
-                        size="icon" 
-                        className="select-none w-7 h-7" 
-                        variant={volume==0 || (focused && focused != id) ? "destructive" : "outline"} 
-                        onClick={()=>{
-                            (volume == 0 || (focused && focused != id)) ? onVolumeChange(1) : onVolumeChange(0)
-                        }}
-                    >M</Button>
-                    <Button 
-                        size="icon" 
-                        className="select-none w-7 h-7" 
-                        variant={ focused == id ? "success" : "outline"}
-                        onClick={()=>{ 
-                            focused == id ? setFocused(null) : setFocused(id)
-                        }}
-                    >S</Button>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                            <Button 
+                                size="icon" 
+                                className="select-none w-7 h-7" 
+                                variant={volume==0 || (focused && focused != id) ? "destructive" : "outline"} 
+                                onClick={()=>{
+                                    (volume == 0 || (focused && focused != id)) ? onVolumeChange(1) : onVolumeChange(0)
+                                }}
+                            >M</Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Mute</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                            <Button 
+                                size="icon" 
+                                className="select-none w-7 h-7" 
+                                variant={ focused == id ? "success" : "outline"}
+                                onClick={()=>{ 
+                                    focused == id ? setFocused(null) : setFocused(id)
+                                }}
+                            >S</Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Focus Track</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
-                
             </div>
     
             {/* Waveform Display */}
