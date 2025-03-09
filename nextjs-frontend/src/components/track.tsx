@@ -5,6 +5,13 @@ import { Button } from './ui/button';
 import { twMerge } from 'tailwind-merge';
 import SheetMusic from '@/assets/sheet-music'
 import MusicNote from '@/assets/music-note'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+
 interface TrackProps {
     id: number;
     focused: number | null; // id of the track that is focused
@@ -96,12 +103,31 @@ export default function Track({
     
             {/* Action Buttons */}
             <div className="ml-4 flex flex-col gap-2">
-                <Button size="icon" className="w-9 h-9 rounded-full group" variant='outline' >
-                    <SheetMusic className="invert-0 group-hover:invert" />
-                </Button>
-                <Button size="icon" className="w-9 h-9 rounded-full group" variant="outline">
-                    <MusicNote className="invert-0 group-hover:invert" />
-                </Button>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger>
+                        <Button size="icon" className="w-9 h-9 rounded-full group" variant='outline' >
+                            <SheetMusic className="invert-0 group-hover:invert" />
+                        </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Convert to Sheet Music</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger>
+                        <Button size="icon" className="w-9 h-9 rounded-full group" variant="outline">
+                            <MusicNote className="invert-0 group-hover:invert" />
+                        </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Download MP3</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+                
             </div>
         </div>
     </div>

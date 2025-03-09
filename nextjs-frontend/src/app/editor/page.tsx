@@ -1,10 +1,6 @@
 "use client";
-import Image from "next/image";
-import WavesurferPlayer, { WavesurferProps } from "@wavesurfer/react";
 import Track from "@/components/track";
 import { useState, useEffect } from "react";
-import { Toggle } from "@/components/ui/toggle";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Button } from "@/components/ui/button";
 import PlaySVG from "@/assets/play"
 import ForwardSVG from "@/assets/forward"
@@ -12,8 +8,13 @@ import PauseSVG from "@/assets/pause"
 import BackwardSVG from "@/assets/backward";
 import ListSVG from "@/assets/list"
 import MenuSVG from "@/assets/menu"
-import { Slider } from "@/components/ui/slider"
 import Link from "next/link";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 import {
     NavigationMenu,
     NavigationMenuContent,
@@ -162,32 +163,32 @@ export default function Home() {
                         <NavigationMenuList>
                             <NavigationMenuItem>
                                 <NavigationMenuTrigger>My Projects</NavigationMenuTrigger>
-                                <NavigationMenuContent>
+                                <NavigationMenuContent className="">
                                     <div className="w-[200px] h-auto p-3 bg-black">
                                         <p className="text-white mb-2 font-semibold">
                                             Recent
                                         </p>
-                                        <ul className="text-zinc-500">
-                                            <li className="truncate p-2 leading-5 transition ease-out hover:bg-zinc-900 rounded-sm">
-                                                <Link href="/projects" legacyBehavior passHref>
-                                                    Song Name 1 THIS IS LONG 
-                                                </Link>
-                                            </li>
-                                            <li className="truncate p-2 leading-5 transition ease-out hover:bg-zinc-900 rounded-sm">
-                                                <Link href="/projects" legacyBehavior passHref>
-                                                    Song Name 2 jkdajkldjklad
-                                                </Link>
-                                            </li>
-                                            <li className="truncate p-2 leading-5 transition ease-out hover:bg-zinc-900 rounded-sm">
-                                                <Link href="/projects" legacyBehavior passHref>
-                                                    Song Name 3 asodasidadak
-                                                </Link>
-                                            </li>
-                                            <li className="truncate p-2 leading-5 transition ease-out hover:bg-zinc-900 rounded-sm">
-                                                <Link href="/projects" legacyBehavior passHref>
-                                                    Song Name 4
-                                                </Link>
-                                            </li>
+                                        <ul className="text-neutral-400">
+                                            <Link href="/projects" legacyBehavior passHref>
+                                                <li className="hover:cursor-pointer truncate p-2 leading-5 transition ease-out hover:bg-neutral-900 rounded-sm">
+                                                    Song Name 1 THIS IS LONG
+                                                </li>
+                                            </Link>
+                                            <Link href="/projects" legacyBehavior passHref>
+                                                <li className="hover:cursor-pointer truncate p-2 leading-5 transition ease-out hover:bg-neutral-900 rounded-sm">
+                                                    Song Name 1 THIS IS LONG
+                                                </li>
+                                            </Link>
+                                            <Link href="/projects" legacyBehavior passHref>
+                                                <li className="hover:cursor-pointer truncate p-2 leading-5 transition ease-out hover:bg-neutral-900 rounded-sm">
+                                                    Song Name 1 THIS IS LONG
+                                                </li>
+                                            </Link>
+                                            <Link href="/projects" legacyBehavior passHref>
+                                                <li className="hover:cursor-pointer truncate p-2 leading-5 transition ease-out hover:bg-neutral-900 rounded-sm">
+                                                    Song Name 1 THIS IS LONG
+                                                </li>
+                                            </Link>
                                         </ul>
                                         <div className="w-full mt-5 flex justify-end font-semibold text-white">
                                             <Link href="/projects" legacyBehavior passHref>
@@ -205,6 +206,13 @@ export default function Home() {
                                 </Link>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
+                                <Link href="/" legacyBehavior passHref>
+                                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                                        Profile
+                                    </NavigationMenuLink>
+                                </Link>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem>
                                 <Link href="/logout" legacyBehavior passHref>
                                     <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                                         Logout
@@ -216,13 +224,13 @@ export default function Home() {
                 </div>
                 
 
-                <div className="mt-20 flex w-full justify-center">
+                <div className="mt-20 mb-3 flex w-full justify-center">
                     <div className="container lg:px-5 px-3">
-                        <div className="lg:pb-5 pb-3 flex gap-3 place-items-baseline">
+                        <div className=" flex gap-3 place-items-baseline">
                             <p className="text-3xl lg:text-4xl font-semibold text-white truncate">
                                 {PROJECTNAME}
                             </p>
-                            <p className="text-base text-zinc-500 truncate">
+                            <p className="text-base text-neutral-400 truncate">
                                 / {FILENAME}
                             </p>
                         </div>
@@ -231,8 +239,8 @@ export default function Home() {
 
                 {/* TRACK CONTAINER THING -- IT RESIZES */}
                 <div className="flex w-full justify-center overflow-x-hidden">
-                    <div className="container">
-                        <div className="flex flex-col gap-3 border border-zinc-700 rounded-lg lg:gap-6 lg:p-5 p-3">
+                    <div className="container mx-3">
+                        <div className="flex flex-col gap-3 border border-neutral-700 rounded-lg lg:gap-6 lg:p-5 p-3">
                             <Track
                                 id={1}
                                 className="border-red-400 shadow-[0px_0px_50px_#fb2c3655]"
@@ -324,40 +332,81 @@ export default function Home() {
                 {/* TOOLBAR */}
                 <div className=" flex w-full justify-center mb-5">
                     <div className="container lg:px-5 px-3">
-                        <div className="border-b border-zinc-700 py-1 w-full min-h-7 flex justify-center gap-2">
-                            <Button 
-                                size="icon" 
-                                variant="ghost" 
-                                className="w-7 h-7 group"
-                                // TODO: On click
-                            >
-                                <MenuSVG className="invert-0 group-hover:invert" />
-                            </Button>
-                            <Button 
-                                size="icon" 
-                                variant="ghost" 
-                                className="w-7 h-7 group"
-                                onClick={onUniversalSkipBackward}
-                            >
-                                <BackwardSVG className="invert-0 group-hover:invert"/>
-                            </Button>
-                            <Button 
-                                size="icon" 
-                                variant="ghost" 
-                                className="w-7 h-7 group"
-                                onClick={onUniversalPlayPause}
-                            >
-                                {isPlaying===true ? <PauseSVG className="invert-0 group-hover:invert" /> 
-                                : <PlaySVG className="invert-0 group-hover:invert"/>}
-                            </Button>
-                            <Button 
-                                size="icon" 
-                                variant="ghost" 
-                                className="w-7 h-7 group"
-                                onClick={onUniversalSkipForward}
-                            >
-                                <ForwardSVG className="invert-0 group-hover:invert" />
-                            </Button>
+                        <div className="border-b border-neutral-700 py-1 w-full min-h-7 flex justify-center gap-2">
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Button 
+                                            size="icon" 
+                                            variant="ghost" 
+                                            className="w-7 h-7 group"
+                                            // TODO: On click
+                                        >
+                                            <MenuSVG className="invert-0 group-hover:invert" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Icon</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                            
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Button 
+                                            size="icon" 
+                                            variant="ghost" 
+                                            className="w-7 h-7 group"
+                                            onClick={onUniversalSkipBackward}
+                                        >
+                                            <BackwardSVG className="invert-0 group-hover:invert"/>
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Seek Forward (Left Arrow)</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Button 
+                                            size="icon" 
+                                            variant="ghost" 
+                                            className="w-7 h-7 group"
+                                            onClick={onUniversalPlayPause}
+                                        >
+                                            {isPlaying===true ? <PauseSVG className="invert-0 group-hover:invert" /> 
+                                            : <PlaySVG className="invert-0 group-hover:invert"/>}
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Play/Pause (Space)</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Button 
+                                            size="icon" 
+                                            variant="ghost" 
+                                            className="w-7 h-7 group"
+                                            onClick={onUniversalSkipForward}
+                                        >
+                                            <ForwardSVG className="invert-0 group-hover:invert" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Seek Forward (Right Arrow)</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+
+                            
                             <Button 
                                 size="icon" 
                                 variant="ghost" 
