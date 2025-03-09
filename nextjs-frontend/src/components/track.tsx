@@ -72,7 +72,7 @@ export default function Track({
                     <Button 
                         size="icon" 
                         className="select-none w-7 h-7" 
-                        variant={ focused == id ? "destructive" : "outline"}
+                        variant={ focused == id ? "success" : "outline"}
                         onClick={()=>{ 
                             focused == id ? setFocused(null) : setFocused(id)
                         }}
