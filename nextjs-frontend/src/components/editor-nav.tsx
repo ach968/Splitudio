@@ -29,7 +29,7 @@ export default function EditorNav() {
     const pathname = usePathname()
 
     return <nav className="justify-center flex">
-        <div className="flex flex-row w-full container justify-between px-6 fixed top-0 mt-8">
+        <div className="flex flex-row w-full container items-baseline justify-between px-6 fixed top-0 mt-8">
             <div className="flex gap-5 text-neutral-400 underline-offset-4">
                 <Link href="/projects">
                     <p className={twMerge(pathname==="/projects" && "text-white", "hover:cursor-pointer hover:underline")}>Projects</p>
