@@ -15,17 +15,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
-import {
-    NavigationMenu,
-    NavigationMenuContent,
-    NavigationMenuIndicator,
-    NavigationMenuItem,
-    NavigationMenuLink,
-    NavigationMenuList,
-    NavigationMenuTrigger,
-    NavigationMenuViewport,
-    navigationMenuTriggerStyle 
-} from "@/components/ui/navigation-menu"
+import EditorNav from "@/components/editor-nav";
 
 
 interface TrackState {
@@ -158,70 +148,9 @@ export default function Home() {
   <section>
         <div className="w-screen flex h-screen bg-black">
             <div className="flex flex-col justify-center w-full h-full">
-                <div className="flex w-full justify-end px-6">
-                    <NavigationMenu className="fixed top-0 mt-6">
-                        <NavigationMenuList>
-                            <NavigationMenuItem>
-                                <NavigationMenuTrigger>My Projects</NavigationMenuTrigger>
-                                <NavigationMenuContent className="">
-                                    <div className="w-[200px] h-auto p-3 bg-black">
-                                        <p className="text-white mb-2 font-semibold">
-                                            Recent
-                                        </p>
-                                        <ul className="text-neutral-400">
-                                            <Link href="/projects" legacyBehavior passHref>
-                                                <li className="hover:cursor-pointer truncate p-2 leading-5 transition ease-out hover:bg-neutral-900 rounded-sm">
-                                                    Song Name 1 THIS IS LONG
-                                                </li>
-                                            </Link>
-                                            <Link href="/projects" legacyBehavior passHref>
-                                                <li className="hover:cursor-pointer truncate p-2 leading-5 transition ease-out hover:bg-neutral-900 rounded-sm">
-                                                    Song Name 1 THIS IS LONG
-                                                </li>
-                                            </Link>
-                                            <Link href="/projects" legacyBehavior passHref>
-                                                <li className="hover:cursor-pointer truncate p-2 leading-5 transition ease-out hover:bg-neutral-900 rounded-sm">
-                                                    Song Name 1 THIS IS LONG
-                                                </li>
-                                            </Link>
-                                            <Link href="/projects" legacyBehavior passHref>
-                                                <li className="hover:cursor-pointer truncate p-2 leading-5 transition ease-out hover:bg-neutral-900 rounded-sm">
-                                                    Song Name 1 THIS IS LONG
-                                                </li>
-                                            </Link>
-                                        </ul>
-                                        <div className="w-full mt-5 flex justify-end font-semibold text-white">
-                                            <Link href="/projects" legacyBehavior passHref>
-                                                All Projects
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </NavigationMenuContent>
-                            </NavigationMenuItem>
-                            <NavigationMenuItem>
-                                <Link href="/" legacyBehavior passHref>
-                                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                                        + New Project
-                                    </NavigationMenuLink>
-                                </Link>
-                            </NavigationMenuItem>
-                            <NavigationMenuItem>
-                                <Link href="/" legacyBehavior passHref>
-                                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                                        Profile
-                                    </NavigationMenuLink>
-                                </Link>
-                            </NavigationMenuItem>
-                            <NavigationMenuItem>
-                                <Link href="/logout" legacyBehavior passHref>
-                                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                                        Logout
-                                    </NavigationMenuLink>
-                                </Link>
-                            </NavigationMenuItem>
-                        </NavigationMenuList>
-                    </NavigationMenu>
-                </div>
+                
+                <EditorNav></EditorNav>
+                
                 
 
                 <div className="mt-20 mb-3 flex w-full justify-center">
@@ -243,7 +172,7 @@ export default function Home() {
                         <div className="flex flex-col gap-3 border border-neutral-700 rounded-lg lg:gap-6 lg:p-5 p-3">
                             <Track
                                 id={1}
-                                className="border-red-400 shadow-[0px_0px_50px_#fb2c3655]"
+                                className="border-red-400 shadow-[0px_0px_50px_#fb2c3633]"
                                 fileUrl="/vocals.wav"
                                 trackName="Vocal"
                                 waveColor="#fb2c36"
@@ -257,7 +186,7 @@ export default function Home() {
                             />
                             <Track
                                 id={2}
-                                className="border-yellow-400 shadow-[0px_0px_50px_#efb10055]"
+                                className="border-yellow-400 shadow-[0px_0px_50px_#efb10033]"
                                 fileUrl="/drums.wav"
                                 trackName="Drums"
                                 waveColor="#efb100"
@@ -271,7 +200,7 @@ export default function Home() {
                             />
                             <Track
                                 id={3}
-                                className="border-lime-400 shadow-[0px_0px_50px_#7ccf0055]"
+                                className="border-lime-400 shadow-[0px_0px_50px_#7ccf0033]"
                                 fileUrl="/bass.wav"
                                 trackName="Bass"
                                 waveColor="#7ccf00"
@@ -285,7 +214,7 @@ export default function Home() {
                             />
                             <Track
                                 id={4}
-                                className="border-teal-400 shadow-[0px_0px_50px_#00bba755]"
+                                className="border-teal-400 shadow-[0px_0px_50px_#00bba733]"
                                 fileUrl="/other.wav"
                                 trackName="Guitar"
                                 waveColor="#00bba7"
@@ -299,7 +228,7 @@ export default function Home() {
                             />
                             <Track
                                 id={5}
-                                className="border-red-400 shadow-[0px_0px_50px_#fb2c3655]"
+                                className="border-red-400 shadow-[0px_0px_50px_#fb2c3633]"
                                 fileUrl="/vocals.wav"
                                 trackName="Vocal"
                                 waveColor="#fb2c36"
@@ -313,7 +242,7 @@ export default function Home() {
                             />
                             <Track
                                 id={6}
-                                className="border-yellow-400 shadow-[0px_0px_50px_#efb10055]"
+                                className="border-yellow-400 shadow-[0px_0px_50px_#efb10033]"
                                 fileUrl="/drums.wav"
                                 trackName="Drums"
                                 waveColor="#efb100"
@@ -419,7 +348,6 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
