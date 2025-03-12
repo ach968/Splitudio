@@ -1,5 +1,8 @@
-import WavesurferPlayer, { WavesurferProps } from '@wavesurfer/react'
-import { useState } from 'react';
+"use client"
+import WavesurferPlayer from '@wavesurfer/react';
+import RegionsPlugin, {RegionParams, RegionEvents} from 'wavesurfer.js/plugins/regions'
+
+import { useState, useRef, useEffect } from 'react';
 import { Slider } from './ui/slider';
 import { Button } from './ui/button';
 import { twMerge } from 'tailwind-merge';
@@ -25,6 +28,8 @@ interface TrackProps {
     setIsPlaying: (status: boolean) => void;
     updateVolume: (id: number, newVol: number) => void;
     setFocused: (id: number | null) => void;
+    setStart: (time: number) => void;
+    setEnd: (time: number) => void;
 }
 
 export default function Track({
@@ -39,8 +44,11 @@ export default function Track({
     onUniversalSeek, 
     setIsPlaying,
     updateVolume,
-    setFocused
+    setFocused,
+    setStart,
+    setEnd
 } : TrackProps) {
+    
     const onReady = (ws: any) => {
         ws.setVolume(volume);
         registerWaveSurfer(id, ws);
@@ -49,7 +57,8 @@ export default function Track({
     const onVolumeChange = (newVolume: number) => {
         updateVolume(id, newVolume)
     };
-  
+
+
     return (
     <div className={twMerge(className, (volume == 0 || focused && focused != id) && "filter brightness-50", "bg-black w-full border-2 p-2 lg:p-4 rounded-md lg:rounded-xl")}>
 
@@ -107,7 +116,7 @@ export default function Track({
     
             {/* Waveform Display */}
             <div className="flex-grow">
-                <WavesurferPlayer
+                <WavesurferPlayer  
                     height={70}
                     progressColor={waveColor}
                     waveColor="White"
@@ -115,6 +124,11 @@ export default function Track({
                     onFinish={()=>setIsPlaying(false)}
                     onReady={onReady}
                     onSeeking={(e: any)=> onUniversalSeek(e)}
+                    onRedrawcomplete={()=>console.log(`FINISHED LOADING ${id}`) } // TODO: SKELETON WHILE LOADING
+                    // onClick={(e: any)=>setStart(e)}
+                    onDragstart={(e: any)=>setStart(e)}
+                    onDragend={(e: any)=>setEnd(e)}
+                    dragToSeek={true}
                 />
             </div>
     

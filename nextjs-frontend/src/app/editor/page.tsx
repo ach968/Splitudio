@@ -1,6 +1,6 @@
 "use client";
 import Track from "@/components/track";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import PlaySVG from "@/assets/play"
 import ForwardSVG from "@/assets/forward"
@@ -9,6 +9,7 @@ import BackwardSVG from "@/assets/backward";
 import ListSVG from "@/assets/list"
 import MenuSVG from "@/assets/menu"
 import Link from "next/link";
+import { WaveformHighlight } from "@/components/waveformHighlight";
 import {
     Tooltip,
     TooltipContent,
@@ -26,15 +27,30 @@ interface TrackState {
 export default function Home() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [trackStates, setTrackStates] = useState<Record<number, TrackState>>({});
+    
     // Prevent feedback loop
     const [isSeeking, setIsSeeking] = useState(false);
     const [focused, setFocused] = useState<number| null>(null);
 
+    // This is all for highlighting a section
+    const [start, setStart] = useState(null);
+    const [end, setEnd] = useState(null);
+    const [waveformWidth, setWaveformWidth] = useState(0);
+    const [trackLength, setTrackLength] = useState(0);
+    const containerRef = useRef<HTMLDivElement>(null);
+
     const PROJECTNAME = "Untitled Project" // TODO HOOK UP TO BACKEND
     const FILENAME = "this_is_a_filler_file_name.mp3" // TODO HOOK UP TO BACKEND
 
+    // useEffect(() => {
+    //     if (containerRef.current) {
+    //         setWaveformWidth(containerRef.current.clientWidth);
+    //     }
+    // }, [containerRef]);
+    
     // Callback to register each track's wavesurfer instance
     const registerWaveSurfer = (id: number, ws: any) => {
+        setTrackLength(ws.getDuration())
         setTrackStates((prev: Record<number, TrackState>) => {
             return {
                 ...prev,
@@ -88,8 +104,20 @@ export default function Home() {
         Object.values(trackStates).forEach(({ ws }) => {
             if (ws) ws.setTime(newTime);
         });
-        setTimeout(() => setIsSeeking(false), 100);
+        setTimeout(() => setIsSeeking(false), 50);
     };
+
+    const onUniversalStart = (e:any) => {
+        console.log("START TIME " + e.media.currentTime)
+        setWaveformWidth(e.renderer.lastContainerWidth);
+        setStart(e.media.currentTime)
+    }
+    
+    const onUniversalEnd = (e:any) => {
+        console.log("END TIME " + e.media.currentTime)
+        setEnd(e.media.currentTime)
+        console.log("TRACKLENGTH " + trackLength)
+    }
 
     // Control play/pause for all tracks
     const onUniversalPlayPause = () => {
@@ -150,8 +178,6 @@ export default function Home() {
             <div className="flex flex-col justify-center w-full h-full">
                 
                 <EditorNav></EditorNav>
-                
-                
 
                 <div className="mt-20 mb-3 flex w-full justify-center">
                     <div className="container lg:px-5 px-3">
@@ -169,7 +195,8 @@ export default function Home() {
                 {/* TRACK CONTAINER THING -- IT RESIZES */}
                 <div className="flex w-full justify-center overflow-x-hidden">
                     <div className="container mx-3">
-                        <div className="flex flex-col gap-3 border border-neutral-700 rounded-lg lg:gap-6 lg:p-5 p-3">
+                        <div className="relative flex flex-col gap-3 border border-neutral-700 rounded-lg lg:gap-6 lg:p-5 p-3">
+                            
                             <Track
                                 id={1}
                                 className="border-red-400 shadow-[0px_0px_50px_#fb2c3633]"
@@ -183,6 +210,8 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
+                                setStart={onUniversalStart}
+                                setEnd={onUniversalEnd}
                             />
                             <Track
                                 id={2}
@@ -197,6 +226,8 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
+                                setStart={onUniversalStart}
+                                setEnd={onUniversalEnd}
                             />
                             <Track
                                 id={3}
@@ -211,6 +242,8 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
+                                setStart={onUniversalStart}
+                                setEnd={onUniversalEnd}
                             />
                             <Track
                                 id={4}
@@ -225,6 +258,8 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
+                                setStart={onUniversalStart}
+                                setEnd={onUniversalEnd}
                             />
                             <Track
                                 id={5}
@@ -239,6 +274,8 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
+                                setStart={onUniversalStart}
+                                setEnd={onUniversalEnd}
                             />
                             <Track
                                 id={6}
@@ -253,7 +290,16 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
+                                setStart={onUniversalStart}
+                                setEnd={onUniversalEnd}
                             />
+                           <WaveformHighlight
+                                start={start}
+                                end={end}
+                                trackLength={trackLength}
+                                waveformWidth={waveformWidth}
+                            />
+                            
                         </div>
                     </div>
                 </div>
