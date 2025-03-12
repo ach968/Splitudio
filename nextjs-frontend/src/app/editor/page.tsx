@@ -108,6 +108,12 @@ export default function Home() {
     };
 
     const onUniversalStart = (e:any) => {
+        console.log(e.media.currentTime)
+        setTimeout(()=> {
+            console.log(trackStates[1].ws.getCurrentTime())
+        }, 100)
+        
+        
         console.log("START TIME " + e.media.currentTime)
         setWaveformWidth(e.renderer.lastContainerWidth);
         setStart(e.media.currentTime)
@@ -116,6 +122,7 @@ export default function Home() {
     const onUniversalEnd = (e:any) => {
         console.log("END TIME " + e.media.currentTime)
         setEnd(e.media.currentTime)
+        
         console.log("TRACKLENGTH " + trackLength)
     }
 

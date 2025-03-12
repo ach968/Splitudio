@@ -123,10 +123,11 @@ export default function Track({
                     url={fileUrl}
                     onFinish={()=>setIsPlaying(false)}
                     onReady={onReady}
-                    onSeeking={(e: any)=> onUniversalSeek(e)}
+                    onSeeking={(e: any)=>{onUniversalSeek(e)}}
                     onRedrawcomplete={()=>console.log(`FINISHED LOADING ${id}`) } // TODO: SKELETON WHILE LOADING
-                    // onClick={(e: any)=>setStart(e)}
-                    onDragstart={(e: any)=>setStart(e)}
+                    // onClick={(e:any)=>{onUniversalSeek(e); setStart(e)}}
+                    onDrag={(e: any)=>setStart(e)}
+                    // onDragstart={(e: any)=>setStart(e)}
                     onDragend={(e: any)=>setEnd(e)}
                     dragToSeek={true}
                 />
