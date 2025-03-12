@@ -1,4 +1,5 @@
 "use client"
+
 import WavesurferPlayer from '@wavesurfer/react';
 import RegionsPlugin, {RegionParams, RegionEvents} from 'wavesurfer.js/plugins/regions'
 
@@ -28,8 +29,7 @@ interface TrackProps {
     setIsPlaying: (status: boolean) => void;
     updateVolume: (id: number, newVol: number) => void;
     setFocused: (id: number | null) => void;
-    setStart: (time: number) => void;
-    setEnd: (time: number) => void;
+
 }
 
 export default function Track({
@@ -44,9 +44,7 @@ export default function Track({
     onUniversalSeek, 
     setIsPlaying,
     updateVolume,
-    setFocused,
-    setStart,
-    setEnd
+    setFocused
 } : TrackProps) {
     
     const onReady = (ws: any) => {
@@ -125,10 +123,6 @@ export default function Track({
                     onReady={onReady}
                     onSeeking={(e: any)=>{onUniversalSeek(e)}}
                     onRedrawcomplete={()=>console.log(`FINISHED LOADING ${id}`) } // TODO: SKELETON WHILE LOADING
-                    // onClick={(e:any)=>{onUniversalSeek(e); setStart(e)}}
-                    onDrag={(e: any)=>setStart(e)}
-                    // onDragstart={(e: any)=>setStart(e)}
-                    onDragend={(e: any)=>setEnd(e)}
                     dragToSeek={true}
                 />
             </div>

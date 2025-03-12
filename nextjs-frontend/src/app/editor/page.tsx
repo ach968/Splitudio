@@ -1,6 +1,7 @@
 "use client";
+
 import Track from "@/components/track";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import PlaySVG from "@/assets/play"
 import ForwardSVG from "@/assets/forward"
@@ -29,15 +30,15 @@ export default function Home() {
     const [trackStates, setTrackStates] = useState<Record<number, TrackState>>({});
     
     // Prevent feedback loop
-    const [isSeeking, setIsSeeking] = useState(false);
-    const [focused, setFocused] = useState<number| null>(null);
+    const isSeekingRef = useRef(false);
+    const [focused, setFocused] = useState<number | null>(null);
 
     // This is all for highlighting a section
+    const [isSelecting, setIsSelecting] = useState(false);
     const [start, setStart] = useState(null);
     const [end, setEnd] = useState(null);
     const [waveformWidth, setWaveformWidth] = useState(0);
     const [trackLength, setTrackLength] = useState(0);
-    const containerRef = useRef<HTMLDivElement>(null);
 
     const PROJECTNAME = "Untitled Project" // TODO HOOK UP TO BACKEND
     const FILENAME = "this_is_a_filler_file_name.mp3" // TODO HOOK UP TO BACKEND
@@ -97,32 +98,31 @@ export default function Home() {
     }
 
     // Seeking with one wavesurfer seeks for all instances
-    const onUniversalSeek = (e: any) => {
-        if (isSeeking) return;
-        setIsSeeking(true);
+    const onUniversalSeek = useCallback((e: any) => {
+        if (isSeekingRef.current) return;
+        isSeekingRef.current = true;
+
         const newTime = e.media.currentTime;
         Object.values(trackStates).forEach(({ ws }) => {
             if (ws) ws.setTime(newTime);
         });
-        setTimeout(() => setIsSeeking(false), 50);
-    };
+
+        requestAnimationFrame(()=> {
+            isSeekingRef.current = false;
+        })
+    }, [trackStates]);
 
     const onUniversalStart = (e:any) => {
-        console.log(e.media.currentTime)
-        setTimeout(()=> {
-            console.log(trackStates[1].ws.getCurrentTime())
-        }, 100)
-        
-        
-        console.log("START TIME " + e.media.currentTime)
+        if(isSelecting == true) return
+        setIsSelecting(true)
         setWaveformWidth(e.renderer.lastContainerWidth);
-        setStart(e.media.currentTime)
+        setStart(e.media.currentTime);
     }
     
     const onUniversalEnd = (e:any) => {
-        console.log("END TIME " + e.media.currentTime)
+        setIsSelecting(false)
+        // console.log("END TIME " + e.media.currentTime)
         setEnd(e.media.currentTime)
-        
         console.log("TRACKLENGTH " + trackLength)
     }
 
@@ -217,8 +217,6 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
-                                setStart={onUniversalStart}
-                                setEnd={onUniversalEnd}
                             />
                             <Track
                                 id={2}
@@ -233,8 +231,6 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
-                                setStart={onUniversalStart}
-                                setEnd={onUniversalEnd}
                             />
                             <Track
                                 id={3}
@@ -249,8 +245,6 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
-                                setStart={onUniversalStart}
-                                setEnd={onUniversalEnd}
                             />
                             <Track
                                 id={4}
@@ -265,8 +259,6 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
-                                setStart={onUniversalStart}
-                                setEnd={onUniversalEnd}
                             />
                             <Track
                                 id={5}
@@ -281,8 +273,6 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
-                                setStart={onUniversalStart}
-                                setEnd={onUniversalEnd}
                             />
                             <Track
                                 id={6}
@@ -297,8 +287,6 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
-                                setStart={onUniversalStart}
-                                setEnd={onUniversalEnd}
                             />
                            <WaveformHighlight
                                 start={start}

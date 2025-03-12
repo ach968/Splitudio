@@ -26,7 +26,6 @@ export function WaveformHighlight({
     const width = ((normalizedEnd - normalizedStart) / trackLength) * waveformWidth
     return (
         <div 
-        // className={twMerge("absolute pointer-events-none bg-[rgba(255,255,0,0.3)] top-0, bottom-0")}
         style={{
             position: 'absolute',
             width: `${width}px`,
