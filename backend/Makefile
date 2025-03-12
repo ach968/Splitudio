@@ -1,0 +1,2 @@
+script:
+	python script.py
