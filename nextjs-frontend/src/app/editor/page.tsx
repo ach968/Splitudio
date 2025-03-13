@@ -28,28 +28,39 @@ interface TrackState {
 export default function Home() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [trackStates, setTrackStates] = useState<Record<number, TrackState>>({});
-    
+    const [currentTime, setCurrentTime] = useState(0);
+    const [selected, setSelected] = useState(false);
+
     // Prevent feedback loop
     const isSeekingRef = useRef(false);
     const [focused, setFocused] = useState<number | null>(null);
 
     // This is all for highlighting a section
+    const MINWIDTH = 5;
     const [isSelecting, setIsSelecting] = useState(false);
-    const [start, setStart] = useState(null);
-    const [end, setEnd] = useState(null);
+    const [start, setStart] = useState<number | null>(null);
+    const [end, setEnd] = useState<number | null>(null);
     const [waveformWidth, setWaveformWidth] = useState(0);
     const [trackLength, setTrackLength] = useState(0);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const wrapperRef = useRef<HTMLDivElement>(null);
+    const [waveformOffset, setWaveformOffset] = useState(0);
+    
+    // Highlighting using buttons
+    const [manualSelecting, setManualSelecting] = useState(false);
 
     const PROJECTNAME = "Untitled Project" // TODO HOOK UP TO BACKEND
     const FILENAME = "this_is_a_filler_file_name.mp3" // TODO HOOK UP TO BACKEND
 
-    // useEffect(() => {
-    //     if (containerRef.current) {
-    //         setWaveformWidth(containerRef.current.clientWidth);
-    //     }
-    // }, [containerRef]);
-    
-    // Callback to register each track's wavesurfer instance
+    useEffect(() => {
+        if (containerRef.current && wrapperRef.current) {
+          const containerRect = wrapperRef.current?.getBoundingClientRect();
+          const waveformRect = containerRef.current.getBoundingClientRect();
+          setWaveformOffset(waveformRect.left - containerRect.left);
+          setWaveformWidth(waveformRect.width);
+        }
+    }, [containerRef.current, wrapperRef.current, waveformWidth]);
+
     const registerWaveSurfer = (id: number, ws: any) => {
         setTrackLength(ws.getDuration())
         setTrackStates((prev: Record<number, TrackState>) => {
@@ -97,34 +108,120 @@ export default function Home() {
         setFocused(setId);
     }
 
-    // Seeking with one wavesurfer seeks for all instances
-    const onUniversalSeek = useCallback((e: any) => {
+    
+    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        if(manualSelecting || selected) return;
+        if (!containerRef.current) return;
+
+        // if you're wondering, chatgpt cooked up this shit
+        const rect = containerRef.current.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const timePerPixel = trackLength / rect.width; // seconds per pixel
+        
+        const computedTime = clickX * timePerPixel;
+        const clampedTime = Math.max(0, Math.min(computedTime, trackLength));
+
+        setStart(clampedTime);
+        setEnd(null);
+        setWaveformWidth(rect.width);
+        setIsSelecting(true);
+    };
+      
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if(manualSelecting || selected) return;
+        if (!isSelecting || !containerRef.current) return;
+
+        // if you're wondering, I cooked up this shit
+        const rect = containerRef.current.getBoundingClientRect();
+        const moveX = e.clientX - rect.left;
+        const timePerPixel = trackLength / rect.width;
+        const computedTime = moveX * timePerPixel;
+        const clampedTime = Math.max(0, Math.min(computedTime, trackLength));
+        setEnd(clampedTime);
+    };
+    
+    const handleMouseUp = () => {
+        if(manualSelecting || selected) return;
+        if (!isSelecting) return;
+        if(start) seekAll(start)
+        setIsSelecting(false);
+        
+        if(end && start && Math.abs(start-end) > MINWIDTH) {
+            setSelected(true)
+        }
+    };
+
+    const selectStart = () => {
+        setManualSelecting(true);
+        setSelected(false);
+        
+        // Pick an arbitrary track (they should be in sync) to get the current time
+        const ws = Object.values(trackStates).find(({ ws }) => ws)?.ws;
+        if (ws) {
+            setStart(ws.getCurrentTime());
+            setEnd(null)
+        }
+    };
+      
+    const selectEnd = () => {
+        if (!containerRef.current) return;
+        setManualSelecting(false);
+
+        const ws = Object.values(trackStates).find(({ ws }) => ws)?.ws;
+        if (ws) {
+            setEnd(ws.getCurrentTime());
+        }
+
+        const rect = containerRef.current.getBoundingClientRect();
+        setWaveformWidth(rect.width);
+
+        if(end != null && start && Math.abs(start-end) > MINWIDTH) {
+            setSelected(true)
+        }
+    };
+
+    const onTimeUpdate = (e: any) => {
+        var curr = e.media.currentTime
+        if(manualSelecting == true) {
+            setEnd(curr)
+        }
+
+        setCurrentTime(curr)
+        console.log(curr)
+        // const newTime = e.media.currentTime;
+        // if(start && end) {
+        //     if(end > start && newTime > end) seekAll(start)
+        //     if(start > end && newTime > start) seekAll(end)
+        // }
+    }
+
+    const handleRightClick = (e: any) => {
+        e.preventDefault();
+        setStart(null)
+        setEnd(null)
+        setSelected(false)
+    }
+
+
+    const seekAll = (time: number) => {
         if (isSeekingRef.current) return;
         isSeekingRef.current = true;
 
-        const newTime = e.media.currentTime;
         Object.values(trackStates).forEach(({ ws }) => {
-            if (ws) ws.setTime(newTime);
+            if (ws) ws.setTime(time);
         });
 
         requestAnimationFrame(()=> {
             isSeekingRef.current = false;
         })
-    }, [trackStates]);
+    }
 
-    const onUniversalStart = (e:any) => {
-        if(isSelecting == true) return
-        setIsSelecting(true)
-        setWaveformWidth(e.renderer.lastContainerWidth);
-        setStart(e.media.currentTime);
-    }
-    
-    const onUniversalEnd = (e:any) => {
-        setIsSelecting(false)
-        // console.log("END TIME " + e.media.currentTime)
-        setEnd(e.media.currentTime)
-        console.log("TRACKLENGTH " + trackLength)
-    }
+    // Seeking with one wavesurfer seeks for all instances
+    const onUniversalSeek = useCallback((e: any) => {
+        const newTime = e.media.currentTime;
+        seekAll(newTime)
+        
+    }, [trackStates]);
 
     // Control play/pause for all tracks
     const onUniversalPlayPause = () => {
@@ -169,7 +266,6 @@ export default function Home() {
             e.preventDefault();
             onUniversalSkipForward();
         }
-        
     };
 
     document.addEventListener("keydown", handleKeyDown);
@@ -201,8 +297,25 @@ export default function Home() {
 
                 {/* TRACK CONTAINER THING -- IT RESIZES */}
                 <div className="flex w-full justify-center overflow-x-hidden">
-                    <div className="container mx-3">
-                        <div className="relative flex flex-col gap-3 border border-neutral-700 rounded-lg lg:gap-6 lg:p-5 p-3">
+                    <div ref={wrapperRef} className="container mx-3">
+                        <div
+                        onContextMenuCapture={(e)=>{handleRightClick(e)}}
+                        onPointerDownCapture={handleMouseDown} 
+                        onPointerMoveCapture={handleMouseMove} 
+                        onPointerUpCapture={handleMouseUp} 
+                        onMouseLeave={handleMouseUp}
+                        
+                        className="relative flex flex-col gap-3 border border-neutral-700 rounded-lg lg:gap-6 lg:p-5 p-3">
+                            
+                            <WaveformHighlight
+                                containerRef={containerRef.current}
+                                start={start}
+                                end={end}
+                                trackLength={trackLength}
+                                waveformWidth={waveformWidth}
+                                waveformOffset={waveformOffset}
+                                minWidth={MINWIDTH}
+                            />
                             
                             <Track
                                 id={1}
@@ -217,6 +330,8 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
+                                waveformContainerRef={containerRef}
+                                onTimeUpdate={onTimeUpdate}
                             />
                             <Track
                                 id={2}
@@ -231,6 +346,7 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
+                                onTimeUpdate={onTimeUpdate}
                             />
                             <Track
                                 id={3}
@@ -245,6 +361,7 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
+                                onTimeUpdate={onTimeUpdate}
                             />
                             <Track
                                 id={4}
@@ -259,6 +376,7 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
+                                onTimeUpdate={onTimeUpdate}
                             />
                             <Track
                                 id={5}
@@ -273,6 +391,7 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
+                                onTimeUpdate={onTimeUpdate}
                             />
                             <Track
                                 id={6}
@@ -287,17 +406,18 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
+                                onTimeUpdate={onTimeUpdate}
                             />
-                           <WaveformHighlight
-                                start={start}
-                                end={end}
-                                trackLength={trackLength}
-                                waveformWidth={waveformWidth}
-                            />
-                            
+                           
                         </div>
                     </div>
                 </div>
+
+                <p className="text-white">
+                    {(currentTime/3600).toFixed(0).padStart(2, '0') != "00" && `${(currentTime/3600).toFixed(0).padStart(2, '0')}:`}
+                    {((currentTime % 3600) / 60).toFixed(0).padStart(2, '0')}: 
+                    {(currentTime % 60).toFixed(0).padStart(2, '0')}
+                </p>
 
                 {/* TOOLBAR */}
                 <div className=" flex w-full justify-center mb-5">
@@ -321,6 +441,24 @@ export default function Home() {
                                 </Tooltip>
                             </TooltipProvider>
                             
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Button 
+                                            size="icon" 
+                                            variant={manualSelecting ? "success" :"ghost"} 
+                                            className="w-7 h-7 group"
+                                            onClick={selectStart}
+                                        >
+                                            [
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Select Start</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger>
@@ -376,7 +514,24 @@ export default function Home() {
                                 </Tooltip>
                             </TooltipProvider>
 
-                            
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Button 
+                                            size="icon" 
+                                            variant={manualSelecting ? "success" :"ghost"} 
+                                            className="w-7 h-7 group"
+                                            onClick={selectEnd}
+                                        >
+                                            ]
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Select End</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+
                             <Button 
                                 size="icon" 
                                 variant="ghost" 

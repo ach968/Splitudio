@@ -1,14 +1,10 @@
-"use client"
-
 import WavesurferPlayer from '@wavesurfer/react';
-import RegionsPlugin, {RegionParams, RegionEvents} from 'wavesurfer.js/plugins/regions'
-
-import { useState, useRef, useEffect } from 'react';
 import { Slider } from './ui/slider';
 import { Button } from './ui/button';
 import { twMerge } from 'tailwind-merge';
 import SheetMusic from '@/assets/sheet-music'
 import MusicNote from '@/assets/music-note'
+import { useRef } from 'react';
 import {
     Tooltip,
     TooltipContent,
@@ -24,12 +20,13 @@ interface TrackProps {
     trackName: string;
     className: string;
     volume: number;
-    onUniversalSeek: (time: number) => void;
+    onUniversalSeek: (event: any) => void;
     registerWaveSurfer: (id: number, ws: any) => void;
     setIsPlaying: (status: boolean) => void;
     updateVolume: (id: number, newVol: number) => void;
     setFocused: (id: number | null) => void;
-
+    waveformContainerRef?: React.RefObject<HTMLDivElement | null>
+    onTimeUpdate: (event: any) => void;
 }
 
 export default function Track({
@@ -44,9 +41,12 @@ export default function Track({
     onUniversalSeek, 
     setIsPlaying,
     updateVolume,
-    setFocused
+    setFocused,
+    waveformContainerRef,
+    onTimeUpdate
 } : TrackProps) {
-    
+
+
     const onReady = (ws: any) => {
         ws.setVolume(volume);
         registerWaveSurfer(id, ws);
@@ -55,7 +55,6 @@ export default function Track({
     const onVolumeChange = (newVolume: number) => {
         updateVolume(id, newVolume)
     };
-
 
     return (
     <div className={twMerge(className, (volume == 0 || focused && focused != id) && "filter brightness-50", "bg-black w-full border-2 p-2 lg:p-4 rounded-md lg:rounded-xl")}>
@@ -113,7 +112,7 @@ export default function Track({
             </div>
     
             {/* Waveform Display */}
-            <div className="flex-grow">
+            <div ref={waveformContainerRef} className="flex-grow">
                 <WavesurferPlayer  
                     height={70}
                     progressColor={waveColor}
@@ -123,7 +122,7 @@ export default function Track({
                     onReady={onReady}
                     onSeeking={(e: any)=>{onUniversalSeek(e)}}
                     onRedrawcomplete={()=>console.log(`FINISHED LOADING ${id}`) } // TODO: SKELETON WHILE LOADING
-                    dragToSeek={true}
+                    onTimeupdate={(e: any)=>onTimeUpdate(e)}
                 />
             </div>
     
