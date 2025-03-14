@@ -49,6 +49,9 @@ export default function Home() {
     // Highlighting using buttons
     const [manualSelecting, setManualSelecting] = useState(false);
 
+    // Enable looping of highlighted section
+    const [looping, setLooping] = useState(false);
+
     const PROJECTNAME = "Untitled Project" // TODO HOOK UP TO BACKEND
     const FILENAME = "this_is_a_filler_file_name.mp3" // TODO HOOK UP TO BACKEND
 
@@ -108,7 +111,6 @@ export default function Home() {
         setFocused(setId);
     }
 
-    
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         if(manualSelecting || selected) return;
         if (!containerRef.current) return;
@@ -143,7 +145,17 @@ export default function Home() {
     const handleMouseUp = () => {
         if(manualSelecting || selected) return;
         if (!isSelecting) return;
-        if(start) seekAll(start)
+        if(start){
+            // requestAnimationFrame(()=> {
+            //     requestAnimationFrame(()=> {
+            //         seekAll(start)
+            //     })
+                
+            // })
+            setTimeout(()=> {
+                seekAll(start)
+            }, 50)
+        } 
         setIsSelecting(false);
         
         if(end && start && Math.abs(start-end) > MINWIDTH) {
@@ -168,14 +180,15 @@ export default function Home() {
         setManualSelecting(false);
 
         const ws = Object.values(trackStates).find(({ ws }) => ws)?.ws;
-        if (ws) {
-            setEnd(ws.getCurrentTime());
-        }
+            if (ws) {
+                setEnd(ws.getCurrentTime());
+            }
 
-        const rect = containerRef.current.getBoundingClientRect();
-        setWaveformWidth(rect.width);
+            const rect = containerRef.current.getBoundingClientRect();
+            setWaveformWidth(rect.width);
 
         if(end != null && start && Math.abs(start-end) > MINWIDTH) {
+            
             setSelected(true)
         }
     };
@@ -187,12 +200,16 @@ export default function Home() {
         }
 
         setCurrentTime(curr)
-        console.log(curr)
-        // const newTime = e.media.currentTime;
-        // if(start && end) {
-        //     if(end > start && newTime > end) seekAll(start)
-        //     if(start > end && newTime > start) seekAll(end)
-        // }
+
+        // TODO: implement looping toggle
+        if(looping) {
+            const newTime = e.media.currentTime;
+            if(start && end) {
+                if(end > start && newTime > end) seekAll(start)
+                if(start > end && newTime > start) seekAll(end)
+            }
+        }
+        
     }
 
     const handleRightClick = (e: any) => {
@@ -201,7 +218,6 @@ export default function Home() {
         setEnd(null)
         setSelected(false)
     }
-
 
     const seekAll = (time: number) => {
         if (isSeekingRef.current) return;
@@ -304,11 +320,10 @@ export default function Home() {
                         onPointerMoveCapture={handleMouseMove} 
                         onPointerUpCapture={handleMouseUp} 
                         onMouseLeave={handleMouseUp}
-                        
                         className="relative flex flex-col gap-3 border border-neutral-700 rounded-lg lg:gap-6 lg:p-5 p-3">
                             
                             <WaveformHighlight
-                                containerRef={containerRef.current}
+                                containerRef={containerRef.current} // reads container ref
                                 start={start}
                                 end={end}
                                 trackLength={trackLength}
@@ -330,7 +345,7 @@ export default function Home() {
                                 updateVolume={(updateTrackVolume)}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
-                                waveformContainerRef={containerRef}
+                                waveformContainerRef={containerRef} // Sets container ref on the waveform
                                 onTimeUpdate={onTimeUpdate}
                             />
                             <Track
@@ -446,7 +461,7 @@ export default function Home() {
                                     <TooltipTrigger>
                                         <Button 
                                             size="icon" 
-                                            variant={manualSelecting ? "success" :"ghost"} 
+                                            variant={manualSelecting ? "secondary" :"ghost"} 
                                             className="w-7 h-7 group"
                                             onClick={selectStart}
                                         >
@@ -519,7 +534,7 @@ export default function Home() {
                                     <TooltipTrigger>
                                         <Button 
                                             size="icon" 
-                                            variant={manualSelecting ? "success" :"ghost"} 
+                                            variant={manualSelecting ? "secondary" : "ghost"} 
                                             className="w-7 h-7 group"
                                             onClick={selectEnd}
                                         >
@@ -534,9 +549,9 @@ export default function Home() {
 
                             <Button 
                                 size="icon" 
-                                variant="ghost" 
+                                variant={looping ? "secondary" : "ghost"} 
                                 className="w-7 h-7 group"
-                                // TODO: On click 
+                                onClick={()=>setLooping((prev)=>!prev)}
                             >
                                 <ListSVG className="invert-0 group-hover:invert" />
                             </Button>

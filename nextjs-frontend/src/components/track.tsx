@@ -112,7 +112,7 @@ export default function Track({
             </div>
     
             {/* Waveform Display */}
-            <div ref={waveformContainerRef} className="flex-grow">
+            <div ref={waveformContainerRef} className="flex-grow select-none">
                 <WavesurferPlayer  
                     height={70}
                     progressColor={waveColor}
