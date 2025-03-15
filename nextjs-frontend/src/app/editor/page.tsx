@@ -7,8 +7,10 @@ import PlaySVG from "@/assets/play"
 import ForwardSVG from "@/assets/forward"
 import PauseSVG from "@/assets/pause"
 import BackwardSVG from "@/assets/backward";
-import ListSVG from "@/assets/list"
-import MenuSVG from "@/assets/menu"
+import BracketLeftSVG from "@/assets/bracket-left";
+import BracketRightSVG from "@/assets/bracket-right";
+import SettingsSVG from "@/assets/settings";
+import LoopSVG from "@/assets/loop";
 import Link from "next/link";
 import { WaveformHighlight } from "@/components/waveformHighlight";
 import {
@@ -33,6 +35,7 @@ export default function Home() {
 
     // Prevent feedback loop
     const isSeekingRef = useRef(false);
+    const lastSeekTimeRef = useRef<number | null>(null);
     const [focused, setFocused] = useState<number | null>(null);
 
     // This is all for highlighting a section
@@ -133,29 +136,25 @@ export default function Home() {
         if(manualSelecting || selected) return;
         if (!isSelecting || !containerRef.current) return;
 
+
         // if you're wondering, I cooked up this shit
         const rect = containerRef.current.getBoundingClientRect();
         const moveX = e.clientX - rect.left;
         const timePerPixel = trackLength / rect.width;
         const computedTime = moveX * timePerPixel;
-        const clampedTime = Math.max(0, Math.min(computedTime, trackLength));
-        setEnd(clampedTime);
+        if(computedTime > trackLength || Math.abs(start! - computedTime) < MINWIDTH) setEnd(null)
+        else setEnd(computedTime);
     };
     
     const handleMouseUp = () => {
         if(manualSelecting || selected) return;
         if (!isSelecting) return;
-        if(start){
-            // requestAnimationFrame(()=> {
-            //     requestAnimationFrame(()=> {
-            //         seekAll(start)
-            //     })
-                
-            // })
+        if(start && end){
             setTimeout(()=> {
-                seekAll(start)
+                seekAll(start, false)
             }, 50)
-        } 
+        }
+
         setIsSelecting(false);
         
         if(end && start && Math.abs(start-end) > MINWIDTH) {
@@ -166,7 +165,8 @@ export default function Home() {
     const selectStart = () => {
         setManualSelecting(true);
         setSelected(false);
-        
+        setLooping(false);
+
         // Pick an arbitrary track (they should be in sync) to get the current time
         const ws = Object.values(trackStates).find(({ ws }) => ws)?.ws;
         if (ws) {
@@ -177,18 +177,18 @@ export default function Home() {
       
     const selectEnd = () => {
         if (!containerRef.current) return;
-        setManualSelecting(false);
-
+        
+        var newEnd
         const ws = Object.values(trackStates).find(({ ws }) => ws)?.ws;
-            if (ws) {
-                setEnd(ws.getCurrentTime());
-            }
+        if (ws) {
+            newEnd = ws.getCurrentTime();
+        }
 
+        if(newEnd && start && Math.abs(start-newEnd) > MINWIDTH) {
+            setManualSelecting(false);
+            setEnd(ws.getCurrentTime());
             const rect = containerRef.current.getBoundingClientRect();
             setWaveformWidth(rect.width);
-
-        if(end != null && start && Math.abs(start-end) > MINWIDTH) {
-            
             setSelected(true)
         }
     };
@@ -201,12 +201,12 @@ export default function Home() {
 
         setCurrentTime(curr)
 
-        // TODO: implement looping toggle
-        if(looping) {
-            const newTime = e.media.currentTime;
-            if(start && end) {
-                if(end > start && newTime > end) seekAll(start)
-                if(start > end && newTime > start) seekAll(end)
+        if(looping && start !== null && end !== null) {
+            const loopStart = Math.min(start, end);
+            const loopEnd = Math.max(start, end);
+
+            if (curr >= loopEnd || curr < loopStart) {
+                seekAll(loopStart, true);
             }
         }
         
@@ -219,13 +219,17 @@ export default function Home() {
         setSelected(false)
     }
 
-    const seekAll = (time: number) => {
+    const seekAll = (time: number, important: boolean) => {
+        if (!important && lastSeekTimeRef.current !== null && Math.abs(time - lastSeekTimeRef.current) < 0.1) 
+            return;
+        lastSeekTimeRef.current = time;
+
         if (isSeekingRef.current) return;
         isSeekingRef.current = true;
 
         Object.values(trackStates).forEach(({ ws }) => {
             if (ws) ws.setTime(time);
-        });
+        }); 
 
         requestAnimationFrame(()=> {
             isSeekingRef.current = false;
@@ -235,7 +239,8 @@ export default function Home() {
     // Seeking with one wavesurfer seeks for all instances
     const onUniversalSeek = useCallback((e: any) => {
         const newTime = e.media.currentTime;
-        seekAll(newTime)
+
+        seekAll(newTime, false)
         
     }, [trackStates]);
 
@@ -267,6 +272,14 @@ export default function Home() {
         }
     };
     
+    const formatTime = (time: number): string => {
+        const hours = Math.floor(time / 3600);
+        const minutes = Math.floor((time % 3600) / 60);
+        const seconds = Math.floor(time % 60);
+        return `${hours > 0 ? hours.toString().padStart(2, '0') + ':' : ''}${
+          minutes.toString().padStart(2, '0')
+        }:${seconds.toString().padStart(2, '0')}`;
+    };
 
     useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -301,7 +314,7 @@ export default function Home() {
                 <div className="mt-20 mb-3 flex w-full justify-center">
                     <div className="container lg:px-5 px-3">
                         <div className=" flex gap-3 place-items-baseline">
-                            <p className="text-3xl lg:text-4xl font-semibold text-white truncate">
+                            <p className="text-3xl  lg:text-4xl font-semibold text-white truncate">
                                 {PROJECTNAME}
                             </p>
                             <p className="text-base text-neutral-400 truncate">
@@ -428,134 +441,151 @@ export default function Home() {
                     </div>
                 </div>
 
-                <p className="text-white">
-                    {(currentTime/3600).toFixed(0).padStart(2, '0') != "00" && `${(currentTime/3600).toFixed(0).padStart(2, '0')}:`}
-                    {((currentTime % 3600) / 60).toFixed(0).padStart(2, '0')}: 
-                    {(currentTime % 60).toFixed(0).padStart(2, '0')}
-                </p>
-
                 {/* TOOLBAR */}
                 <div className=" flex w-full justify-center mb-5">
                     <div className="container lg:px-5 px-3">
-                        <div className="border-b border-neutral-700 py-1 w-full min-h-7 flex justify-center gap-2">
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Button 
-                                            size="icon" 
-                                            variant="ghost" 
-                                            className="w-7 h-7 group"
-                                            // TODO: On click
-                                        >
-                                            <MenuSVG className="invert-0 group-hover:invert" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Icon</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
+                        <div className="relative border-b border-neutral-700 block py-1 min-h-7 w-full gap-2">
+
+                            <div className="absolute left-0 top-1/2 transform -translate-y-1/2 pl-4">
+                                <p className="text-white text-sm font-mono">
+                                    {formatTime(currentTime)} / {formatTime(trackLength)}
+                                </p>
+                            </div>
+
+                            <div className="flex justify-center gap-2">
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button 
+                                                size="icon" 
+                                                variant={looping ? "secondary" : "ghost"} 
+                                                className="w-7 h-7 group"
+                                                onClick={()=>
+                                                    setLooping((prev)=>!prev)
+                                                }
+                                            >
+                                                <LoopSVG className="invert-0 group-hover:invert"/>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>Enable Looping</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                                
+                                
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button 
+                                                size="icon" 
+                                                variant={manualSelecting ? "secondary" :"ghost"} 
+                                                className="w-7 h-7 group"
+                                                onClick={selectStart}
+                                            >
+                                                <BracketLeftSVG className="invert-0 group-hover:invert" />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>Select Start</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button 
+                                                size="icon" 
+                                                variant="ghost" 
+                                                className="w-7 h-7 group"
+                                                onClick={onUniversalSkipBackward}
+                                            >
+                                                <BackwardSVG className="invert-0 group-hover:invert"/>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>Seek Forward (Left Arrow)</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button 
+                                                size="icon" 
+                                                variant="ghost" 
+                                                className="w-7 h-7 group"
+                                                onClick={onUniversalPlayPause}
+                                            >
+                                                {isPlaying===true ? <PauseSVG className="invert-0 group-hover:invert" /> 
+                                                : <PlaySVG className="invert-0 group-hover:invert"/>}
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>Play/Pause (Space)</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button 
+                                                size="icon" 
+                                                variant="ghost" 
+                                                className="w-7 h-7 group"
+                                                onClick={onUniversalSkipForward}
+                                            >
+                                                <ForwardSVG className="invert-0 group-hover:invert" />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>Seek Forward (Right Arrow)</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button 
+                                                size="icon" 
+                                                variant={manualSelecting ? "secondary" : "ghost"} 
+                                                className="w-7 h-7 group"
+                                                onClick={selectEnd}
+                                            >
+                                                <BracketRightSVG className="invert-0 group-hover:invert" />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>Select End</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                                
+                                
+                                
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Button 
+                                                size="icon" 
+                                                variant="ghost" 
+                                                className="w-7 h-7 group"
+                                                // TODO: On click
+                                            >
+                                                <SettingsSVG className="invert-0 group-hover:invert" />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>Settings</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
                             
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Button 
-                                            size="icon" 
-                                            variant={manualSelecting ? "secondary" :"ghost"} 
-                                            className="w-7 h-7 group"
-                                            onClick={selectStart}
-                                        >
-                                            [
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Select Start</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Button 
-                                            size="icon" 
-                                            variant="ghost" 
-                                            className="w-7 h-7 group"
-                                            onClick={onUniversalSkipBackward}
-                                        >
-                                            <BackwardSVG className="invert-0 group-hover:invert"/>
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Seek Forward (Left Arrow)</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Button 
-                                            size="icon" 
-                                            variant="ghost" 
-                                            className="w-7 h-7 group"
-                                            onClick={onUniversalPlayPause}
-                                        >
-                                            {isPlaying===true ? <PauseSVG className="invert-0 group-hover:invert" /> 
-                                            : <PlaySVG className="invert-0 group-hover:invert"/>}
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Play/Pause (Space)</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Button 
-                                            size="icon" 
-                                            variant="ghost" 
-                                            className="w-7 h-7 group"
-                                            onClick={onUniversalSkipForward}
-                                        >
-                                            <ForwardSVG className="invert-0 group-hover:invert" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Seek Forward (Right Arrow)</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Button 
-                                            size="icon" 
-                                            variant={manualSelecting ? "secondary" : "ghost"} 
-                                            className="w-7 h-7 group"
-                                            onClick={selectEnd}
-                                        >
-                                            ]
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Select End</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-
-                            <Button 
-                                size="icon" 
-                                variant={looping ? "secondary" : "ghost"} 
-                                className="w-7 h-7 group"
-                                onClick={()=>setLooping((prev)=>!prev)}
-                            >
-                                <ListSVG className="invert-0 group-hover:invert" />
-                            </Button>
-
                         </div>
                     </div>
                 </div>
