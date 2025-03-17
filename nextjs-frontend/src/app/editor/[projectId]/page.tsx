@@ -462,7 +462,7 @@ export default function Editor() {
                                         <TooltipTrigger>
                                             <Button 
                                                 size="icon" 
-                                                variant={looping ? "secondary" : "ghost"} 
+                                                variant={looping ? "secondaryIcon" : "ghost"} 
                                                 className="w-7 h-7 group"
                                                 onClick={()=>
                                                     setLooping((prev)=>!prev)
@@ -483,7 +483,7 @@ export default function Editor() {
                                         <TooltipTrigger>
                                             <Button 
                                                 size="icon" 
-                                                variant={manualSelecting ? "secondary" :"ghost"} 
+                                                variant={manualSelecting ? "secondaryIcon" :"ghost"} 
                                                 className="w-7 h-7 group"
                                                 onClick={selectStart}
                                             >
@@ -556,7 +556,7 @@ export default function Editor() {
                                         <TooltipTrigger>
                                             <Button 
                                                 size="icon" 
-                                                variant={manualSelecting ? "secondary" : "ghost"} 
+                                                variant={manualSelecting ? "secondaryIcon" : "ghost"} 
                                                 className="w-7 h-7 group"
                                                 onClick={selectEnd}
                                             >

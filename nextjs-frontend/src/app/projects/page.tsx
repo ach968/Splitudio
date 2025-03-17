@@ -111,7 +111,7 @@ export default function Projects() {
                             <div className="w-full flex justify-end pb-3">
                                 <span className="relative w-[300px] flex flex-row items-center">
                                     <SearchSVG className="h-5 w-5 absolute left-2"></SearchSVG>
-                                    <Input className="pl-9"
+                                    <Input className="pl-9 border-neutral-500 text-white"
                                     placeholder="Search..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -134,7 +134,7 @@ export default function Projects() {
                                                     setAlphabeticalDown((prev) =>
                                                     prev === null ? true : !prev
                                                 );}}
-                                                className="flex flex-row gap-3 items-center select-none">
+                                                className="flex flex-row gap-2 items-center select-none">
                                                     <p className="text-white">Name</p>
                                                     <PlaySVG
                                                     className={twMerge("w-3 h-3 transition-all opacity-50",
@@ -152,7 +152,7 @@ export default function Projects() {
                                                     prev === null ? true : !prev
                                                     );
                                                 }}
-                                                className="flex flex-row gap-3 items-center select-none">
+                                                className="flex flex-row gap-2 items-center select-none">
                                                     <p className="text-white">Last Modified</p>
                                                     <PlaySVG
                                                     className={twMerge("w-3 h-3 transition-all opacity-50", 
@@ -170,18 +170,20 @@ export default function Projects() {
                                 </TableHeader>
                                 <TableBody>
                                     {sortedProjects.map((project) => (
-                                    <TableRow key={project.id} className="hover:bg-muted/30">
+                                    <TableRow key={project.id} className="hover:bg-white/15">
                                         <Link className="flex justify-between pt-3 pb-3" href={`/editor/${project.id}`} >
                                             <TableCell>
                                                 <span className="flex gap-3 items-baseline">
-                                                    <p>{project.title}</p>
-                                                    <p className="text-neutral-400 text-sm">
+                                                    <p className="line-clamp-1">{project.title}</p>
+                                                    <p className="text-neutral-400 text-sm line-clamp-1">
                                                         / {project.file}
                                                     </p>
                                                 </span>
                                             </TableCell>
                                             <TableCell>
-                                                <p className="text-neutral-400">{new Date(project.lastModified).toDateString()}</p>
+                                                <p className="text-neutral-400 text-sm line-clamp-1">
+                                                    {new Date(project.lastModified).toDateString()}
+                                                </p>
                                             </TableCell>
                                         </Link>
                                     </TableRow>

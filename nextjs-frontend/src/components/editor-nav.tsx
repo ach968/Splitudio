@@ -73,7 +73,9 @@ export default function EditorNav({projectId, projectName} : {projectId?: string
                 <NavigationMenuList>
                     <NavigationMenuItem>
                         <Link href="/profile" legacyBehavior passHref>
-                            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                            <NavigationMenuLink 
+                            className={twMerge(navigationMenuTriggerStyle(), 
+                            pathname.startsWith("/profile") && "bg-white text-black hover:bg-white/80")}>
                                 Profile
                             </NavigationMenuLink>
                         </Link>
