@@ -43,7 +43,7 @@ export default function EditorNav() {
                             <p className={twMerge(pathname==="/export" && "text-white", "hover:cursor-pointer hover:underline")}>Share</p>
                         </DialogTrigger>
                         <DialogContent>
-                            <DialogHeader>
+                            <DialogHeader className="border rounded-md">
                                 <DialogTitle>Share "Unittled Project"</DialogTitle>
                                 <DialogDescription className="pb-7">
                                     When sharing is enabled, anyone with the project link will be able to view your project
