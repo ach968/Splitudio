@@ -123,6 +123,7 @@ export default function Track({
                     onSeeking={(e: any)=>{onUniversalSeek(e)}}
                     onRedrawcomplete={()=>console.log(`FINISHED LOADING ${id}`) } // TODO: SKELETON WHILE LOADING
                     onTimeupdate={(e: any)=>onTimeUpdate(e)}
+                    
                 />
             </div>
     

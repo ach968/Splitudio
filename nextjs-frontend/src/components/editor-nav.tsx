@@ -24,52 +24,58 @@ import { Switch } from "@/components/ui/switch"
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { usePathname } from 'next/navigation'
+import { useState } from "react"
 
-export default function EditorNav() {
+export default function EditorNav({projectId, projectName} : {projectId?: string, projectName?: string}) {
     const pathname = usePathname()
+    console.log(pathname)
+    const [isSharing, setIsSharing] = useState(false);
 
-    return <nav className="justify-center flex">
-        <div className="flex flex-row w-full container items-baseline justify-between px-6 fixed top-0 mt-8">
+    return <nav className="bg-black/50 backdrop-blur-md h-[100px] z-20 justify-center w-full flex fixed top-0">
+        <div className="flex flex-row w-full container items-baseline justify-between px-6 mt-8">
             <div className="flex gap-5 text-neutral-400 underline-offset-4">
                 <Link href="/projects">
                     <p className={twMerge(pathname==="/projects" && "text-white", "hover:cursor-pointer hover:underline")}>Projects</p>
                 </Link>
                 <Link href="/editor">
-                    <p className={twMerge(pathname==="/editor" && "text-white", "hover:cursor-pointer hover:underline")}>Editor</p>
+                    <p className={twMerge(pathname.startsWith("/editor") && "text-white", "hover:cursor-pointer hover:underline")}>Editor</p>
                 </Link>
-                <Link href="#">
-                    <Dialog>
-                        <DialogTrigger>
-                            <p className={twMerge(pathname==="/export" && "text-white", "hover:cursor-pointer hover:underline")}>Share</p>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader className="border rounded-md">
-                                <DialogTitle>Share "Unittled Project"</DialogTitle>
-                                <DialogDescription className="pb-7">
-                                    When sharing is enabled, anyone with the project link will be able to view your project
-                                </DialogDescription>
-                                <div className="flex gap-3 items-center">
-                                    <Switch />
-                                    Enable Sharing
-                                </div>
-                                <div className="pt-2">
-                                    <Button variant="default">
-                                        Copy Link
-                                    </Button>
-                                </div>
-                            </DialogHeader>
-                            
-                        </DialogContent>
-                    </Dialog>
-                    
-                </Link>
+                {
+                    projectId && projectId != "" && projectName &&
+                    <Link href="#">
+                        <Dialog onOpenChange={(open)=>setIsSharing(open)}>
+                            <DialogTrigger>
+                                <p className={twMerge(isSharing && "text-white", "hover:cursor-pointer hover:underline")}>Share</p>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Share "{projectName}"</DialogTitle>
+                                    <DialogDescription className="pb-7">
+                                        When sharing is enabled, anyone with the project link will be able to view your project
+                                    </DialogDescription>
+                                    <div className="flex gap-3 items-center">
+                                        <Switch />
+                                        Enable Sharing
+                                    </div>
+                                    <div className="pt-2">
+                                        <Button variant="default">
+                                            Copy Link
+                                        </Button>
+                                    </div>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
+                    </Link>
+                } 
                 
             </div>
             <NavigationMenu>
                 <NavigationMenuList>
                     <NavigationMenuItem>
                         <Link href="/profile" legacyBehavior passHref>
-                            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                            <NavigationMenuLink 
+                            className={twMerge(navigationMenuTriggerStyle(), 
+                            pathname.startsWith("/profile") && "bg-white text-black hover:bg-white/80")}>
                                 Profile
                             </NavigationMenuLink>
                         </Link>
@@ -84,6 +90,5 @@ export default function EditorNav() {
                 </NavigationMenuList>
             </NavigationMenu>
         </div>
-        
     </nav>
 }

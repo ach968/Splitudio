@@ -70,3 +70,18 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .premium-gradient {
+    background: linear-gradient(to right, #DD7DDF, #E1CD86, #BBCB92, #71C2EF, #3BFFFF, #DD7DDF)
+  }
+  .premium-background {
+
+    text-shadow: 
+      0 0 10px #F87BFF33,
+      0 0 15px #FB92CF44,
+      0 0 20px #FFDD9B55,
+      0 0 25px #C2F0B166,
+      0 0 30px #2FD8FE77;
+  }
+}
