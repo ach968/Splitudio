@@ -16,13 +16,21 @@ import SearchSVG from "@/assets/search"
 import PlaySVG from "@/assets/play"
 import { useState } from "react";
 import { twMerge } from "tailwind-merge"
+import Footer from "@/components/footer"
+import {
+    ContextMenu,
+    ContextMenuContent,
+    ContextMenuItem,
+    ContextMenuTrigger,
+} from "@/components/ui/context-menu"
 
+  
 export default function Projects() {
 
     const projects = [
         {
             id: "projectID1",
-            title: "Untitled Project Alpha",
+            title: "Alpha Audio",
             file: "alpha.mp3",
             lastModified: "01/15/24",
           },
@@ -67,6 +75,12 @@ export default function Projects() {
             title: "Theta Tunes",
             file: "theta.mp3",
             lastModified: "02/08/24",
+          },
+          {
+            id: "projectID9",
+            title: "Untitled Project",
+            file: "untitled.mp3",
+            lastModified: "02/01/24",
           }
     ]
 
@@ -103,9 +117,11 @@ export default function Projects() {
       }
 
     return <section>
-            <div className="w-screen flex min-h-screen bg-black">
-                <div className="flex flex-col w-full h-full">
-                    <EditorNav />
+            <EditorNav />
+
+            <div className="flex flex-col w-full min-h-screen bg-black">
+                <div className="flex flex-col h-full">
+                    
                     <div className="flex justify-center w-full mt-28">
                         <div className="container lg:px-5 px-3">
                             <div className="w-full flex justify-end pb-3">
@@ -170,23 +186,34 @@ export default function Projects() {
                                 </TableHeader>
                                 <TableBody>
                                     {sortedProjects.map((project) => (
-                                    <TableRow key={project.id} className="hover:bg-white/15">
-                                        <Link className="flex justify-between pt-3 pb-3" href={`/editor/${project.id}`} >
-                                            <TableCell>
-                                                <span className="flex gap-3 items-baseline">
-                                                    <p className="line-clamp-1">{project.title}</p>
-                                                    <p className="text-neutral-400 text-sm line-clamp-1">
-                                                        / {project.file}
-                                                    </p>
-                                                </span>
-                                            </TableCell>
-                                            <TableCell>
-                                                <p className="text-neutral-400 text-sm line-clamp-1">
-                                                    {new Date(project.lastModified).toDateString()}
-                                                </p>
-                                            </TableCell>
-                                        </Link>
-                                    </TableRow>
+                                        <TableRow key={project.id} className="hover:bg-white/15">
+                                            <ContextMenu>
+                                                <ContextMenuTrigger>
+                                                
+                                                    <Link className="flex justify-between pt-3 pb-3" href={`/editor/${project.id}`} >
+                                                        <TableCell>
+                                                            <span className="flex gap-3 items-baseline">
+                                                                <p className="line-clamp-1">{project.title}</p>
+                                                                <p className="text-neutral-400 text-sm line-clamp-1">
+                                                                    / {project.file}
+                                                                </p>
+                                                            </span>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <p className="text-neutral-400 text-sm line-clamp-1">
+                                                                {new Date(project.lastModified).toDateString()}
+                                                            </p>
+                                                        </TableCell>
+                                                    </Link>
+                                                
+                                                </ContextMenuTrigger>
+                                                <ContextMenuContent>
+                                                    <ContextMenuItem>Rename</ContextMenuItem>
+                                                    <ContextMenuItem>Delete</ContextMenuItem>
+                                                    <ContextMenuItem>Share</ContextMenuItem>
+                                                </ContextMenuContent>
+                                            </ContextMenu>
+                                        </TableRow>
                                     ))}
                                 </TableBody>
                             </Table>
@@ -194,5 +221,6 @@ export default function Projects() {
                     </div>
                 </div>
             </div>
+            <Footer></Footer>
         </section>
 }

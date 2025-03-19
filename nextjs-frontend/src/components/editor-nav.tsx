@@ -31,7 +31,7 @@ export default function EditorNav({projectId, projectName} : {projectId?: string
     console.log(pathname)
     const [isSharing, setIsSharing] = useState(false);
 
-    return <nav className="bg-black/50 backdrop-blur-md h-[100px] z-20 justify-center w-full flex fixed top-0">
+    return <nav className="bg-black/50 backdrop-blur-md h-[100px] z-20 justify-center w-screen flex fixed top-0">
         <div className="flex flex-row w-full container items-baseline justify-between px-6 mt-8">
             <div className="flex gap-5 text-neutral-400 underline-offset-4">
                 <Link href="/projects">
