@@ -70,7 +70,7 @@ export default function ProjectsLoading() {
                                         <TableRow key={idx} className="hover:bg-white/15">
                                             <TableCell
                                                 key={idx}
-                                                className="flex items-center space-x-6 p-6 bg-black animate-pulse"
+                                                className="flex items-center gap-8 p-6 bg-black animate-pulse"
                                             >
                                                 <div className="flex-1 h-4 bg-neutral-500 rounded" />
                                                 <div className="w-40 h-4 bg-neutral-500 rounded" />
