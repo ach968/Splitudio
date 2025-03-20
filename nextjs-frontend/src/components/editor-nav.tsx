@@ -11,6 +11,7 @@ import {
     NavigationMenuViewport,
     navigationMenuTriggerStyle 
 } from "@/components/ui/navigation-menu"
+import Share from "@/components/share-dialog-header"
 import {
     Dialog,
     DialogContent,
@@ -26,18 +27,17 @@ import { twMerge } from "tailwind-merge";
 import { usePathname } from 'next/navigation'
 import { useState } from "react"
 
-export default function EditorNav({projectId, projectName, playpauseCallback} : {projectId?: string, projectName?: string, playpauseCallback?: ()=>void}) {
+export default function EditorNav({projectId, projectName, pauseCallback} : {projectId?: string, projectName?: string, pauseCallback?: ()=>void}) {
     const pathname = usePathname()
-    console.log(pathname)
     const [isSharing, setIsSharing] = useState(false);
 
     return <nav className="bg-black/50 backdrop-blur-md h-[100px] z-20 justify-center w-screen flex fixed top-0">
         <div className="flex flex-row w-full container items-baseline justify-between px-6 mt-8">
             <div className="flex gap-5 text-neutral-400 underline-offset-4">
-                <Link onClick={playpauseCallback} href="/projects">
+                <Link onClick={pauseCallback} href="/projects">
                     <p className={twMerge(pathname==="/projects" && "text-white", "hover:cursor-pointer hover:underline")}>Projects</p>
                 </Link>
-                <Link onClick={playpauseCallback} href="/editor">
+                <Link onClick={pauseCallback} href="/editor">
                     <p className={twMerge(pathname.startsWith("/editor") && "text-white", "hover:cursor-pointer hover:underline")}>Editor</p>
                 </Link>
                 {
@@ -48,21 +48,7 @@ export default function EditorNav({projectId, projectName, playpauseCallback} : 
                                 <p className={twMerge(isSharing && "text-white", "hover:cursor-pointer hover:underline")}>Share</p>
                             </DialogTrigger>
                             <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Share "{projectName}"</DialogTitle>
-                                    <DialogDescription className="pb-7">
-                                        When sharing is enabled, anyone with the project link will be able to view your project
-                                    </DialogDescription>
-                                    <div className="flex gap-3 items-center">
-                                        <Switch />
-                                        Enable Sharing
-                                    </div>
-                                    <div className="pt-2">
-                                        <Button variant="default">
-                                            Copy Link
-                                        </Button>
-                                    </div>
-                                </DialogHeader>
+                                <Share projectId={projectId} projectName={projectName}/>
                             </DialogContent>
                         </Dialog>
                     </Link>
@@ -73,7 +59,7 @@ export default function EditorNav({projectId, projectName, playpauseCallback} : 
                 <NavigationMenuList>
                     <NavigationMenuItem>
                         <Link href="/profile" legacyBehavior passHref>
-                            <NavigationMenuLink onClick={playpauseCallback}
+                            <NavigationMenuLink onClick={pauseCallback}
                             className={twMerge(navigationMenuTriggerStyle(), 
                             pathname.startsWith("/profile") && "bg-white text-black hover:bg-white/80")}>
                                 Profile
@@ -82,7 +68,7 @@ export default function EditorNav({projectId, projectName, playpauseCallback} : 
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                         <Link href="/logout" legacyBehavior passHref>
-                            <NavigationMenuLink onClick={playpauseCallback}
+                            <NavigationMenuLink onClick={pauseCallback}
                             className={navigationMenuTriggerStyle()}>
                                 Logout
                             </NavigationMenuLink>

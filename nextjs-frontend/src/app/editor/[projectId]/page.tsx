@@ -39,7 +39,7 @@ export default function Editor() {
     const [focused, setFocused] = useState<number | null>(null);
 
     // This is all for highlighting a section
-    const MINWIDTH = 5;
+    const MINWIDTH = 2;
     const [isSelecting, setIsSelecting] = useState(false);
     const [start, setStart] = useState<number | null>(null);
     const [end, setEnd] = useState<number | null>(null);
@@ -254,6 +254,14 @@ export default function Editor() {
         setIsPlaying((prev) => !prev);
     };
 
+    // When clicking a link, we need to pause before the DOM lets us redirect
+    const onUniversalPause = () => {
+        Object.values(trackStates).forEach(({ ws }) => {
+            if (ws) ws.pause();
+        });
+        setIsPlaying(false);
+    };
+
     const onUniversalSkipForward = () => {
         const anyWs = Object.values(trackStates).find(({ ws }) => ws)?.ws;
         if (anyWs) {
@@ -311,7 +319,7 @@ export default function Editor() {
         <div className="w-screen flex h-screen bg-black">
             <div className="flex flex-col justify-start w-full h-full">
                 
-                <EditorNav playpauseCallback={onUniversalPlayPause} projectName={PROJECTNAME} projectId={projectId}></EditorNav>
+                <EditorNav pauseCallback={onUniversalPause} projectName={PROJECTNAME} projectId={projectId}></EditorNav>
 
                 <div className="mt-28 mb-3 flex w-full justify-center">
                     <div className="container lg:px-5 px-3">

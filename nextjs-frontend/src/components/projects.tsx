@@ -23,6 +23,8 @@ import {
     ContextMenuItem,
     ContextMenuTrigger,
 } from "@/components/ui/context-menu"
+import Share from "./share-dialog-header"
+import { Dialog, DialogClose, DialogContent, DialogTrigger } from "./ui/dialog"
 
 interface Project {
     id: string;
@@ -226,13 +228,35 @@ export default function Projects({ initialProjects }: { initialProjects: Project
                                                     }
                                                 </ContextMenuTrigger>
                                                 <ContextMenuContent>
-                                                    <ContextMenuItem 
+                                                    <ContextMenuItem
                                                     onClick={()=>{
                                                         setRenaming(project.id);
                                                         setNewName(project.title);
-                                                    }}>Rename</ContextMenuItem>
-                                                    <ContextMenuItem>Delete</ContextMenuItem>
-                                                    <ContextMenuItem>Share</ContextMenuItem>
+                                                    }}>
+                                                        <p className="flex w-full h-full hover:cursor-pointer">
+                                                            Rename
+                                                        </p>
+                                                    </ContextMenuItem>
+                                                    
+                                                    <Dialog>
+                                                        <ContextMenuItem>
+                                                            <DialogTrigger className="w-full h-full text-start"
+                                                            onClick={(e) => e.stopPropagation()}>
+                                                                <p className="w-full h-full hover:cursor-pointer text-black">
+                                                                    Share
+                                                                </p>
+                                                            </DialogTrigger>
+                                                        </ContextMenuItem>
+                                                        <DialogContent>
+                                                            <Share projectId={project.id} projectName={project.title} />
+                                                        </DialogContent>
+                                                    </Dialog>
+                                                    
+                                                    <ContextMenuItem>
+                                                        <p className="flex w-full h-full hover:cursor-pointer">
+                                                            Delete
+                                                        </p>
+                                                    </ContextMenuItem>
                                                 </ContextMenuContent>
                                             </ContextMenu>
                                         </TableRow>
