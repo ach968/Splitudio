@@ -26,7 +26,7 @@ import { twMerge } from "tailwind-merge";
 import { usePathname } from 'next/navigation'
 import { useState } from "react"
 
-export default function EditorNav({projectId, projectName} : {projectId?: string, projectName?: string}) {
+export default function EditorNav({projectId, projectName, playpauseCallback} : {projectId?: string, projectName?: string, playpauseCallback?: ()=>void}) {
     const pathname = usePathname()
     console.log(pathname)
     const [isSharing, setIsSharing] = useState(false);
@@ -34,10 +34,10 @@ export default function EditorNav({projectId, projectName} : {projectId?: string
     return <nav className="bg-black/50 backdrop-blur-md h-[100px] z-20 justify-center w-screen flex fixed top-0">
         <div className="flex flex-row w-full container items-baseline justify-between px-6 mt-8">
             <div className="flex gap-5 text-neutral-400 underline-offset-4">
-                <Link href="/projects">
+                <Link onClick={playpauseCallback} href="/projects">
                     <p className={twMerge(pathname==="/projects" && "text-white", "hover:cursor-pointer hover:underline")}>Projects</p>
                 </Link>
-                <Link href="/editor">
+                <Link onClick={playpauseCallback} href="/editor">
                     <p className={twMerge(pathname.startsWith("/editor") && "text-white", "hover:cursor-pointer hover:underline")}>Editor</p>
                 </Link>
                 {
@@ -73,7 +73,7 @@ export default function EditorNav({projectId, projectName} : {projectId?: string
                 <NavigationMenuList>
                     <NavigationMenuItem>
                         <Link href="/profile" legacyBehavior passHref>
-                            <NavigationMenuLink 
+                            <NavigationMenuLink onClick={playpauseCallback}
                             className={twMerge(navigationMenuTriggerStyle(), 
                             pathname.startsWith("/profile") && "bg-white text-black hover:bg-white/80")}>
                                 Profile
@@ -82,7 +82,8 @@ export default function EditorNav({projectId, projectName} : {projectId?: string
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                         <Link href="/logout" legacyBehavior passHref>
-                            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                            <NavigationMenuLink onClick={playpauseCallback}
+                            className={navigationMenuTriggerStyle()}>
                                 Logout
                             </NavigationMenuLink>
                         </Link>

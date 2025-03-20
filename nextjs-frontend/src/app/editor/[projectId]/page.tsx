@@ -11,7 +11,6 @@ import BracketLeftSVG from "@/assets/bracket-left";
 import BracketRightSVG from "@/assets/bracket-right";
 import SettingsSVG from "@/assets/settings";
 import LoopSVG from "@/assets/loop";
-import Link from "next/link";
 import { WaveformHighlight } from "@/components/waveformHighlight";
 import {
     Tooltip,
@@ -59,8 +58,6 @@ export default function Editor() {
     const { projectId } = useParams<{projectId: string}>(); // THIS IS PASSED INTO PATH BY PARENT EDITOR PAGE OR PROJECTS PAGE
     const PROJECTNAME = "Untitled Project" // TODO HOOK UP TO BACKEND
     const FILENAME = "this_is_a_filler_file_name.mp3" // TODO HOOK UP TO BACKEND
-    
-    console.log(projectId)
 
     useEffect(() => {
         if (containerRef.current && wrapperRef.current) {
@@ -216,6 +213,7 @@ export default function Editor() {
         
     }
 
+    // Deselect if there is a selected section
     const handleRightClick = (e: any) => {
         e.preventDefault();
         setStart(null)
@@ -313,7 +311,7 @@ export default function Editor() {
         <div className="w-screen flex h-screen bg-black">
             <div className="flex flex-col justify-start w-full h-full">
                 
-                <EditorNav projectName={PROJECTNAME} projectId={projectId}></EditorNav>
+                <EditorNav playpauseCallback={onUniversalPlayPause} projectName={PROJECTNAME} projectId={projectId}></EditorNav>
 
                 <div className="mt-28 mb-3 flex w-full justify-center">
                     <div className="container lg:px-5 px-3">
@@ -348,6 +346,7 @@ export default function Editor() {
                                 waveformOffset={waveformOffset}
                                 minWidth={MINWIDTH}
                             />
+                            
                             
                             <Track
                                 id={1}
@@ -568,8 +567,6 @@ export default function Editor() {
                                         </TooltipContent>
                                     </Tooltip>
                                 </TooltipProvider>
-                                
-                                
                                 
                                 <TooltipProvider>
                                     <Tooltip>

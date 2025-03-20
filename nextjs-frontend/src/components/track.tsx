@@ -1,10 +1,14 @@
+"use client"
+
 import WavesurferPlayer from '@wavesurfer/react';
 import { Slider } from './ui/slider';
 import { Button } from './ui/button';
 import { twMerge } from 'tailwind-merge';
 import SheetMusic from '@/assets/sheet-music'
 import MusicNote from '@/assets/music-note'
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import { Skeleton } from "@/components/ui/skeleton"
+
 import {
     Tooltip,
     TooltipContent,
@@ -46,6 +50,7 @@ export default function Track({
     onTimeUpdate
 } : TrackProps) {
 
+    const [isRendered, setIsRendered] = useState<boolean>(false);
 
     const onReady = (ws: any) => {
         ws.setVolume(volume);
@@ -112,19 +117,25 @@ export default function Track({
             </div>
     
             {/* Waveform Display */}
+            
             <div ref={waveformContainerRef} className="flex-grow select-none">
-                <WavesurferPlayer  
-                    height={70}
-                    progressColor={waveColor}
-                    waveColor="White"
-                    url={fileUrl}
-                    onFinish={()=>setIsPlaying(false)}
-                    onReady={onReady}
-                    onSeeking={(e: any)=>{onUniversalSeek(e)}}
-                    onRedrawcomplete={()=>console.log(`FINISHED LOADING ${id}`) } // TODO: SKELETON WHILE LOADING
-                    onTimeupdate={(e: any)=>onTimeUpdate(e)}
-                    
-                />
+                {
+                    isRendered == false && <Skeleton className="w-full h-[40px] rounded-md bg-white/90" />
+                }
+                <div className={twMerge(isRendered == true ? 'visible' : 'hidden')}>
+                    <WavesurferPlayer
+                        height={70}
+                        progressColor={waveColor}
+                        waveColor="White"
+                        url={fileUrl}
+                        onFinish={()=>setIsPlaying(false)}
+                        onReady={onReady}
+                        onSeeking={(e: any)=>{onUniversalSeek(e)}}
+                        onRedrawcomplete={()=>setIsRendered(true)} // TODO: SKELETON WHILE LOADING
+                        onTimeupdate={(e: any)=>onTimeUpdate(e)}
+                    />
+                </div>
+                
             </div>
     
             {/* Action Buttons */}

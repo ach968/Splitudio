@@ -1,3 +1,3 @@
 export default function Upload() {
-    return <></>
+    return <p className="text-white">UPLOAD MP3 PAGE</p>
 }
