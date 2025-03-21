@@ -67,7 +67,7 @@ async function getProjects(): Promise<Project[]> {
     ];
   }
 
-export default async function ProjectsLoading() {
+export default async function Page() {
     
     const projects = await getProjects();
     return <Projects initialProjects={projects} />;

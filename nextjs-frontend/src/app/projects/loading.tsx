@@ -7,29 +7,10 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
-import Link from "next/link"
 import EditorNav from "@/components/editor-nav"
-import SearchSVG from "@/assets/search"
-import PlaySVG from "@/assets/play"
-import { twMerge } from "tailwind-merge"
 import Footer from "@/components/footer"
-import {
-    ContextMenu,
-    ContextMenuContent,
-    ContextMenuItem,
-    ContextMenuTrigger,
-} from "@/components/ui/context-menu"
 
-interface Project {
-    id: string;
-    title: string;
-    file: string;
-    lastModified: string;
-}
-
-export default function ProjectsLoading() {
-
+export default function Loading() {
 
     return <section>
             <EditorNav />
@@ -70,9 +51,9 @@ export default function ProjectsLoading() {
                                         <TableRow key={idx} className="hover:bg-white/15">
                                             <TableCell
                                                 key={idx}
-                                                className="flex items-center gap-8 p-6 bg-black animate-pulse"
+                                                className="flex flex-row items-center space-x-6 gap-6 p-6 bg-black animate-pulse"
                                             >
-                                                <div className="flex-1 h-4 bg-neutral-500 rounded" />
+                                                <div className="flex-1 h-4 w-full bg-neutral-500 rounded" />
                                                 <div className="w-40 h-4 bg-neutral-500 rounded" />
                                             </TableCell>
                                         </TableRow> 

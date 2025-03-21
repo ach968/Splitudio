@@ -120,7 +120,7 @@ export default function Track({
             
             <div ref={waveformContainerRef} className="flex-grow select-none">
                 {
-                    isRendered == false && <Skeleton className="w-full h-[40px] rounded-md bg-white/90" />
+                    isRendered == false && <Skeleton className="w-full h-[50px] rounded-md bg-neutral-500" />
                 }
                 <div className={twMerge(isRendered == true ? 'visible' : 'hidden')}>
                     <WavesurferPlayer

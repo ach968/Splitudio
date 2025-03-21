@@ -9,8 +9,10 @@ export default function Share({projectId, projectName} : {projectId: string, pro
 
     const [shared, setShared] = useState(true);
 
-    const enableShare = () => {
-
+    const enableShare = (status: boolean) => {
+        // Fetch logic
+        
+        setShared(status);
     }
     const copyLink = () => {
 
