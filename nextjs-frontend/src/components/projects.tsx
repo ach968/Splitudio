@@ -17,6 +17,8 @@ import PlaySVG from "@/assets/play"
 import { useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge"
 import Footer from "@/components/footer"
+import { motion } from "motion/react"
+
 import {
     ContextMenu,
     ContextMenuContent,
@@ -114,14 +116,18 @@ export default function Projects({ initialProjects }: { initialProjects: Project
                     <div className="flex justify-center w-full mt-28">
                         <div className="container lg:px-5 px-3">
                             <div className="w-full flex justify-end pb-3">
-                                <span className="relative w-[300px] flex flex-row items-center">
+                                <motion.div 
+                                initial={{opacity: 0}}
+                                animate={{opacity: 1}}
+                                transition={{duration: 2}}
+                                className="relative w-[300px] flex flex-row items-center">
                                     <SearchSVG className="h-5 w-5 absolute left-2"></SearchSVG>
                                     <Input className="pl-9 border-neutral-500 text-white"
                                     placeholder="Search..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     />
-                                </span>
+                                </motion.div>
                             </div>
                             
                             <Table className="text-base">
@@ -134,12 +140,16 @@ export default function Projects({ initialProjects }: { initialProjects: Project
                                     <TableRow>
                                         <TableHead>
                                             <div className="flex flex-row gap-2 items-center justify-between pt-3 pb-3">
-                                                <span onClick={() => {
+                                                <motion.span
+                                                initial={{opacity: 0}}
+                                                animate={{opacity: 1}}
+                                                transition={{duration: 2}}
+                                                onClick={() => {
                                                     setDateDown(null);
                                                     setAlphabeticalDown((prev) =>
                                                     prev === null ? true : !prev
                                                 );}}
-                                                className="flex flex-row gap-2 items-center select-none">
+                                                className="flex flex-row gap-2 items-center select-none hover:cursor-pointer">
                                                     <p className="text-white">Name</p>
                                                     <PlaySVG
                                                     className={twMerge("w-3 h-3 transition-all opacity-50",
@@ -150,14 +160,18 @@ export default function Projects({ initialProjects }: { initialProjects: Project
                                                             : "rotate-[270deg]"
                                                         )}
                                                     />
-                                                </span>
-                                                <span onClick={() => {
+                                                </motion.span>
+                                                <motion.span 
+                                                initial={{opacity: 0}}
+                                                animate={{opacity: 1}}
+                                                transition={{duration: 2}}                                                
+                                                onClick={() => {
                                                     setAlphabeticalDown(null);
                                                     setDateDown((prev) =>
                                                     prev === null ? true : !prev
                                                     );
                                                 }}
-                                                className="flex flex-row gap-2 items-center select-none">
+                                                className="flex flex-row gap-2 items-center select-none hover:cursor-pointer">
                                                     <p className="text-white">Last Modified</p>
                                                     <PlaySVG
                                                     className={twMerge("w-3 h-3 transition-all opacity-50", 
@@ -168,13 +182,13 @@ export default function Projects({ initialProjects }: { initialProjects: Project
                                                             : "rotate-[270deg]"
                                                     )}
                                                     />
-                                                </span>
+                                                </motion.span>
                                             </div>
                                         </TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {sortedProjects.map((project) => (
+                                    {sortedProjects.map((project, idx) => (
                                         <TableRow key={project.id} className="hover:bg-white/15">
                                             <ContextMenu>
                                                 <ContextMenuTrigger>
@@ -186,15 +200,23 @@ export default function Projects({ initialProjects }: { initialProjects: Project
                                                         setNewName('');
                                                     }}>
                                                         <TableCell>
-                                                            <span className="flex gap-3 items-baseline">
+                                                            <motion.span 
+                                                            initial={{opacity: 0}}
+                                                            animate={{opacity:1}}
+                                                            transition={{duration: 1, delay: idx*0.2}}
+                                                            className="flex gap-3 items-baseline">
                                                                 <p className="line-clamp-1">{project.title}</p>
                                                                 <p className="text-neutral-400 text-sm line-clamp-1">/ {project.file}</p>
-                                                            </span>
+                                                            </motion.span>
                                                         </TableCell>
                                                         <TableCell>
-                                                            <p className="text-neutral-400 text-sm line-clamp-1">
+                                                            <motion.p 
+                                                            initial={{opacity: 0}}
+                                                            animate={{opacity:1}}
+                                                            transition={{duration: 1, delay: idx*0.2}}
+                                                            className="text-neutral-400 text-sm line-clamp-1">
                                                                 {new Date(project.lastModified).toDateString()}
-                                                            </p>
+                                                            </motion.p>
                                                         </TableCell>
                                                     </Link>
                                                     : 
