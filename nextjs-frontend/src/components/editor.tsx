@@ -322,7 +322,7 @@ export default function Editor() {
                 <EditorNav pauseCallback={onUniversalPause} projectName={PROJECTNAME} projectId={projectId}></EditorNav>
 
                 <div className="mt-28 mb-3 flex w-full justify-center">
-                    <div className="container lg:px-5 px-3">
+                    <div className="container px-5">
                         <div className=" flex gap-3 place-items-baseline">
                             <p className="text-2xl  lg:text-4xl font-semibold text-white truncate">
                                 {PROJECTNAME}

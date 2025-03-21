@@ -34,7 +34,7 @@ export default function Editor() {
                 <EditorNav/>
 
                 <div className="mt-28 mb-3 flex w-full justify-center">
-                    <div className="container lg:px-5 px-3">
+                    <div className="container px-5">
                         <div className=" flex gap-3 place-items-baseline">
                             <p className="animate-pulse">
                                 <div className="w-[200px] h-9 bg-neutral-500 rounded-md"></div>

@@ -46,6 +46,12 @@ export default function Projects({ initialProjects }: { initialProjects: Project
     const [renaming, setRenaming] = useState<string | null>(null); // set to project-id while renaming
     const [newName, setNewName] = useState<string>(''); // holds new name for project
     
+    // Only plays framer animations once
+    const [hasMounted, setHasMounted] = useState(false);
+    useEffect(() => {
+    setHasMounted(true);
+    }, []);
+
     const filteredProjects = projects.filter((project) => {
         const lowerQuery = searchQuery.toLowerCase()
         return (
@@ -117,7 +123,7 @@ export default function Projects({ initialProjects }: { initialProjects: Project
                         <div className="container lg:px-5 px-3">
                             <div className="w-full flex justify-end pb-3">
                                 <motion.div 
-                                initial={{opacity: 0}}
+                                initial={hasMounted ? false : {opacity: 0}}
                                 animate={{opacity: 1}}
                                 transition={{duration: 2}}
                                 className="relative w-[300px] flex flex-row items-center">
@@ -141,7 +147,7 @@ export default function Projects({ initialProjects }: { initialProjects: Project
                                         <TableHead>
                                             <div className="flex flex-row gap-2 items-center justify-between pt-3 pb-3">
                                                 <motion.span
-                                                initial={{opacity: 0}}
+                                                initial={hasMounted ? false : {opacity: 0}}
                                                 animate={{opacity: 1}}
                                                 transition={{duration: 2}}
                                                 onClick={() => {
@@ -162,7 +168,7 @@ export default function Projects({ initialProjects }: { initialProjects: Project
                                                     />
                                                 </motion.span>
                                                 <motion.span 
-                                                initial={{opacity: 0}}
+                                                initial={hasMounted ? false : {opacity: 0}}
                                                 animate={{opacity: 1}}
                                                 transition={{duration: 2}}                                                
                                                 onClick={() => {
@@ -201,7 +207,7 @@ export default function Projects({ initialProjects }: { initialProjects: Project
                                                     }}>
                                                         <TableCell>
                                                             <motion.span 
-                                                            initial={{opacity: 0}}
+                                                            initial={hasMounted ? false : {opacity: 0}}
                                                             animate={{opacity:1}}
                                                             transition={{duration: 1, delay: idx*0.2}}
                                                             className="flex gap-3 items-baseline">
@@ -211,7 +217,7 @@ export default function Projects({ initialProjects }: { initialProjects: Project
                                                         </TableCell>
                                                         <TableCell>
                                                             <motion.p 
-                                                            initial={{opacity: 0}}
+                                                            initial={hasMounted ? false : {opacity: 0}}
                                                             animate={{opacity:1}}
                                                             transition={{duration: 1, delay: idx*0.2}}
                                                             className="text-neutral-400 text-sm line-clamp-1">

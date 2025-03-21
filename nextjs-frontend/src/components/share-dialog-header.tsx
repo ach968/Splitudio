@@ -8,11 +8,18 @@ import { useState } from "react";
 export default function Share({projectId, projectName} : {projectId: string, projectName: string}) {
 
     const [shared, setShared] = useState(true);
+    const [disabled, setDisabled] = useState(false);
 
     const enableShare = (status: boolean) => {
-        // Fetch logic
-        
         setShared(status);
+        setDisabled(true);
+
+        // Fetch logic
+
+        // simulate finally after fetch
+        setTimeout(()=> {
+            setDisabled(false)
+        }, 1500)
     }
     const copyLink = () => {
 
@@ -21,10 +28,10 @@ export default function Share({projectId, projectName} : {projectId: string, pro
     return <DialogHeader>
         <DialogTitle>Share "{projectName}"</DialogTitle>
         <DialogDescription className="pb-7">
-            When sharing is enabled, anyone with the project link will be able to view your project
+            If sharing is enabled, anyone with the link can view your project. Otherwise, only you can access it.
         </DialogDescription>
         <div className="flex gap-3 items-center">
-            <Switch disabled={true} checked={shared} onCheckedChange={setShared} id="enable-sharing" />
+            <Switch disabled={disabled} checked={shared} onCheckedChange={enableShare} id="enable-sharing" />
             <Label htmlFor="enable-sharing">Enable Sharing</Label>
         </div>
         <div className="pt-2">

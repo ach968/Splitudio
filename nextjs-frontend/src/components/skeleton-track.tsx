@@ -42,7 +42,7 @@ export default function Track({className} : {className? : string}) {
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger>
-                        <Button size="icon" className="w-9 h-9 rounded-full group bg-neutral-500" variant='outline' ></Button>
+                            <div className="w-9 h-9 rounded-full group bg-neutral-500"></div>
                         </TooltipTrigger>
                         <TooltipContent>
                             <p>Convert to Sheet Music</p>
@@ -52,7 +52,7 @@ export default function Track({className} : {className? : string}) {
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger>
-                        <Button size="icon" className="w-9 h-9 rounded-full group bg-neutral-500" variant="outline"></Button>
+                            <div className="w-9 h-9 rounded-full group bg-neutral-500"></div>
                         </TooltipTrigger>
                         <TooltipContent>
                             <p>Download MP3</p>
