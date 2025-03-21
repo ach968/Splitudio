@@ -59,7 +59,7 @@ export function WaveformHighlight({
                 top: 0,
                 left: `${highlightLeft}px`,
                 bottom: 0,
-                backgroundColor: 'rgba(255,255,0,0.3)',
+                backgroundColor: 'rgba(200,200,200,0.2)',
                 pointerEvents: 'none', // ensures the highlight doesn't block interactions
                 zIndex: 10
             }}

@@ -1,8 +1,7 @@
-import Track from "@/components/track";
+
 import { Button } from "@/components/ui/button";
 import PlaySVG from "@/assets/play"
 import ForwardSVG from "@/assets/forward"
-import PauseSVG from "@/assets/pause"
 import BackwardSVG from "@/assets/backward";
 import BracketLeftSVG from "@/assets/bracket-left";
 import BracketRightSVG from "@/assets/bracket-right";
@@ -17,15 +16,7 @@ import {
 import EditorNav from "@/components/editor-nav";
 import SkeletonTrack from "@/components/skeleton-track";
 
-interface TrackState {
-    ws: any;
-    volume: number;
-}
-
-export default function Editor() {
-
-    
-
+export default function Loading() {
   return (
   <section>
         <div className="w-screen flex h-screen bg-black">
@@ -35,13 +26,13 @@ export default function Editor() {
 
                 <div className="mt-28 mb-3 flex w-full justify-center">
                     <div className="container px-5">
-                        <div className=" flex gap-3 place-items-baseline">
-                            <p className="animate-pulse">
-                                <div className="w-[200px] h-9 bg-neutral-500 rounded-md"></div>
-                            </p>
-                            <p className=" animate-pulse">
-                                <div className="w-[100px] h-4 bg-neutral-500 rounded-md"></div>
-                            </p>
+                        <div className="flex gap-3 place-items-baseline justify-start">
+                            <div className="animate-pulse">
+                                <div className="w-[200px] h-6 lg:h-7 bg-neutral-500 rounded-md"></div>
+                            </div>
+                            <div className="animate-pulse delay-100">
+                                <div className="w-[200px] h-4 bg-neutral-500 rounded-md"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -51,6 +42,8 @@ export default function Editor() {
                     <div className="container mx-3">
                         <div
                         className="relative flex flex-col gap-3 border border-neutral-700 rounded-lg lg:gap-6 lg:p-5 p-3">
+                            <SkeletonTrack />
+                            <SkeletonTrack />
                             <SkeletonTrack />
                             <SkeletonTrack />
                             <SkeletonTrack />

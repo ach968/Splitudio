@@ -8,7 +8,7 @@ interface Project {
 }
 async function getProjects(): Promise<Project[]> {
     // Simulate a delay (e.g. network request)
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     return [
       {
         id: "projectID1",

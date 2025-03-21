@@ -209,7 +209,7 @@ export default function Projects({ initialProjects }: { initialProjects: Project
                                                             <motion.span 
                                                             initial={hasMounted ? false : {opacity: 0}}
                                                             animate={{opacity:1}}
-                                                            transition={{duration: 1, delay: idx*0.2}}
+                                                            transition={{duration: 1, delay: 1/(sortedProjects.length)*idx}}
                                                             className="flex gap-3 items-baseline">
                                                                 <p className="line-clamp-1">{project.title}</p>
                                                                 <p className="text-neutral-400 text-sm line-clamp-1">/ {project.file}</p>
@@ -219,7 +219,7 @@ export default function Projects({ initialProjects }: { initialProjects: Project
                                                             <motion.p 
                                                             initial={hasMounted ? false : {opacity: 0}}
                                                             animate={{opacity:1}}
-                                                            transition={{duration: 1, delay: idx*0.2}}
+                                                            transition={{duration: 1, delay: 1/(sortedProjects.length)*idx}}
                                                             className="text-neutral-400 text-sm line-clamp-1">
                                                                 {new Date(project.lastModified).toDateString()}
                                                             </motion.p>

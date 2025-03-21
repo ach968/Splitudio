@@ -324,7 +324,7 @@ export default function Editor() {
                 <div className="mt-28 mb-3 flex w-full justify-center">
                     <div className="container px-5">
                         <div className=" flex gap-3 place-items-baseline">
-                            <p className="text-2xl  lg:text-4xl font-semibold text-white truncate">
+                            <p className="text-2xl lg:text-3xl font-semibold text-white truncate">
                                 {PROJECTNAME}
                             </p>
                             <p className="text-base text-neutral-400 truncate">
@@ -374,7 +374,7 @@ export default function Editor() {
                             />
                             <Track
                                 id={2}
-                                className="border-yellow-400 shadow-[0px_0px_50px_#efb10033]"
+                                className="border-orange-400 shadow-[0px_0px_50px_#efb10033]"
                                 fileUrl="/drums.wav"
                                 trackName="Drums"
                                 waveColor="#efb100"
@@ -389,10 +389,10 @@ export default function Editor() {
                             />
                             <Track
                                 id={3}
-                                className="border-lime-400 shadow-[0px_0px_50px_#7ccf0033]"
+                                className="border-yellow-400 shadow-[0px_0px_50px_#facc1533]"
                                 fileUrl="/bass.wav"
                                 trackName="Bass"
-                                waveColor="#7ccf00"
+                                waveColor="#facc15"
                                 registerWaveSurfer={registerWaveSurfer}
                                 onUniversalSeek={onUniversalSeek}
                                 setIsPlaying={setIsPlaying}
@@ -404,10 +404,10 @@ export default function Editor() {
                             />
                             <Track
                                 id={4}
-                                className="border-teal-400 shadow-[0px_0px_50px_#00bba733]"
+                                className="border-green-400 shadow-[0px_0px_50px_#4ade8033]"
                                 fileUrl="/other.wav"
                                 trackName="Guitar"
-                                waveColor="#00bba7"
+                                waveColor="#4ade80"
                                 registerWaveSurfer={registerWaveSurfer}
                                 onUniversalSeek={onUniversalSeek}
                                 setIsPlaying={setIsPlaying}
@@ -419,10 +419,10 @@ export default function Editor() {
                             />
                             <Track
                                 id={5}
-                                className="border-red-400 shadow-[0px_0px_50px_#fb2c3633]"
+                                className="border-blue-400 shadow-[0px_0px_50px_#60a5fa33]"
                                 fileUrl="/vocals.wav"
                                 trackName="Vocal"
-                                waveColor="#fb2c36"
+                                waveColor="#60a5fa"
                                 registerWaveSurfer={registerWaveSurfer}
                                 onUniversalSeek={onUniversalSeek}
                                 setIsPlaying={setIsPlaying}
@@ -434,10 +434,10 @@ export default function Editor() {
                             />
                             <Track
                                 id={6}
-                                className="border-yellow-400 shadow-[0px_0px_50px_#efb10033]"
+                                className="border-violet-400 shadow-[0px_0px_50px_#a78bfa33]"
                                 fileUrl="/drums.wav"
                                 trackName="Drums"
-                                waveColor="#efb100"
+                                waveColor="#a78bfa"
                                 registerWaveSurfer={registerWaveSurfer}
                                 onUniversalSeek={onUniversalSeek}
                                 setIsPlaying={setIsPlaying}

@@ -122,7 +122,7 @@ export default function Track({
                 {
                     isRendered == false && <Skeleton className="w-full h-[50px] rounded-md bg-neutral-500" />
                 }
-                <div className={twMerge(isRendered == true ? 'visible' : 'hidden')}>
+                <div className={twMerge(isRendered == true ? 'visible' : 'hidden', "hover:cursor-pointer")}>
                     <WavesurferPlayer
                         height={70}
                         progressColor={waveColor}
