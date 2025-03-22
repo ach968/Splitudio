@@ -35,17 +35,17 @@ export default function EditorNav({projectId, projectName, pauseCallback} : {pro
         <div className="flex flex-row w-full container items-baseline justify-between px-6 mt-8">
             <div className="flex gap-5 text-neutral-400 underline-offset-4">
                 <Link onClick={pauseCallback} href="/projects">
-                    <p className={twMerge(pathname==="/projects" && "text-white", "hover:cursor-pointer hover:underline")}>Projects</p>
+                    <p className={twMerge(pathname==="/projects" && "text-white", "hover:cursor-pointer hover:text-white hover:underline")}>Projects</p>
                 </Link>
                 <Link onClick={pauseCallback} href="/editor">
-                    <p className={twMerge(pathname.startsWith("/editor") && "text-white", "hover:cursor-pointer hover:underline")}>Editor</p>
+                    <p className={twMerge(pathname.startsWith("/editor") && "text-white", "hover:cursor-pointer hover:text-white hover:underline")}>Editor</p>
                 </Link>
                 {
                     projectId && projectId != "" && projectName &&
                     <Link href="#">
                         <Dialog onOpenChange={(open)=>setIsSharing(open)}>
                             <DialogTrigger>
-                                <p className={twMerge(isSharing && "text-white", "hover:cursor-pointer hover:underline")}>Share</p>
+                                <p className={twMerge(isSharing && "text-white", "hover:cursor-pointer hover:text-white hover:underline")}>Share</p>
                             </DialogTrigger>
                             <DialogContent>
                                 <Share projectId={projectId} projectName={projectName}/>
