@@ -38,7 +38,7 @@ export default function Upload({isPremiumUser} : {isPremiumUser : boolean}) {
         !files[0].name.toLocaleLowerCase().endsWith(".aac")) {
             alert("Upload an mp3, wav, flac, or aac file")
         }
-
+        
     };
     
     const handleLink = (youtubeLink : string) => {
