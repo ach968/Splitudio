@@ -1,10 +1,14 @@
-import WavesurferPlayer, { WavesurferProps } from '@wavesurfer/react'
-import { useState } from 'react';
+"use client"
+
+import WavesurferPlayer from '@wavesurfer/react';
 import { Slider } from './ui/slider';
 import { Button } from './ui/button';
 import { twMerge } from 'tailwind-merge';
 import SheetMusic from '@/assets/sheet-music'
 import MusicNote from '@/assets/music-note'
+import { useRef, useState } from 'react';
+import { Skeleton } from "@/components/ui/skeleton"
+
 import {
     Tooltip,
     TooltipContent,
@@ -20,11 +24,13 @@ interface TrackProps {
     trackName: string;
     className: string;
     volume: number;
-    onUniversalSeek: (time: number) => void;
+    onUniversalSeek: (event: any) => void;
     registerWaveSurfer: (id: number, ws: any) => void;
     setIsPlaying: (status: boolean) => void;
     updateVolume: (id: number, newVol: number) => void;
     setFocused: (id: number | null) => void;
+    waveformContainerRef?: React.RefObject<HTMLDivElement | null>
+    onTimeUpdate: (event: any) => void;
 }
 
 export default function Track({
@@ -39,8 +45,13 @@ export default function Track({
     onUniversalSeek, 
     setIsPlaying,
     updateVolume,
-    setFocused
+    setFocused,
+    waveformContainerRef,
+    onTimeUpdate
 } : TrackProps) {
+
+    const [isRendered, setIsRendered] = useState<boolean>(false);
+
     const onReady = (ws: any) => {
         ws.setVolume(volume);
         registerWaveSurfer(id, ws);
@@ -49,7 +60,7 @@ export default function Track({
     const onVolumeChange = (newVolume: number) => {
         updateVolume(id, newVolume)
     };
-  
+
     return (
     <div className={twMerge(className, (volume == 0 || focused && focused != id) && "filter brightness-50", "bg-black w-full border-2 p-2 lg:p-4 rounded-md lg:rounded-xl")}>
 
@@ -106,16 +117,25 @@ export default function Track({
             </div>
     
             {/* Waveform Display */}
-            <div className="flex-grow">
-                <WavesurferPlayer
-                    height={70}
-                    progressColor={waveColor}
-                    waveColor="White"
-                    url={fileUrl}
-                    onFinish={()=>setIsPlaying(false)}
-                    onReady={onReady}
-                    onSeeking={(e: any)=> onUniversalSeek(e)}
-                />
+            
+            <div ref={waveformContainerRef} className="flex-grow select-none">
+                {
+                    isRendered == false && <Skeleton className="w-full h-[50px] rounded-md bg-neutral-500" />
+                }
+                <div className={twMerge(isRendered == true ? 'visible' : 'hidden', "hover:cursor-pointer")}>
+                    <WavesurferPlayer
+                        height={70}
+                        progressColor={waveColor}
+                        waveColor="White"
+                        url={fileUrl}
+                        onFinish={()=>setIsPlaying(false)}
+                        onReady={onReady}
+                        onSeeking={(e: any)=>{onUniversalSeek(e)}}
+                        onRedrawcomplete={()=>setIsRendered(true)} // TODO: SKELETON WHILE LOADING
+                        onTimeupdate={(e: any)=>onTimeUpdate(e)}
+                    />
+                </div>
+                
             </div>
     
             {/* Action Buttons */}
