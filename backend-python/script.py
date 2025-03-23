@@ -1,5 +1,6 @@
 from basic_pitch.inference import predict_and_save, predict
 from basic_pitch import ICASSP_2022_MODEL_PATH
+import time
 
 
 def mp3_midi_save(audio_path, output):
@@ -16,9 +17,13 @@ def mp3_midi_save(audio_path, output):
 
 def mp3_midi(audio_path: str):
     model_output, midi_data, note_events = predict(audio_path=audio_path)
-    # process MIDI
+    print(note_events)
 
 
 if __name__ == "__main__":
+    start = time.time()
     audio_path = "pure-love-304010.mp3"
-    mp3_midi_save(audio_path, "output")
+    # mp3_midi_save(audio_path, "output")
+    mp3_midi(audio_path)
+    print("Track length: 1:18")
+    print("Time taken: ", time.time() - start)

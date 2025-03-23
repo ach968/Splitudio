@@ -1,0 +1,4 @@
+.venv
+*.mid
+*.mp3
+/output
