@@ -35,7 +35,7 @@ export default function Piano({notes, isFullPiano} : {notes: Set<string>, isFull
 
     const getShadow = (midi: number) => {
         if(activeMidis.has(midi)) {
-            return '0 -25px 10px #F87BFF33, 0 -20px 15px #FB92CF44, 0 -15px 20px #FFDD9B55, 0 -10px 25px #C2F0B166, 0 -5px 30px #2FD8FE77'
+            return '0 -5px 10px #F87BFF33, 0 -10px 15px #FB92CF44, 0 -15px 20px #FFDD9B55, 0 -20px 25px #C2F0B166, 0 -25px 30px #2FD8FE77'
         }
         return ''
     }

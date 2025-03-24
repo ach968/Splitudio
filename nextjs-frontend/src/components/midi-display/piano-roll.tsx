@@ -70,7 +70,7 @@ export default function PianoRoll({ notes, windowStart, windowDuration, isFullPi
     }
 
     return <div ref={containerRef}
-        className="relative border border-neutral-800 bg-gray-950 overflow-y-clip w-full h-full">
+        className="relative border border-neutral-800 bg-neutral-950 overflow-y-clip w-full h-full">
 
         {/* Render falling note blocks */}
         { 
