@@ -7,6 +7,9 @@ import EditorNav from "../editor-nav";
 import { Slider } from "../ui/slider";
 import Footer from "../footer";
 import { Button } from "../ui/button";
+// import { Tone } from "tone";
+import * as Tone from "tone";
+import { PolySynth, Synth, SynthOptions } from "tone";
 
 interface Note {
     midi: number; // e.g., 60 for middle C
@@ -15,7 +18,9 @@ interface Note {
     name: string; // e.g. "C4"
     pitch: string; // e.g. "C" 
     octave: number; // e.g. 4
+    velocity: number
 }
+
 
 export default function Play({ midiData } : {midiData : Midi}) {
 
@@ -49,7 +54,7 @@ export default function Play({ midiData } : {midiData : Midi}) {
 
     const handleScrollEvent = (e: WheelEvent) => {
         e.preventDefault();
-        console.log("SCROLL")
+
         const multiplier = 0.01;
         setCurrentTime((prev) => {
             let newTime = prev + e.deltaY * multiplier;
@@ -57,26 +62,85 @@ export default function Play({ midiData } : {midiData : Midi}) {
             if (newTime > midiData.duration) newTime = midiData.duration;
             return newTime;
         });
+
+        setBuffer(new Set());
     }
 
-    const play = () => {
-        if (intervalRef.current !== null) { // already playing
-            clearInterval(intervalRef.current);
-            intervalRef.current = null;
-        }
-        else {
-            intervalRef.current = setInterval(() => {
-                requestAnimationFrame(() => {
-                    setCurrentTime(prev => prev + 0.01);
-                });
-            }, 10);
-        }
+    const sampler = useRef<PolySynth<Synth<SynthOptions>>>(null);
+    // Hashed string: note.midi-note.time
+    const [buffer, setBuffer] = useState(new Set<string>()); // stores the recently used notes so we don't play them again
+
+    useEffect(() => {
+        sampler.current = new Tone.PolySynth(Tone.Synth).toDestination()
+    }, []);
+
+    useEffect(()=>{
+        // Add notes so buffer so we don't play it again
+        notes.forEach((note: Note)=>{
+
+            const TOLERANCE = 0.05;
+            if(!buffer.has(`${note.name}-${note.time}-${note.duration}`) && Math.abs(note.time - currentTime) < TOLERANCE) {
+                sampler.current?.triggerAttackRelease(note.name, note.duration, undefined, note.velocity);
+                setBuffer((buff)=>new Set(buff).add(`${note.name}-${note.time}-${note.duration}`))
+            }
+        })
+
+        // Delete notes after they have left the window
+        setBuffer((prev) => {
+            const newBuffer = new Set(prev);
+            newBuffer.forEach((encodedNote: string) => {
+                const parts = encodedNote.split("-");
+                // parts[1] should be note.time
+                // parts[2] should be note.duration
+                const noteTime = parseFloat(parts[1]);
+                const noteDuration = parseFloat(parts[2]);
+                const bufferOffset = 0.5; // window offset in seconds
+                if (noteTime + noteDuration + bufferOffset < currentTime) {
+                    newBuffer.delete(encodedNote);
+                }
+            });
+            return newBuffer;
+        });
         
+    }, [currentTime])
+
+    // For react
+    const [isPlaying, setIsPlaying] = useState(false);
+
+    // High resolution clock using requestAnimationFrame
+    // Updates based on delta time from previous frame, so playback is not affected by cpu speed
+    const isPlayingRef = useRef(false);
+    const requestRef = useRef<number | null>(null);
+    const previousTimeRef = useRef<number | null>(null);
+
+    const animate = (time: number) => {
+        if (previousTimeRef.current != null && isPlayingRef.current) {
+            const delta = (time - previousTimeRef.current) / 1000; // convert to seconds
+            setCurrentTime((prev) => prev + delta);
+        }
+        previousTimeRef.current = time;
+        requestRef.current = requestAnimationFrame(animate);
+    };
+
+    const play = () => {
+        setBuffer(new Set());
+        setIsPlaying(true);
+
+        if (!isPlayingRef.current) {
+            isPlayingRef.current = true;
+
+            previousTimeRef.current = null;
+            requestRef.current = requestAnimationFrame(animate);
+        }
     }
+
     const pause = () => {
-        console.log("PAUSE")
-        if (intervalRef.current !== null) {
+        setIsPlaying(false)
+        if (isPlayingRef.current && requestRef.current) {
             
+            isPlayingRef.current = false;
+            cancelAnimationFrame(requestRef.current);
+            requestRef.current = null;
         }
     };
 
@@ -88,9 +152,12 @@ export default function Play({ midiData } : {midiData : Midi}) {
                 <label htmlFor="timeSlider" className="block mb-2">
                 Current Time: {currentTime.toFixed(2)}s
                 </label>
-                <Button
-                onClick={play}
-                >Play</Button>
+                {
+                    isPlaying ?
+                    <Button onClick={pause}>Pause</Button> :
+                    <Button onClick={play}>Play</Button>
+                }
+                
                 <Slider
                 min={0}
                 max={midiData.duration}
