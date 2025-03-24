@@ -7,6 +7,7 @@ import EditorNav from "../editor-nav";
 import { Slider } from "../ui/slider";
 import Footer from "../footer";
 import { Button } from "../ui/button";
+import * as SliderPrimitive from "@radix-ui/react-slider"
 // import { Tone } from "tone";
 import * as Tone from "tone";
 import { PolySynth, Synth, SynthOptions } from "tone";
@@ -29,8 +30,10 @@ export default function Play({ midiData } : {midiData : Midi}) {
 
     const pianoRollContainerRef = useRef<HTMLDivElement>(null);
     
+    const WINDOW_SIZE = 3
+
     // Calculate what notes are visible in the time window
-    const notes = noteWindow(midiData, currentTime, 5);
+    const notes = noteWindow(midiData, currentTime, WINDOW_SIZE);
 
     // Define piano size
     useEffect(()=>{
@@ -42,12 +45,42 @@ export default function Play({ midiData } : {midiData : Midi}) {
         setIsFullPiano(octaveRange > 5)
     }, [midiData])
     
+    // Add event listeners
     useEffect(()=>{
+        const handleKeyDownEvent = (e: KeyboardEvent) => {
+            if (e.keyCode === 32) {
+                e.preventDefault();
+                if(isPlaying) pause()
+                else play()
+            }
+            else if(e.keyCode === 37) {
+                e.preventDefault();
+                setCurrentTime((prev)=>Math.max(0, prev-WINDOW_SIZE*0.5))
+            }
+            else if(e.keyCode === 39) {
+                e.preventDefault();
+                setCurrentTime((prev)=>Math.min(midiData.tracks[0].duration, prev+WINDOW_SIZE*0.5))
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDownEvent)
+
+        return(()=>{
+            window.removeEventListener("keydown", handleKeyDownEvent)
+        })
+    })
+    useEffect(()=>{
+
+        // Scrolling on piano roll will move currentTime
         const container = pianoRollContainerRef.current;
         if (!container) return;
         container.addEventListener("wheel", handleScrollEvent, { passive: false });
+
         return ()=>{
-            window.removeEventListener("wheel", handleScrollEvent);
+            const container = pianoRollContainerRef.current;
+            if (container) {
+                container.removeEventListener("wheel", handleScrollEvent);
+            }
         }
     },[pianoRollContainerRef.current])
 
@@ -65,6 +98,8 @@ export default function Play({ midiData } : {midiData : Midi}) {
         setBuffer(new Set());
     }
 
+    
+
     const sampler = useRef<PolySynth<Synth<SynthOptions>>>(null);
     // Hashed string: note.midi-note.time
     const [buffer, setBuffer] = useState(new Set<string>()); // stores the recently used notes so we don't play them again
@@ -74,8 +109,6 @@ export default function Play({ midiData } : {midiData : Midi}) {
     }, []);
 
     useEffect(()=>{
-
-        console.log(buffer);
 
         // Add notes so buffer so we don't play it again
         notes.forEach((note: Note)=>{
@@ -145,41 +178,56 @@ export default function Play({ midiData } : {midiData : Midi}) {
         }
     };
 
-    return <section>
-        <div className="flex flex-col w-full h-screen bg-black text-white p-6">
-            <EditorNav />
+    const formatTime = (time: number): string => {
+        const hours = Math.floor(time / 3600);
+        const minutes = Math.floor((time % 3600) / 60);
+        const seconds = Math.floor(time % 60);
+        return `${hours > 0 ? hours.toString().padStart(2, '0') + ':' : ''}${
+          minutes.toString().padStart(2, '0')
+        }:${seconds.toString().padStart(2, '0')}`;
+    };
 
+    return <section>
+        <EditorNav />
+
+        <div className="flex flex-col w-full h-screen bg-black text-white p-6">
             <div className="pt-20">
-                <label htmlFor="timeSlider" className="block mb-2">
-                Current Time: {currentTime.toFixed(2)}s
-                </label>
                 {
                     isPlaying ?
                     <Button onClick={pause}>Pause</Button> :
                     <Button onClick={play}>Play</Button>
                 }
                 
-                <Slider
-                min={0}
-                max={midiData.duration}
-                step={0.01}
-                value={[currentTime]}
-                onValueChange={(e:any) => setCurrentTime(parseFloat(e[0]))}
-                className="w-full mb-2"
-                ></Slider>
             </div>
-
-            <div 
+            <div
             className="w-full h-full overflow-y-auto"
             ref={pianoRollContainerRef}
             >
                 <PianoRoll
                 notes={notes} 
                 windowStart={currentTime} 
-                windowDuration={3} 
+                windowDuration={WINDOW_SIZE} 
                 isFullPiano={isFullPiano}
                 />
             </div>
+
+            {/* Stolen from shadcn */}
+            <div className="mt-2 flex gap-3">
+                <p className="font-mono text-xs">{formatTime(currentTime)}</p>
+                <SliderPrimitive.Root
+                className="relative flex w-full touch-none select-none items-center"
+                min={0}
+                max={midiData.duration}
+                step={0.01}
+                value={[currentTime]}
+                onValueChange={(e:any) => setCurrentTime(parseFloat(e[0]))}>
+                    <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-gray-700">
+                        <SliderPrimitive.Range className="absolute h-full bg-white" />
+                    </SliderPrimitive.Track>
+                </SliderPrimitive.Root>
+                <p className="font-mono text-xs">{formatTime(midiData.tracks[0].duration)}</p>
+            </div>
+            
         </div>
         <Footer />
     </section>
