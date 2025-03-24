@@ -28,9 +28,16 @@ export default function Piano({notes, isFullPiano} : {notes: Set<string>, isFull
         const baseColor = isBlackKey(midi) ? "#000" : "#fff";
         if (activeMidis.has(midi)) {
             // Apply a semi-transparent blue overlay
-            return `linear-gradient(rgba(0, 0, 255, 0.5), rgba(0, 0, 255, 0.3)), ${baseColor}`;
+            return `linear-gradient(to bottom, #DD7DDFAA, #E1CD86AA, #BBCB92AA, #71C2EFAA, #3BFFFFAA, #DD7DDFAA), ${baseColor}`;
         }
         return baseColor;
+    }
+
+    const getShadow = (midi: number) => {
+        if(activeMidis.has(midi)) {
+            return '0 -25px 10px #F87BFF33, 0 -20px 15px #FB92CF44, 0 -15px 20px #FFDD9B55, 0 -10px 25px #C2F0B166, 0 -5px 30px #2FD8FE77'
+        }
+        return ''
     }
     useEffect(() => {
         if (!containerRef.current) return;
@@ -50,7 +57,7 @@ export default function Piano({notes, isFullPiano} : {notes: Set<string>, isFull
 
     return  <div 
     ref={containerRef}
-    className="relative"
+    className="relative bg-black"
     style={{ width: "100%", height: "100%" }}>
         {Array.from({ length: KEY_COUNT }, (_, idx) => {
         const midi = MIN_MIDI + idx;
@@ -62,7 +69,8 @@ export default function Piano({notes, isFullPiano} : {notes: Set<string>, isFull
               left: idx * KEY_WIDTH,
               width: KEY_WIDTH,
               pointerEvents: "none",
-              background: getKeyColor(midi)
+              background: getKeyColor(midi),
+              boxShadow: getShadow(midi)
             }}
           />
         );

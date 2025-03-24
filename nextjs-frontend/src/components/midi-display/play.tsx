@@ -12,6 +12,7 @@ import * as SliderPrimitive from "@radix-ui/react-slider"
 import * as Tone from "tone";
 import { PolySynth, Synth, SynthOptions } from "tone";
 import Piano from "@/components/midi-display/piano";
+import { Label } from "../ui/label";
 interface Note {
     midi: number; // e.g., 60 for middle C
     time: number; // in seconds, when the note starts
@@ -30,7 +31,8 @@ export default function Play({ midiData } : {midiData : Midi}) {
 
     const pianoRollContainerRef = useRef<HTMLDivElement>(null);
     
-    const WINDOW_SIZE = 3
+    const [WINDOW_SIZE, setWindowSize] = useState<number>(3);
+    const MAX_WINDOW_SIZE = 30;
 
     // Calculate what notes are visible in the time window
     const notes = noteWindow(midiData, currentTime, WINDOW_SIZE);
@@ -44,10 +46,11 @@ export default function Play({ midiData } : {midiData : Midi}) {
 
         setIsFullPiano(octaveRange > 5)
     }, [midiData])
-    
+
     // Add event listeners
     useEffect(()=>{
         const handleKeyDownEvent = (e: KeyboardEvent) => {
+            console.log(e.key)
             if (e.keyCode === 32) {
                 e.preventDefault();
                 if(isPlaying) pause()
@@ -55,11 +58,21 @@ export default function Play({ midiData } : {midiData : Midi}) {
             }
             else if(e.keyCode === 37) {
                 e.preventDefault();
+                setBuffer(new Set());
                 setCurrentTime((prev)=>Math.max(0, prev-WINDOW_SIZE*0.5))
             }
             else if(e.keyCode === 39) {
                 e.preventDefault();
+                setBuffer(new Set());
                 setCurrentTime((prev)=>Math.min(midiData.tracks[0].duration, prev+WINDOW_SIZE*0.5))
+            }
+            else if(e.ctrlKey || e.metaKey && e.key === '=') {
+                e.preventDefault();
+                setWindowSize((prev)=>Math.max(0.5, prev-2))
+            }
+            else if(e.ctrlKey || e.metaKey && e.key === '-') {
+                e.preventDefault();
+                setWindowSize((prev)=>Math.min(MAX_WINDOW_SIZE, prev+2))
             }
         };
 
@@ -87,15 +100,26 @@ export default function Play({ midiData } : {midiData : Midi}) {
     const handleScrollEvent = (e: WheelEvent) => {
         e.preventDefault();
 
-        const multiplier = 0.01;
-        setCurrentTime((prev) => {
-            let newTime = prev + e.deltaY * multiplier;
-            if (newTime < 0) newTime = 0;
-            if (newTime > midiData.duration) newTime = midiData.duration;
-            return newTime;
-        });
-
         setBuffer(new Set());
+
+        if(e.altKey || e.ctrlKey || e.metaKey) {
+            const multiplier = 0.01;
+            setWindowSize((prev) => {
+                let newSize = prev + e.deltaY * multiplier;
+                if(newSize < 0.5) newSize = 0.5
+                if (newSize > MAX_WINDOW_SIZE) newSize = MAX_WINDOW_SIZE;
+                return newSize;
+            });
+        }
+        else {
+            const multiplier = 0.01;
+            setCurrentTime((prev) => {
+                let newTime = prev + e.deltaY * multiplier;
+                if (newTime < 0) newTime = 0;
+                if (newTime > midiData.duration) newTime = midiData.duration;
+                return newTime;
+            });
+        }
     }
 
     
@@ -111,7 +135,9 @@ export default function Play({ midiData } : {midiData : Midi}) {
 
         console.log(buffer)
 
-        // Add notes so buffer so we don't play it again
+        // Notes are added to buffer when they 'hit' the currentTime
+        // 1.   Makes sure that notes are not played twice by synth
+        // 2.   Used for piano overlay
         notes.forEach((note: Note)=>{
             const TOLERANCE = 0.05;
             if(!buffer.has(`${note.name}-${note.time}-${note.duration}-${note.midi}`) && Math.abs(note.time - currentTime) < TOLERANCE) {
@@ -191,16 +217,7 @@ export default function Play({ midiData } : {midiData : Midi}) {
         <EditorNav />
 
         <div className="flex flex-col w-full min-h-screen h-screen bg-black text-white p-6">
-            <div className="pt-20">
-                {
-                    isPlaying ?
-                    <Button onClick={pause}>Pause</Button> :
-                    <Button onClick={play}>Play</Button>
-                }
-                
-            </div>
-            <div
-            className="w-full h-full overflow-y-auto"
+            <div className="w-full h-full overflow-y-auto"
             ref={pianoRollContainerRef}
             >
                 <PianoRoll
@@ -209,14 +226,13 @@ export default function Play({ midiData } : {midiData : Midi}) {
                 windowDuration={WINDOW_SIZE} 
                 isFullPiano={isFullPiano}
                 />
-                
             </div>
             
             <div className="w-full h-20">
                 <Piano notes={buffer} isFullPiano={isFullPiano}></Piano>
             </div>
             
-            <div className="w-full justify-center flex">
+            <div className="w-full justify-center items-center flex flex-col">
                 <div className="container px-3 lg:px-5">
                     <div className="mt-2 flex gap-3">
                         <p className="font-mono text-xs">{formatTime(currentTime)}</p>
@@ -228,12 +244,33 @@ export default function Play({ midiData } : {midiData : Midi}) {
                         max={midiData.duration}
                         step={0.01}
                         value={[currentTime]}
-                        onValueChange={(e:any) => setCurrentTime(parseFloat(e[0]))}>
+                        onValueChange={(e:any) => {
+                            setBuffer(new Set());
+                            setCurrentTime(parseFloat(e[0]))
+                        }}>
                             <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-gray-700">
                                 <SliderPrimitive.Range className="absolute h-full bg-white" />
                             </SliderPrimitive.Track>
                         </SliderPrimitive.Root>
                         <p className="font-mono text-xs">{formatTime(midiData.tracks[0].duration)}</p>
+                    </div>
+
+                    <div className="flex justify-between w-full">
+                        <div className="flex gap-2 w-[200px] items-center">
+                            <span className="font-mono text-xs">Window:{WINDOW_SIZE.toFixed(2)}s</span>
+                            <Slider
+                            className="w-full"
+                            min={0.5}
+                            max={MAX_WINDOW_SIZE}
+                            step={0.01}
+                            value={[WINDOW_SIZE]}
+                            onValueChange={(e)=>setWindowSize(e[0])}></Slider>
+                        </div>
+                        {
+                            isPlaying ?
+                            <Button onClick={pause}>Pause</Button> :
+                            <Button onClick={play}>Play</Button>
+                        }
                     </div>
                 </div>
             </div>
