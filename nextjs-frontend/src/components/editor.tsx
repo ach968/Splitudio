@@ -27,16 +27,61 @@ interface TrackState {
     volume: number;
 }
 
+const trackList = [
+    {
+        id: "track-id-1",
+        fileUrl: "/vocals.wav",
+        trackName: "Vocal",
+        waveColor: "#fb2c36",
+        className: "border-red-400 shadow-[0px_0px_50px_#fb2c3633]",
+    },
+    {
+        id: "track-id-2",
+        fileUrl: "/drums.wav",
+        trackName: "Drums",
+        waveColor: "#efb100",
+        className: "border-orange-400 shadow-[0px_0px_50px_#efb10033]",
+    },
+    {
+        id: "track-id-3",
+        fileUrl: "/bass.wav",
+        trackName: "Bass",
+        waveColor: "#facc15",
+        className: "border-yellow-400 shadow-[0px_0px_50px_#facc1533]",
+    },
+    {
+        id: "track-id-4",
+        fileUrl: "/other.wav",
+        trackName: "Guitar",
+        waveColor: "#4ade80",
+        className: "border-green-400 shadow-[0px_0px_50px_#4ade8033]",
+    },
+    {
+        id: "track-id-5",
+        fileUrl: "/vocals.wav",
+        trackName: "Piano",
+        waveColor: "#60a5fa",
+        className: "border-blue-400 shadow-[0px_0px_50px_#60a5fa33]",
+    },
+    {
+        id: "track-id-6",
+        fileUrl: "/drums.wav",
+        trackName: "Other",
+        waveColor: "#a78bfa",
+        className: "border-violet-400 shadow-[0px_0px_50px_#a78bfa33]",
+    },
+];
+
 export default function Editor() {
     const [isPlaying, setIsPlaying] = useState(false);
-    const [trackStates, setTrackStates] = useState<Record<number, TrackState>>({});
+    const [trackStates, setTrackStates] = useState<Record<string, TrackState>>({});
     const [currentTime, setCurrentTime] = useState(0);
     const [selected, setSelected] = useState(false);
 
     // Prevent feedback loop
     const isSeekingRef = useRef(false);
     const lastSeekTimeRef = useRef<number | null>(null);
-    const [focused, setFocused] = useState<number | null>(null);
+    const [focused, setFocused] = useState<string | null>(null);
 
     // This is all for highlighting a section
     const MINWIDTH = 2;
@@ -68,9 +113,9 @@ export default function Editor() {
         }
     }, [containerRef.current, wrapperRef.current, waveformWidth]);
 
-    const registerWaveSurfer = (id: number, ws: any) => {
+    const registerWaveSurfer = (id: string, ws: any) => {
         setTrackLength(ws.getDuration())
-        setTrackStates((prev: Record<number, TrackState>) => {
+        setTrackStates((prev: Record<string, TrackState>) => {
             return {
                 ...prev,
                 [id]: {ws, volume: 1}
@@ -78,12 +123,12 @@ export default function Editor() {
         })
     };
 
-    const updateTrackVolume = (id:number, newVolume: number) => {
+    const updateTrackVolume = (id:string, newVolume: number) => {
         if(focused != null && focused != id) {
             setFocusedLayer(null);
         }
 
-        setTrackStates((prev: Record<number, TrackState>) => {
+        setTrackStates((prev: Record<string, TrackState>) => {
             const track = prev[id]
             if(track && track.ws) {
                 track.ws.setVolume(newVolume);
@@ -95,7 +140,7 @@ export default function Editor() {
         })
     }
 
-    const setFocusedLayer = (setId: number | null) => {
+    const setFocusedLayer = (setId: string | null) => {
         if(setId == null) {
             Object.values(trackStates).forEach((trackState) => {
                 if (trackState.ws) trackState.ws.setVolume(trackState.volume);
@@ -103,7 +148,7 @@ export default function Editor() {
         }
         else {
             Object.entries(trackStates).forEach(([id, trackState])=> {
-                if(setId != Number(id) && trackState.ws) {
+                if(setId != id && trackState.ws) {
                     trackState.ws.setVolume(0);
                 }
                 else {
@@ -346,107 +391,34 @@ export default function Editor() {
                         className="relative flex flex-col gap-3 border border-neutral-700 rounded-lg lg:gap-6 lg:p-5 p-3">
                             
                             <WaveformHighlight
-                                containerRef={containerRef.current} // reads container ref
-                                start={start}
-                                end={end}
-                                trackLength={trackLength}
-                                waveformWidth={waveformWidth}
-                                waveformOffset={waveformOffset}
-                                minWidth={MINWIDTH}
+                            containerRef={containerRef.current} // reads container ref
+                            start={start}
+                            end={end}
+                            trackLength={trackLength}
+                            waveformWidth={waveformWidth}
+                            waveformOffset={waveformOffset}
+                            minWidth={MINWIDTH}
                             />
                             
-                            
-                            <Track
-                                id={1}
-                                className="border-red-400 shadow-[0px_0px_50px_#fb2c3633]"
-                                fileUrl="/vocals.wav"
-                                trackName="Vocal"
-                                waveColor="#fb2c36"
+                            {trackList.map((track) => (
+                                <Track
+                                key={track.id}
+                                id={track.id}
+                                className={track.className}
+                                fileUrl={track.fileUrl}
+                                trackName={track.trackName}
+                                waveColor={track.waveColor}
                                 registerWaveSurfer={registerWaveSurfer}
                                 onUniversalSeek={onUniversalSeek}
                                 setIsPlaying={setIsPlaying}
-                                volume={trackStates[1] ? trackStates[1].volume : 1}
-                                updateVolume={(updateTrackVolume)}
+                                volume={trackStates[track.id] ? trackStates[track.id].volume : 1}
+                                updateVolume={updateTrackVolume}
                                 focused={focused}
                                 setFocused={setFocusedLayer}
                                 waveformContainerRef={containerRef} // Sets container ref on the waveform
                                 onTimeUpdate={onTimeUpdate}
-                            />
-                            <Track
-                                id={2}
-                                className="border-orange-400 shadow-[0px_0px_50px_#efb10033]"
-                                fileUrl="/drums.wav"
-                                trackName="Drums"
-                                waveColor="#efb100"
-                                registerWaveSurfer={registerWaveSurfer}
-                                onUniversalSeek={onUniversalSeek}
-                                setIsPlaying={setIsPlaying}
-                                volume={trackStates[2] ? trackStates[2].volume : 1}
-                                updateVolume={(updateTrackVolume)}
-                                focused={focused}
-                                setFocused={setFocusedLayer}
-                                onTimeUpdate={onTimeUpdate}
-                            />
-                            <Track
-                                id={3}
-                                className="border-yellow-400 shadow-[0px_0px_50px_#facc1533]"
-                                fileUrl="/bass.wav"
-                                trackName="Bass"
-                                waveColor="#facc15"
-                                registerWaveSurfer={registerWaveSurfer}
-                                onUniversalSeek={onUniversalSeek}
-                                setIsPlaying={setIsPlaying}
-                                volume={trackStates[3] ? trackStates[3].volume : 1}
-                                updateVolume={(updateTrackVolume)}
-                                focused={focused}
-                                setFocused={setFocusedLayer}
-                                onTimeUpdate={onTimeUpdate}
-                            />
-                            <Track
-                                id={4}
-                                className="border-green-400 shadow-[0px_0px_50px_#4ade8033]"
-                                fileUrl="/other.wav"
-                                trackName="Guitar"
-                                waveColor="#4ade80"
-                                registerWaveSurfer={registerWaveSurfer}
-                                onUniversalSeek={onUniversalSeek}
-                                setIsPlaying={setIsPlaying}
-                                volume={trackStates[4] ? trackStates[4].volume : 1}
-                                updateVolume={(updateTrackVolume)}
-                                focused={focused}
-                                setFocused={setFocusedLayer}
-                                onTimeUpdate={onTimeUpdate}
-                            />
-                            <Track
-                                id={5}
-                                className="border-blue-400 shadow-[0px_0px_50px_#60a5fa33]"
-                                fileUrl="/vocals.wav"
-                                trackName="Vocal"
-                                waveColor="#60a5fa"
-                                registerWaveSurfer={registerWaveSurfer}
-                                onUniversalSeek={onUniversalSeek}
-                                setIsPlaying={setIsPlaying}
-                                volume={trackStates[5] ? trackStates[5].volume : 1}
-                                updateVolume={(updateTrackVolume)}
-                                focused={focused}
-                                setFocused={setFocusedLayer}
-                                onTimeUpdate={onTimeUpdate}
-                            />
-                            <Track
-                                id={6}
-                                className="border-violet-400 shadow-[0px_0px_50px_#a78bfa33]"
-                                fileUrl="/drums.wav"
-                                trackName="Drums"
-                                waveColor="#a78bfa"
-                                registerWaveSurfer={registerWaveSurfer}
-                                onUniversalSeek={onUniversalSeek}
-                                setIsPlaying={setIsPlaying}
-                                volume={trackStates[6] ? trackStates[6].volume : 1}
-                                updateVolume={(updateTrackVolume)}
-                                focused={focused}
-                                setFocused={setFocusedLayer}
-                                onTimeUpdate={onTimeUpdate}
-                            />
+                                />
+                            ))}
                            
                         </div>
                     </div>
@@ -483,7 +455,6 @@ export default function Editor() {
                                         </TooltipContent>
                                     </Tooltip>
                                 </TooltipProvider>
-                                
                                 
                                 <TooltipProvider>
                                     <Tooltip>

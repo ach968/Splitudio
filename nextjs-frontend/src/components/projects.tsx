@@ -27,6 +27,8 @@ import {
 } from "@/components/ui/context-menu"
 import Share from "./share-dialog-header"
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "./ui/dialog"
+import EnterSVG from "@/assets/enter"
+import { Button } from "./ui/button"
 
 interface Project {
     id: string;
@@ -49,7 +51,7 @@ export default function Projects({ initialProjects }: { initialProjects: Project
     // Only plays framer animations once
     const [hasMounted, setHasMounted] = useState(false);
     useEffect(() => {
-    setHasMounted(true);
+        setHasMounted(true);
     }, []);
 
     const filteredProjects = projects.filter((project) => {
@@ -63,6 +65,7 @@ export default function Projects({ initialProjects }: { initialProjects: Project
     // used to autofocus rename Input field because react DOM is stupid
     const inputElement = useRef<HTMLInputElement | null>(null);
     useEffect(() => {
+        console.log("renaming:" + renaming);
         if (renaming && inputElement.current != null) {
             setTimeout(() => {
                 inputElement.current?.focus();
@@ -195,7 +198,16 @@ export default function Projects({ initialProjects }: { initialProjects: Project
                                 </TableHeader>
                                 <TableBody>
                                     {sortedProjects.map((project, idx) => (
-                                        <TableRow key={project.id} className="hover:bg-white/15">
+                                        <TableRow 
+                                        onClick={(e)=>{
+                                            // Cancel out when user clicks off
+                                            if(!(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLButtonElement) && renaming != null) {
+                                                setRenaming(null);
+                                                setNewName('');
+                                            }
+                                        }}
+                                        key={project.id} 
+                                        className="hover:bg-white/15">
                                             <ContextMenu>
                                                 <ContextMenuTrigger>
                                                     {renaming !== project.id ?
@@ -229,19 +241,29 @@ export default function Projects({ initialProjects }: { initialProjects: Project
                                                     <div className="flex justify-between pt-3 pb-3">
                                                         <TableCell>
                                                             <span className="flex gap-3 items-baseline">
-                                                                <Input
-                                                                ref={inputElement}
-                                                                className="border-neutral-400 text-white"
-                                                                autoFocus
-                                                                value={newName}
-                                                                onChange={(e) => setNewName(e.target.value)}
-                                                                onKeyDown={(e) => {
-                                                                    if (e.key === "Enter") {
-                                                                      handleRenameSubmit(project.id);
-                                                                    }
-                                                                }}
-                                                                onBlur={() => {handleRenameSubmit(project.id)}} 
-                                                                />
+                                                                <div className="relative flex items-center">
+                                                                    <Input
+                                                                    ref={inputElement}
+                                                                    className="border-neutral-400 w-[200px] text-white pr-10"
+                                                                    autoFocus
+                                                                    value={newName}
+                                                                    onChange={(e) => setNewName(e.target.value)}
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === "Enter") {
+                                                                            handleRenameSubmit(project.id);
+                                                                        }
+                                                                    }}
+                                                                    />
+                                                                    <Button 
+                                                                    className=" absolute right-1 w-7 h-7 group" 
+                                                                    variant="ghost" 
+                                                                    size="icon"
+                                                                    onClick={(e)=>handleRenameSubmit(project.id)}>
+                                                                        <EnterSVG className="group-hover:invert"></EnterSVG>
+                                                                    </Button>
+                                                                   
+                                                                </div>
+                                                                
                                                                 <p className="text-neutral-400 text-sm line-clamp-1">/ {project.file}</p>
                                                             </span>
                                                         </TableCell>

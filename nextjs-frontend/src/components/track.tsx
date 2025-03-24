@@ -15,20 +15,21 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
+import Link from 'next/link';
 
 interface TrackProps {
-    id: number;
-    focused: number | null; // id of the track that is focused
+    id: string;
+    focused: string | null; // id of the track that is focused
     fileUrl: string;
     waveColor: string;
     trackName: string;
     className: string;
     volume: number;
     onUniversalSeek: (event: any) => void;
-    registerWaveSurfer: (id: number, ws: any) => void;
+    registerWaveSurfer: (id: string, ws: any) => void;
     setIsPlaying: (status: boolean) => void;
-    updateVolume: (id: number, newVol: number) => void;
-    setFocused: (id: number | null) => void;
+    updateVolume: (id: string, newVol: number) => void;
+    setFocused: (id: string | null) => void;
     waveformContainerRef?: React.RefObject<HTMLDivElement | null>
     onTimeUpdate: (event: any) => void;
 }
@@ -76,7 +77,7 @@ export default function Track({
                     step={0.01}
                     className='w-20'
                     onValueChange={(e)=>onVolumeChange(e[0])}
-                    value={[focused && focused !=id ? 0 : volume]}
+                    value={[focused && focused != id ? 0 : volume]}
                 />
                 <div className="flex gap-2">
                     <TooltipProvider>
@@ -140,27 +141,43 @@ export default function Track({
     
             {/* Action Buttons */}
             <div className="ml-4 flex flex-col gap-2">
+                <div className="flex flex-row gap-2 justify-center">
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                            <Button size="icon" className="w-9 h-9 rounded-full group" variant='outline' >
+                                <SheetMusic className="invert-0 group-hover:invert" />
+                            </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Convert to Sheet Music</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                            <Button size="icon" className="w-9 h-9 rounded-full group" variant="outline">
+                                <MusicNote className="invert-0 group-hover:invert" />
+                            </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Download MP3</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </div>
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger>
-                        <Button size="icon" className="w-9 h-9 rounded-full group" variant='outline' >
-                            <SheetMusic className="invert-0 group-hover:invert" />
+                        <Button className="w-20 h-9 rounded-full group" variant="outline">
+                            <Link href="/play"> 
+                                <p>Play Midi</p>
+                            </Link>
                         </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                            <p>Convert to Sheet Music</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger>
-                        <Button size="icon" className="w-9 h-9 rounded-full group" variant="outline">
-                            <MusicNote className="invert-0 group-hover:invert" />
-                        </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>Download MP3</p>
+                            <p>Launch interactive midi player</p>
                         </TooltipContent>
                     </Tooltip>
                 </TooltipProvider>

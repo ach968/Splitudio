@@ -10,7 +10,7 @@ export default function Footer() {
                 <a href="/editor">Editor</a>
                 <a href="/help">Help</a>
             </nav>
-            <p className='mt-6'>&copy; {d.getFullYear()} Music-To-Sheets.</p>
+            <p className='mt-6'>{d.getFullYear()} Music-To-Sheets.</p>
         </div>
   </footer>
 }
