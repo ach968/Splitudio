@@ -58,7 +58,7 @@ export default function PianoRoll({ notes, windowStart, windowDuration, isFullPi
         const left = (note.midi - MIN_MIDI) * KEY_WIDTH;
         return <div
                 key={index}
-                className="absolute bg-blue-500 opacity-75 rounded-sm"
+                className="absolute bg-neutral-200 rounded-sm"
                 style={{
                 bottom: bottom, // Clip if note starts above window
                 left,
@@ -70,13 +70,12 @@ export default function PianoRoll({ notes, windowStart, windowDuration, isFullPi
     }
 
     return <div ref={containerRef}
-        className="relative border border-neutral-800 bg-gray-950 overflow-y-clip"
-        style={{ width: "100%", height: "100%" }}>
+        className="relative border border-neutral-800 bg-gray-950 overflow-y-clip w-full h-full">
 
-            {/* Render falling note blocks */}
-            { 
-                notes.map((note, index) => createNote(note, index))
-            }
+        {/* Render falling note blocks */}
+        { 
+            notes.map((note, index) => createNote(note, index))
+        }
 
         {/* Show lines for note alignment */}
         {Array.from({ length: KEY_COUNT }).map((_, idx) => (

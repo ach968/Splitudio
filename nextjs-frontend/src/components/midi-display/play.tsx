@@ -11,7 +11,7 @@ import * as SliderPrimitive from "@radix-ui/react-slider"
 // import { Tone } from "tone";
 import * as Tone from "tone";
 import { PolySynth, Synth, SynthOptions } from "tone";
-
+import Piano from "@/components/midi-display/piano";
 interface Note {
     midi: number; // e.g., 60 for middle C
     time: number; // in seconds, when the note starts
@@ -99,7 +99,6 @@ export default function Play({ midiData } : {midiData : Midi}) {
     }
 
     
-
     const sampler = useRef<PolySynth<Synth<SynthOptions>>>(null);
     // Hashed string: note.midi-note.time
     const [buffer, setBuffer] = useState(new Set<string>()); // stores the recently used notes so we don't play them again
@@ -110,12 +109,14 @@ export default function Play({ midiData } : {midiData : Midi}) {
 
     useEffect(()=>{
 
+        console.log(buffer)
+
         // Add notes so buffer so we don't play it again
         notes.forEach((note: Note)=>{
             const TOLERANCE = 0.05;
-            if(!buffer.has(`${note.name}-${note.time}-${note.duration}`) && Math.abs(note.time - currentTime) < TOLERANCE) {
+            if(!buffer.has(`${note.name}-${note.time}-${note.duration}-${note.midi}`) && Math.abs(note.time - currentTime) < TOLERANCE) {
                 sampler.current?.triggerAttackRelease(note.name, note.duration, undefined, note.velocity);
-                setBuffer((buff)=>new Set(buff).add(`${note.name}-${note.time}-${note.duration}`))
+                setBuffer((buff)=>new Set(buff).add(`${note.name}-${note.time}-${note.duration}-${note.midi}`))
             }
         })
 
@@ -128,8 +129,7 @@ export default function Play({ midiData } : {midiData : Midi}) {
                 // parts[2] should be note.duration
                 const noteTime = parseFloat(parts[1]);
                 const noteDuration = parseFloat(parts[2]);
-                const bufferOffset = 0.5; // window offset in seconds
-                if (noteTime + noteDuration + bufferOffset < currentTime) {
+                if (noteTime + noteDuration < currentTime) {
                     newBuffer.delete(encodedNote);
                 }
             });
@@ -190,7 +190,7 @@ export default function Play({ midiData } : {midiData : Midi}) {
     return <section>
         <EditorNav />
 
-        <div className="flex flex-col w-full h-screen bg-black text-white p-6">
+        <div className="flex flex-col w-full min-h-screen h-screen bg-black text-white p-6">
             <div className="pt-20">
                 {
                     isPlaying ?
@@ -209,26 +209,37 @@ export default function Play({ midiData } : {midiData : Midi}) {
                 windowDuration={WINDOW_SIZE} 
                 isFullPiano={isFullPiano}
                 />
+                
             </div>
+            
+            <div className="w-full h-20">
+                <Piano notes={buffer} isFullPiano={isFullPiano}></Piano>
+            </div>
+            
+            <div className="w-full justify-center flex">
+                <div className="container px-3 lg:px-5">
+                    <div className="mt-2 flex gap-3">
+                        <p className="font-mono text-xs">{formatTime(currentTime)}</p>
 
-            {/* Stolen from shadcn */}
-            <div className="mt-2 flex gap-3">
-                <p className="font-mono text-xs">{formatTime(currentTime)}</p>
-                <SliderPrimitive.Root
-                className="relative flex w-full touch-none select-none items-center"
-                min={0}
-                max={midiData.duration}
-                step={0.01}
-                value={[currentTime]}
-                onValueChange={(e:any) => setCurrentTime(parseFloat(e[0]))}>
-                    <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-gray-700">
-                        <SliderPrimitive.Range className="absolute h-full bg-white" />
-                    </SliderPrimitive.Track>
-                </SliderPrimitive.Root>
-                <p className="font-mono text-xs">{formatTime(midiData.tracks[0].duration)}</p>
+                        {/* Stolen from shadcn ts */}
+                        <SliderPrimitive.Root
+                        className="relative flex w-full touch-none select-none items-center"
+                        min={0}
+                        max={midiData.duration}
+                        step={0.01}
+                        value={[currentTime]}
+                        onValueChange={(e:any) => setCurrentTime(parseFloat(e[0]))}>
+                            <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-gray-700">
+                                <SliderPrimitive.Range className="absolute h-full bg-white" />
+                            </SliderPrimitive.Track>
+                        </SliderPrimitive.Root>
+                        <p className="font-mono text-xs">{formatTime(midiData.tracks[0].duration)}</p>
+                    </div>
+                </div>
             </div>
             
         </div>
+            
         <Footer />
     </section>
 }
