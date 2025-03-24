@@ -26,7 +26,6 @@ export default function Play({ midiData } : {midiData : Midi}) {
 
     const [currentTime, setCurrentTime] = useState(0);
     const [isFullPiano, setIsFullPiano] = useState(true) // minMidi 21 : 36, maxMidi 108 : 96
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const pianoRollContainerRef = useRef<HTMLDivElement>(null);
     
@@ -75,9 +74,11 @@ export default function Play({ midiData } : {midiData : Midi}) {
     }, []);
 
     useEffect(()=>{
+
+        console.log(buffer);
+
         // Add notes so buffer so we don't play it again
         notes.forEach((note: Note)=>{
-
             const TOLERANCE = 0.05;
             if(!buffer.has(`${note.name}-${note.time}-${note.duration}`) && Math.abs(note.time - currentTime) < TOLERANCE) {
                 sampler.current?.triggerAttackRelease(note.name, note.duration, undefined, note.velocity);
