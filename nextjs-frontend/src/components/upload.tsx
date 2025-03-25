@@ -1,7 +1,6 @@
 "use client"
 
 import DragDropSVG from "@/assets/drag-drop";
-import EditorNav from "@/components/editor-nav";
 import {
     Tabs,
     TabsContent,
@@ -17,6 +16,7 @@ import { Input } from "./ui/input";
 import { redirect } from "next/navigation";
 import { Progress } from "./ui/progress";
 import { motion } from "framer-motion"
+import Topbar from "./topbar";
 
 export default function Upload({ isPremiumUser } : { isPremiumUser : boolean }) {
     // For drag and drop
@@ -147,7 +147,7 @@ export default function Upload({ isPremiumUser } : { isPremiumUser : boolean }) 
         <section>
             <div className="w-screen flex h-screen bg-black">
                 <div className="flex flex-col justify-start w-full h-full">
-                    <EditorNav />
+                    <Topbar />
                     <div className="flex justify-center w-full mt-28">
                         <div className="container px-3 lg:px-5 flex justify-center">
                             <motion.div

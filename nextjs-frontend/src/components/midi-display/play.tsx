@@ -3,7 +3,6 @@
 import PianoRoll from "@/components/midi-display/piano-roll";
 import { useEffect, useRef, useState } from "react";
 import { Midi } from '@tonejs/midi'
-import EditorNav from "../editor-nav";
 import { Slider } from "../ui/slider";
 import Footer from "../footer";
 import { Button } from "../ui/button";
@@ -13,6 +12,7 @@ import * as Tone from "tone";
 import { PolySynth, Synth, SynthOptions } from "tone";
 import Piano from "@/components/midi-display/piano";
 import { Label } from "../ui/label";
+import Topbar from "../topbar";
 interface Note {
     midi: number; // e.g., 60 for middle C
     time: number; // in seconds, when the note starts
@@ -214,7 +214,7 @@ export default function Play({ midiData } : {midiData : Midi}) {
     };
 
     return <section>
-        <EditorNav />
+        <Topbar />
 
         <div className="flex flex-col w-full min-h-screen h-screen bg-black text-white p-6">
             <div className="w-full h-full overflow-y-auto"

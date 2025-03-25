@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import EditorNav from "@/components/editor-nav";
 import Footer from "@/components/footer";
 import { motion } from "framer-motion";
 import { signInWithEmailAndPassword, signInWithGoogle } from "@/lib/firebase/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Topbar from "@/components/topbar";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -49,7 +49,7 @@ export default function Login() {
   return (
     <section>
       <div className="flex flex-col items-center w-full min-h-screen bg-black">
-        <EditorNav />
+        <Topbar />
 
         <motion.div
           initial={{ opacity: 0, y: 5 }}

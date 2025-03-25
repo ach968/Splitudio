@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
-import EditorNav from "@/components/editor-nav"
 import SearchSVG from "@/assets/search"
 import PlaySVG from "@/assets/play"
 import { useEffect, useRef, useState } from "react";
@@ -29,6 +28,7 @@ import Share from "./share-dialog-header"
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "./ui/dialog"
 import EnterSVG from "@/assets/enter"
 import { Button } from "./ui/button"
+import Topbar from "./topbar"
 
 interface Project {
     id: string;
@@ -117,7 +117,7 @@ export default function Projects({ initialProjects }: { initialProjects: Project
     };
 
     return <section>
-            <EditorNav />
+            <Topbar />
 
             <div className="flex flex-col w-full min-h-screen bg-black">
                 <div className="flex flex-col h-full">

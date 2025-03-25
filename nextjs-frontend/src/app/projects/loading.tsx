@@ -7,14 +7,14 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import EditorNav from "@/components/editor-nav"
 import Footer from "@/components/footer"
 import { twMerge } from "tailwind-merge"
+import Topbar from "@/components/topbar"
 
 export default function Loading() {
 
     return <section>
-            <EditorNav />
+            <Topbar />
 
             <div className="flex flex-col w-full min-h-screen bg-black">
                 <div className="flex flex-col h-full">

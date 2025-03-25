@@ -3,12 +3,12 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from '@/components/ui/input'
 import { Button } from "@/components/ui/button"
-import EditorNav from "@/components/editor-nav"
 import Link from "next/link"
 import Footer from "@/components/footer"
 import PremiumText from "@/components/premium-text"
 import { useState } from "react"
 import { motion } from "framer-motion"
+import Topbar from "@/components/topbar"
 export default function Profile() {
 
     const subscriptionStatus: number = 1;
@@ -46,7 +46,7 @@ export default function Profile() {
 
     return <section>
         <div className="flex flex-col items-center w-full min-h-screen bg-black">
-            <EditorNav />
+            <Topbar />
             
             {/* Username and password */}
             <motion.div 
