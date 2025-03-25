@@ -8,7 +8,6 @@ import { useAuth } from "./authContext";
 export default function Topbar() {
   const pathname = usePathname();
   const { user, loading } = useAuth();
-
   const publicNavigation: never[] = [];
 
   const privateNavigation = [
@@ -40,6 +39,7 @@ export default function Topbar() {
             </Link>
           ))}
         </div>
+
         <div className="ml-auto flex items-center space-x-4">
           {user ? (
             <Link

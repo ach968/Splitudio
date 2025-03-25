@@ -9,9 +9,9 @@ import {
   signInWithEmailAndPassword,
   signInWithGoogle,
 } from "@/lib/firebase/auth";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Link from "next/link";
-import Topbar from "@/components/topbar";
+import Topbar from "@/components/loggedout-nav";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -27,7 +27,7 @@ export default function Login() {
 
     try {
       await signInWithEmailAndPassword(email, password);
-      router.push("/");
+      router.push("/projects");
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -41,7 +41,7 @@ export default function Login() {
 
     try {
       await signInWithGoogle();
-      router.push("/");
+      router.push("/projects")
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -123,7 +123,7 @@ export default function Login() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full border-neutral-500 text-white hover:text-white"
+                className="w-full border-neutral-500 text-white"
                 onClick={handleGoogleLogin}
                 disabled={isLoading}
               >

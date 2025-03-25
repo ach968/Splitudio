@@ -2,11 +2,12 @@
 
 import { useEffect } from "react";
 import { signOut } from "@/lib/firebase/auth";
+import { redirect } from 'next/navigation';
 
 export default function Logout() {
   useEffect(() => {
     signOut();
-    window.location.href = "/";
+    redirect("/")
   }, []);
 
   return (

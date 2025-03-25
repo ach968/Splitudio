@@ -11,8 +11,8 @@ import * as SliderPrimitive from "@radix-ui/react-slider"
 import * as Tone from "tone";
 import { PolySynth, Synth, SynthOptions } from "tone";
 import Piano from "@/components/midi-display/piano";
-import { Label } from "../ui/label";
-import Topbar from "../topbar";
+import EditorNav from "../loggedin-nav";
+
 interface Note {
     midi: number; // e.g., 60 for middle C
     time: number; // in seconds, when the note starts
@@ -214,7 +214,7 @@ export default function Play({ midiData } : {midiData : Midi}) {
     };
 
     return <section>
-        <Topbar />
+        <EditorNav />
 
         <div className="flex flex-col w-full min-h-screen h-screen bg-black text-white p-6">
             <div className="w-full h-full overflow-y-auto"

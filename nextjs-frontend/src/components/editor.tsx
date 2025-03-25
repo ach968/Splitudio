@@ -18,7 +18,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
-import EditorNav from "@/components/editor-nav";
+import EditorNav from "@/components/loggedin-nav";
 import { useParams } from "next/navigation";
 
 

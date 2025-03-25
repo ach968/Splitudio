@@ -8,7 +8,8 @@ import Footer from "@/components/footer"
 import PremiumText from "@/components/premium-text"
 import { useState } from "react"
 import { motion } from "framer-motion"
-import Topbar from "@/components/topbar"
+import Topbar from "@/components/loggedout-nav"
+import EditorNav from "@/components/loggedin-nav"
 export default function Profile() {
 
     const subscriptionStatus: number = 1;
@@ -46,7 +47,7 @@ export default function Profile() {
 
     return <section>
         <div className="flex flex-col items-center w-full min-h-screen bg-black">
-            <Topbar />
+            <EditorNav />
             
             {/* Username and password */}
             <motion.div 
@@ -82,14 +83,16 @@ export default function Profile() {
                                     placeholder="********" 
                                     type="password" 
                                     className="border-neutral-500 text-white"
-                                    value={password_1} 
+                                    value={password_1}
+                                    required
                                     onChange={(e:any)=>setPassword_1(e.target.value)}></Input>
                                 </span>
                                 
                                 <span>
                                     <p className="text-neutral-400 leading-8">Username</p>
                                     <Input 
-                                    value={username_1} 
+                                    value={username_1}
+                                    required
                                     onChange={(e:any)=>setUsername_1(e.target.value)} 
                                     className="border-neutral-500 text-white"></Input>
                                 </span>
@@ -118,7 +121,8 @@ export default function Profile() {
                                     placeholder="********" 
                                     type="password" 
                                     className="border-neutral-500 text-white"
-                                    value={currpassword_2} 
+                                    value={currpassword_2}
+                                    required
                                     onChange={(e:any)=>setCurrpassword_2(e.target.value)}></Input>
                                 </span>
                                 
@@ -129,6 +133,7 @@ export default function Profile() {
                                     type="password" 
                                     className="border-neutral-500 text-white"
                                     value={newpassword_2} 
+                                    required
                                     onChange={(e:any)=>setNewpassword_2(e.target.value)}></Input>
                                 </span>
                                 
