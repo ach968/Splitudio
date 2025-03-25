@@ -5,7 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/footer";
 import { motion } from "framer-motion";
-import { signInWithEmailAndPassword, signInWithGoogle } from "@/lib/firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  signInWithGoogle,
+} from "@/lib/firebase/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Topbar from "@/components/topbar";
@@ -24,7 +27,7 @@ export default function Login() {
 
     try {
       await signInWithEmailAndPassword(email, password);
-      router.push("/profile");
+      router.push("/");
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -38,7 +41,7 @@ export default function Login() {
 
     try {
       await signInWithGoogle();
-      router.push("/profile");
+      router.push("/");
     } catch (err: any) {
       setError(err.message);
     } finally {
