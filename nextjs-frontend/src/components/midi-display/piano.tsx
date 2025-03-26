@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useRef, useState } from "react";
+import { PolySynth, Synth, SynthOptions } from "tone";
 
 function isBlackKey(midi: number): boolean {
     const mod = midi % 12;
@@ -7,7 +8,7 @@ function isBlackKey(midi: number): boolean {
     return [1, 3, 6, 8, 10].includes(mod);
 }
 
-export default function Piano({notes, isFullPiano} : {notes: Set<string>, isFullPiano: boolean} ) {
+export default function Piano({notes, isFullPiano, sampler} : {notes: Set<string>, isFullPiano: boolean, sampler: PolySynth<Synth<SynthOptions>> | null} ) {
     // init constants
     const MIN_MIDI = isFullPiano ? 21 : 36;
     const MAX_MIDI = isFullPiano ? 108 : 96;
@@ -16,6 +17,8 @@ export default function Piano({notes, isFullPiano} : {notes: Set<string>, isFull
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0 });
     
+    const [keysDown, setKeysDown] = useState<number[]>([])
+
     // Encode:
     // ${note.name}-${note.time}-${note.duration}-${note.midi}
     const activeMidis: Set<number> = new Set(
@@ -26,8 +29,9 @@ export default function Piano({notes, isFullPiano} : {notes: Set<string>, isFull
 
     const getKeyColor = (midi: number) => {
         const baseColor = isBlackKey(midi) ? "#000" : "#fff";
+
         if (activeMidis.has(midi)) {
-            // Apply a semi-transparent blue overlay
+            // Apply a semi-transparent overlay
             return `linear-gradient(to bottom, #DD7DDFAA, #E1CD86AA, #BBCB92AA, #71C2EFAA, #3BFFFFAA, #DD7DDFAA), ${baseColor}`;
         }
         return baseColor;
@@ -39,6 +43,7 @@ export default function Piano({notes, isFullPiano} : {notes: Set<string>, isFull
         }
         return ''
     }
+
     useEffect(() => {
         if (!containerRef.current) return;
 
@@ -64,11 +69,16 @@ export default function Piano({notes, isFullPiano} : {notes: Set<string>, isFull
         return (
           <div
             key={midi}
-            className="absolute h-full border-black border rounded-sm"
+            className="absolute h-full border-black border rounded-sm hover:cursor-pointer select-none"
+            // onPointerDown={()=>{
+            //     sampler?.triggerAttack(midi, undefined, 2)
+            // }}
+            // onPointerUp={()=>{
+            //     sampler?.triggerRelease(midi)
+            // }}
             style={{
               left: idx * KEY_WIDTH,
               width: KEY_WIDTH,
-              pointerEvents: "none",
               background: getKeyColor(midi),
               boxShadow: getShadow(midi)
             }}

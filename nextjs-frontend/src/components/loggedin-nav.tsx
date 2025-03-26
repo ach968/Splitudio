@@ -2,22 +2,15 @@
 
 import {
     NavigationMenu,
-    NavigationMenuContent,
-    NavigationMenuIndicator,
     NavigationMenuItem,
     NavigationMenuLink,
     NavigationMenuList,
-    NavigationMenuTrigger,
-    NavigationMenuViewport,
     navigationMenuTriggerStyle 
 } from "@/components/ui/navigation-menu"
 import Share from "@/components/share-dialog-header"
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
 import Link from "next/link";
@@ -39,7 +32,7 @@ export default function EditorNav({projectId, projectName, pauseCallback} : {pro
         }
     },[])
 
-    return <nav className="bg-black/50 backdrop-blur-md h-[80px] z-[999] justify-center items-center w-screen flex fixed top-0">
+    return <nav className="bg-black/50 backdrop-blur-md h-[70px] z-[999] justify-center items-center w-screen flex fixed top-0">
         <div className="flex flex-row w-full container items-baseline justify-between px-6 text-sm">
             <div className="flex gap-5 text-neutral-400 underline-offset-4">
                 <Link onClick={pauseCallback} href="/projects">

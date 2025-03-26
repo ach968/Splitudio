@@ -16,6 +16,7 @@ import { Input } from "./ui/input";
 import { redirect } from "next/navigation";
 import { Progress } from "./ui/progress";
 import { motion } from "framer-motion"
+import { useToast } from "@/hooks/use-toast"
 import EditorNav from "./loggedin-nav";
 
 export default function Upload({ isPremiumUser } : { isPremiumUser : boolean }) {
@@ -37,16 +38,26 @@ export default function Upload({ isPremiumUser } : { isPremiumUser : boolean }) 
     const [uploadProgress, setUploadProgress] = useState<number | null>(null);
     const [fileName, setFileName] = useState<string>("");
 
+    const { toast } = useToast()
+
     // Function to process files (validate, then upload)
     const handleFiles = (files: FileList) => {
         if (files.length !== 1) {
-            return alert("Upload only 1 file at a time");
+            toast({
+                title: "ERROR",
+                description: "Please upload 1 file",
+            })
+            return
         }
         const file = files[0];
         const validExtensions = [".mp3", ".wav", ".flac", ".aac"];
         const fileNameLC = file.name.toLowerCase();
         if (!validExtensions.some(ext => fileNameLC.endsWith(ext))) {
-            return alert("Upload an mp3, wav, flac, or aac file");
+            toast({
+                title: "ERROR",
+                description: "Please upload an mp3, wav, flac, or aac file",
+            })
+            return
         }
         setFileName(file.name);
 
@@ -59,7 +70,7 @@ export default function Upload({ isPremiumUser } : { isPremiumUser : boolean }) 
             setServerReturn(true);
             setTimeout(()=>{
                 redirect('/editor/project-id-returned')
-            }, 200);
+            }, 500);
             
         }, 10000)
 
@@ -148,7 +159,7 @@ export default function Upload({ isPremiumUser } : { isPremiumUser : boolean }) 
             <div className="w-screen flex h-screen bg-black">
                 <div className="flex flex-col justify-start w-full h-full">
                     <EditorNav />
-                    <div className="flex justify-center w-full mt-28">
+                    <div className="flex justify-center w-full mt-20">
                         <div className="container px-3 lg:px-5 flex justify-center">
                             <motion.div
                             initial={{opacity:0, y:7}}

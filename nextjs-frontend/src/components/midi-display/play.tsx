@@ -12,11 +12,12 @@ import * as Tone from "tone";
 import { PolySynth, Synth, SynthOptions } from "tone";
 import Piano from "@/components/midi-display/piano";
 import EditorNav from "../loggedin-nav";
+import Knob from "./knob";
 
 interface Note {
     midi: number; // e.g., 60 for middle C
     time: number; // in seconds, when the note starts
-    duration: number; // in seconds, how long the note lasts
+    duration: number; // how long a note is held for
     name: string; // e.g. "C4"
     pitch: string; // e.g. "C" 
     octave: number; // e.g. 4
@@ -24,8 +25,8 @@ interface Note {
 }
 
 
-export default function Play({ midiData } : {midiData : Midi}) {
-
+export default function Play({ midiData, duration } : {midiData : Midi, duration: number}) {
+    
     const [currentTime, setCurrentTime] = useState(0);
     const [isFullPiano, setIsFullPiano] = useState(true) // minMidi 21 : 36, maxMidi 108 : 96
 
@@ -39,6 +40,8 @@ export default function Play({ midiData } : {midiData : Midi}) {
 
     // Define piano size
     useEffect(()=>{
+        console.log(midiData)
+
         const noteOctaves = midiData.tracks[0].notes.map(note => note.octave);
         const minOctave = Math.min(...noteOctaves);
         const maxOctave = Math.max(...noteOctaves);
@@ -64,7 +67,7 @@ export default function Play({ midiData } : {midiData : Midi}) {
             else if(e.keyCode === 39) {
                 e.preventDefault();
                 setBuffer(new Set());
-                setCurrentTime((prev)=>Math.min(midiData.tracks[0].duration, prev+WINDOW_SIZE*0.5))
+                setCurrentTime((prev)=>Math.min(duration, prev+WINDOW_SIZE*0.5))
             }
             else if(e.ctrlKey || e.metaKey && e.key === '=') {
                 e.preventDefault();
@@ -116,20 +119,26 @@ export default function Play({ midiData } : {midiData : Midi}) {
             setCurrentTime((prev) => {
                 let newTime = prev + e.deltaY * multiplier;
                 if (newTime < 0) newTime = 0;
-                if (newTime > midiData.duration) newTime = midiData.duration;
+                if (newTime > duration) newTime = duration;
                 return newTime;
             });
         }
     }
-
     
     const sampler = useRef<PolySynth<Synth<SynthOptions>>>(null);
-    // Hashed string: note.midi-note.time
-    const [buffer, setBuffer] = useState(new Set<string>()); // stores the recently used notes so we don't play them again
+    const [volume, setVolume] = useState(1); // in Db variation from original
 
     useEffect(() => {
         sampler.current = new Tone.PolySynth(Tone.Synth).toDestination()
+        
     }, []);
+
+    useEffect(()=> {
+        sampler.current!.volume.value =  (volume * 50) - 50;
+    }, [volume])
+
+    // Hashed string: note.midi-note.time
+    const [buffer, setBuffer] = useState(new Set<string>()); // stores the recently used notes so we don't play them again
 
     useEffect(()=>{
 
@@ -139,7 +148,7 @@ export default function Play({ midiData } : {midiData : Midi}) {
         // 1.   Makes sure that notes are not played twice by synth
         // 2.   Used for piano overlay
         notes.forEach((note: Note)=>{
-            const TOLERANCE = 0.05;
+            const TOLERANCE = 0.02;
             if(!buffer.has(`${note.name}-${note.time}-${note.duration}-${note.midi}`) && Math.abs(note.time - currentTime) < TOLERANCE) {
                 sampler.current?.triggerAttackRelease(note.name, note.duration, undefined, note.velocity);
                 setBuffer((buff)=>new Set(buff).add(`${note.name}-${note.time}-${note.duration}-${note.midi}`))
@@ -229,7 +238,7 @@ export default function Play({ midiData } : {midiData : Midi}) {
             </div>
             
             <div className="w-full h-20">
-                <Piano notes={buffer} isFullPiano={isFullPiano}></Piano>
+                <Piano notes={buffer} isFullPiano={isFullPiano} sampler={sampler.current}></Piano>
             </div>
             
             <div className="w-full justify-center items-center flex flex-col">
@@ -241,7 +250,7 @@ export default function Play({ midiData } : {midiData : Midi}) {
                         <SliderPrimitive.Root
                         className="relative flex w-full touch-none select-none items-center"
                         min={0}
-                        max={midiData.duration}
+                        max={duration}
                         step={0.01}
                         value={[currentTime]}
                         onValueChange={(e:any) => {
@@ -252,10 +261,10 @@ export default function Play({ midiData } : {midiData : Midi}) {
                                 <SliderPrimitive.Range className="absolute h-full bg-white" />
                             </SliderPrimitive.Track>
                         </SliderPrimitive.Root>
-                        <p className="font-mono text-xs">{formatTime(midiData.tracks[0].duration)}</p>
+                        <p className="font-mono text-xs">{formatTime(duration)}</p>
                     </div>
 
-                    <div className="flex justify-between w-full">
+                    <div className="flex justify-between w-full items-center mt-2">
                         <div className="flex gap-2 w-[200px] items-center">
                             <span className="font-mono text-xs">Window:{WINDOW_SIZE.toFixed(2)}s</span>
                             <Slider
@@ -271,6 +280,7 @@ export default function Play({ midiData } : {midiData : Midi}) {
                             <Button onClick={pause}>Pause</Button> :
                             <Button onClick={play}>Play</Button>
                         }
+                        <Knob size={30} value={volume} onChange={setVolume}></Knob>
                     </div>
                 </div>
             </div>

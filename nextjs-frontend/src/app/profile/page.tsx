@@ -54,7 +54,7 @@ export default function Profile() {
             initial={{opacity: 0, y:5}}
             animate={{opacity: 1, y:0}}
             transition={{duration: 0.5}}
-            className="container pt-28 flex justify-center items-center">
+            className="container mt-20 flex justify-center items-center">
 
                 <Tabs defaultValue="username" className="px-3 lg:px-5 max-w-[700px] w-full">
                     <TabsList className="flex w-full">

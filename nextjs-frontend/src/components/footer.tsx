@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
     const d = new Date();
 
@@ -10,6 +12,9 @@ export default function Footer() {
                 <a href="/editor">Editor</a>
                 <a href="/help">Help</a>
             </nav>
+            <div className="mt-6">
+                Made By <Link className="hover:underline" href="https://github.com/ach968">Andrew</Link>, <Link className="hover:underline" href="https://github.com/Slava-code">Slava</Link>, and <Link className="hover:underline" href="https://github.com/njyeung">Nick</Link>
+            </div>
             <p className='mt-6'>{d.getFullYear()} Splitudio.</p>
         </div>
   </footer>

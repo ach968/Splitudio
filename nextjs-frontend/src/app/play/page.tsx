@@ -1,22 +1,24 @@
-"use client"
+
+
 import Play from '@/components/midi-display/play'
 import { Midi } from '@tonejs/midi'
-import { useEffect, useState } from 'react';
 
-export default function Page() {
-    const [midiData, setMidiData] = useState<Midi | null>(null);
-    
-    useEffect(()=> {
-        async function loadMidi() {
-            const data = await Midi.fromUrl("/Am_I_Blue_AB.mid")
-            setMidiData(data);
-          }
+export default async function Page() {
+    async function getMidi() {
+        // Simulate a delay (e.g. network request)
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
 
-          loadMidi();
-    }, [])
+    // simulate waiting for backend
+    const wait = await getMidi();
     
-    if(midiData == null)
-        return <>LOADING PAGE</>
+    var data = await Midi.fromUrl("https://bitmidi.com/uploads/112561.mid")
     
-    return <Play midiData={midiData}/>
+    // bring out the complex stuff we need
+    const duration = data.tracks[0].duration;
+
+    // get rid of complex objects so next can pass ts
+    data = JSON.parse(JSON.stringify(data));
+
+    return <Play midiData={data} duration={duration}/>
 }

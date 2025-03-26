@@ -123,7 +123,7 @@ export default function Projects({ initialProjects }: { initialProjects: Project
             <div className="flex flex-col w-full min-h-screen bg-black">
                 <div className="flex flex-col h-full">
                     
-                    <div className="flex justify-center w-full mt-28">
+                    <div className="flex justify-center w-full mt-20">
                         <div className="container lg:px-5 px-3">
                             <div className="w-full flex justify-end pb-3">
                                 <motion.div 

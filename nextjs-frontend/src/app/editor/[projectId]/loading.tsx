@@ -24,7 +24,7 @@ export default function Loading() {
                 
                 <EditorNav/>
 
-                <div className="mt-28 mb-3 flex w-full justify-center">
+                <div className="mt-20 mb-3 flex w-full justify-center">
                     <div className="container px-5">
                         <div className="flex gap-3 place-items-baseline justify-start">
                             <div className="animate-pulse">

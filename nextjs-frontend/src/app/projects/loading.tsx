@@ -18,7 +18,7 @@ export default function Loading() {
             <div className="flex flex-col w-full min-h-screen bg-black">
                 <div className="flex flex-col h-full">
                     
-                    <div className="flex justify-center w-full mt-28">
+                    <div className="flex justify-center w-full mt-20">
                         <div className="container lg:px-5 px-3">
                             <div className="w-full flex justify-end pb-3">
                                 <div className="flex items-center justify-center space-x-2 pb-2 bg-black animate-pulse">
