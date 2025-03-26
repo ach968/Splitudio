@@ -49,7 +49,7 @@ export default function AuthPage() {
             <Button
               type="button"
               variant="outline"
-              className="w-full max-w-md border-neutral-500 text-white hover:text-white"
+              className="w-full max-w-md border-neutral-500 text-white hover:text-black hover:bg-white"
               onClick={handleGoogleAuth}
               disabled={isLoading}
             >
