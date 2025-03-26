@@ -19,7 +19,6 @@ export default function AuthPage() {
 
     try {
       const result = await signInWithGoogle();
-      const user = result.user;
 
       router.push("/projects");
     } catch (err: any) {
