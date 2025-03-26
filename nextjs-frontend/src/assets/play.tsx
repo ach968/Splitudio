@@ -1,6 +1,6 @@
 
 export default function PlaySVG({className}: {className?: string}) {
-    return <svg className={className} fill="#FFFF" width="800px" height="800px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    return <svg className={className} fill="#FFFF" width="800px" height="800px" viewBox="0 0 32 32" enableBackground="new 0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
 
     <g id="play">
     
