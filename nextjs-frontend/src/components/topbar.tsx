@@ -21,7 +21,7 @@ export default function Topbar() {
   const navigation = user ? privateNavigation : publicNavigation;
 
   return (
-    <nav className="pl-10 fixed top-0 z-50 w-full border-b border-neutral-800 bg-black/95 backdrop-blur supports-[backdrop-filter]:bg-black/60">
+    <nav className="pl-10 pr-10 fixed top-0 z-50 w-full border-b border-neutral-800 bg-black/95 backdrop-blur supports-[backdrop-filter]:bg-black/60">
       <div className="container flex h-14 items-center">
         <Link href="/" className="mr-6 flex items-center space-x-2">
           <span className="font-bold text-white">Splitudio</span>
@@ -40,7 +40,7 @@ export default function Topbar() {
             </Link>
           ))}
         </div>
-        <div className="ml-auto flex items-center space-x-4">
+        <div className="ml-auto flex items-center">
           {user ? (
             <Link
               href="/logout"
