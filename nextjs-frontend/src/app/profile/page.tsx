@@ -8,7 +8,7 @@ import Footer from "@/components/footer"
 import PremiumText from "@/components/premium-text"
 import { useState } from "react"
 import { motion } from "framer-motion"
-import Topbar from "@/components/loggedout-nav"
+import Topbar from "@/components/topbar"
 import EditorNav from "@/components/loggedin-nav"
 export default function Profile() {
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Footer from "@/components/footer";
-import Topbar from "@/components/loggedout-nav";
+import Topbar from "@/components/topbar";
 export default function Home() {
   return (
     <div className="flex flex-col items-center w-full h-screen bg-black">
