@@ -3,7 +3,7 @@
 // .
 // .
 export default function ListSVG({className}: {className?: string}) {
-    return <svg fill="#FFFF" className={className} width="800px" height="800px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" version="1.1">
+    return <svg fill="#FFFF" className={className} width="800px" height="800px" viewBox="0 0 32 32" enableBackground="new 0 0 32 32" version="1.1">
 
     <g id="play"/>
     

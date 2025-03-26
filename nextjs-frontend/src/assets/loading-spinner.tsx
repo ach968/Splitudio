@@ -14,7 +14,7 @@ export default function LoadingSpinnerSVG({className} : {className?: string}) {
                 animation: spinner_zKoa 2s linear infinite;
             }
             .spinner_V8m1 circle {
-                stroke-linecap: round;
+                strokeLinecap: round;
                 animation: spinner_YpZS 1.5s ease-in-out infinite;
             }
             @keyframes spinner_zKoa {
