@@ -20,19 +20,27 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Button } from "./ui/button"
-import { Switch } from "@/components/ui/switch"
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
-import { usePathname } from 'next/navigation'
-import { useState } from "react"
+import { redirect, usePathname } from 'next/navigation'
+import { useEffect, useState } from "react"
+import { useAuth } from "./authContext";
 
 export default function EditorNav({projectId, projectName, pauseCallback} : {projectId?: string, projectName?: string, pauseCallback?: ()=>void}) {
     const pathname = usePathname()
     const [isSharing, setIsSharing] = useState(false);
 
-    return <nav className="bg-black/50 backdrop-blur-md h-[100px] z-[999] justify-center w-screen flex fixed top-0">
-        <div className="flex flex-row w-full container items-baseline justify-between px-6 mt-8">
+    const { user, loading } = useAuth();
+    
+    // REDIRECT TO HOME PAGE IF NOT LOGGED IN
+    useEffect(()=>{
+        if(!user) {
+            redirect("/")
+        }
+    },[])
+
+    return <nav className="bg-black/50 backdrop-blur-md h-[80px] z-[999] justify-center items-center w-screen flex fixed top-0">
+        <div className="flex flex-row w-full container items-baseline justify-between px-6 text-sm">
             <div className="flex gap-5 text-neutral-400 underline-offset-4">
                 <Link onClick={pauseCallback} href="/projects">
                     <p className={twMerge(pathname==="/projects" && "text-white", "hover:cursor-pointer hover:text-white hover:underline")}>Projects</p>
@@ -62,7 +70,7 @@ export default function EditorNav({projectId, projectName, pauseCallback} : {pro
                             <NavigationMenuLink onClick={pauseCallback}
                             className={twMerge(navigationMenuTriggerStyle(), 
                             pathname.startsWith("/profile") && "bg-white text-black hover:bg-white/80")}>
-                                Profile
+                                <p className="text-sm">Profile</p> 
                             </NavigationMenuLink>
                         </Link>
                     </NavigationMenuItem>
@@ -70,7 +78,7 @@ export default function EditorNav({projectId, projectName, pauseCallback} : {pro
                         <Link href="/logout" legacyBehavior passHref>
                             <NavigationMenuLink onClick={pauseCallback}
                             className={navigationMenuTriggerStyle()}>
-                                Logout
+                                <p className="text-sm">Logout</p> 
                             </NavigationMenuLink>
                         </Link>
                     </NavigationMenuItem>

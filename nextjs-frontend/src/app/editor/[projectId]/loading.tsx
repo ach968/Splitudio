@@ -14,7 +14,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import SkeletonTrack from "@/components/skeleton-track";
-import Topbar from "@/components/topbar";
+import EditorNav from "@/components/loggedin-nav";
 
 export default function Loading() {
   return (
@@ -22,7 +22,7 @@ export default function Loading() {
         <div className="w-screen flex h-screen bg-black">
             <div className="flex flex-col justify-start w-full h-full">
                 
-                <Topbar/>
+                <EditorNav/>
 
                 <div className="mt-28 mb-3 flex w-full justify-center">
                     <div className="container px-5">

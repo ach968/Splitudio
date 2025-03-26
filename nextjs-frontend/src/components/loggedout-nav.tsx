@@ -8,7 +8,6 @@ import { useAuth } from "./authContext";
 export default function Topbar() {
   const pathname = usePathname();
   const { user, loading } = useAuth();
-
   const publicNavigation: never[] = [];
 
   const privateNavigation = [

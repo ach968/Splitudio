@@ -28,7 +28,8 @@ import Share from "./share-dialog-header"
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "./ui/dialog"
 import EnterSVG from "@/assets/enter"
 import { Button } from "./ui/button"
-import Topbar from "./topbar"
+import Topbar from "./loggedout-nav"
+import EditorNav from "./loggedin-nav"
 
 interface Project {
     id: string;
@@ -117,7 +118,7 @@ export default function Projects({ initialProjects }: { initialProjects: Project
     };
 
     return <section>
-            <Topbar />
+            <EditorNav />
 
             <div className="flex flex-col w-full min-h-screen bg-black">
                 <div className="flex flex-col h-full">
