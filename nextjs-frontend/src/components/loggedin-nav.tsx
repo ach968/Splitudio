@@ -30,7 +30,7 @@ export default function EditorNav({projectId, projectName, pauseCallback} : {pro
         if(!user) {
             redirect("/")
         }
-    },[])
+    },[user])
 
     return <nav className="bg-black/50 backdrop-blur-md h-[70px] z-[999] justify-center items-center w-screen flex fixed top-0">
         <div className="flex flex-row w-full container items-baseline justify-between px-6 text-sm">

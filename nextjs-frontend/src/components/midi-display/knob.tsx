@@ -19,7 +19,7 @@ export default function Knob({ className, value, onChange, size = 100 }: KnobPro
 
   // Define the angular range for the knob (in degrees)
   const minAngle = -45;
-  const maxAngle = 225;
+  const maxAngle = 90;
   // Map value (0 to 1) to an angle
   const angle = minAngle + (maxAngle - minAngle) * value;
 
@@ -44,7 +44,7 @@ export default function Knob({ className, value, onChange, size = 100 }: KnobPro
     if (deg > maxAngle) deg = maxAngle;
     // Convert angle back to a value between 0 and 1.
     const newValue = (deg - minAngle) / (maxAngle - minAngle);
-    console.log(newValue)
+
     onChange(newValue);
   };
 
@@ -75,6 +75,9 @@ export default function Knob({ className, value, onChange, size = 100 }: KnobPro
     >
       {/* Knob indicator */}
       <div
+      onClick={()=>{
+        onChange(1);
+      }}
       className="rounded-full bg-white"
         style={{
           width: size / 6,
@@ -86,18 +89,6 @@ export default function Knob({ className, value, onChange, size = 100 }: KnobPro
           transformOrigin: "50% 100%",
         }}
       />
-      {/* <div
-      style={{
-        width: size / 8,
-        height: size / 2,
-        background: "#333",
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: `translate(-50%, -100%) rotate(${angle}deg) `,
-        transformOrigin: "50% 100%",
-        borderRadius: "2px",
-      }}></div> */}
     </div>
   );
 }

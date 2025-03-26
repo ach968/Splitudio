@@ -21,9 +21,7 @@ export default function AuthPage() {
       const result = await signInWithGoogle();
       const user = result.user;
 
-      console.log("User signed in:", user.displayName);
-
-      router.push("/");
+      router.push("/projects");
     } catch (err: any) {
       setError(err.message);
     } finally {

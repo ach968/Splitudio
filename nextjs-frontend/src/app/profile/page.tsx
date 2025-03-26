@@ -50,7 +50,7 @@ export default function Profile() {
             <EditorNav />
             
             {/* Username and password */}
-            <motion.div 
+            {/* <motion.div 
             initial={{opacity: 0, y:5}}
             animate={{opacity: 1, y:0}}
             transition={{duration: 0.5}}
@@ -147,14 +147,14 @@ export default function Profile() {
                         </div>
                     </TabsContent>
                 </Tabs>
-            </motion.div>
+            </motion.div> */}
 
             {/* Subscription */}
             <motion.div
             initial={{opacity: 0, y:7}}
             animate={{opacity: 1, y:0}}
-            transition={{delay:0.2, duration: 0.5}}
-            className="container mt-12 flex justify-center items-center">
+            transition={{duration: 0.5}}
+            className="container mt-20 flex justify-center items-center">
                 <div className="w-full max-w-[700px] px-3 lg:px-5">
                     <div className="border gap-7 flex flex-col p-6 rounded-lg border-neutral-500 bg-black">
                         {subscriptionStatus == 0 ?
