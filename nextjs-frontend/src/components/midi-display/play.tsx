@@ -13,7 +13,8 @@ import { PolySynth, Synth, SynthOptions } from "tone";
 import Piano from "@/components/midi-display/piano";
 import EditorNav from "../loggedin-nav";
 import Knob from "./knob";
-
+import { useMicrophone } from "./use-microphone";
+import { LineChart } from '@mui/x-charts/LineChart';
 interface Note {
     midi: number; // e.g., 60 for middle C
     time: number; // in seconds, when the note starts
@@ -24,7 +25,7 @@ interface Note {
     velocity: number
 }
 
-
+  
 export default function Play({ midiData, duration } : {midiData : Midi, duration: number}) {
     
     const [currentTime, setCurrentTime] = useState(0);
@@ -34,6 +35,21 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
     
     const [WINDOW_SIZE, setWindowSize] = useState<number>(3);
     const MAX_WINDOW_SIZE = 30;
+
+    const { audioBuffer, fftData } = useMicrophone();
+
+    useEffect(() => {
+        if (audioBuffer) {
+            // Log details of the AudioBuffer.
+        }
+    }, [audioBuffer]);
+
+    useEffect(() => {
+        if (fftData) {
+            console.log(fftData.length)
+            // getFrequencies(44100, 2048, downSampledFftData!.length);
+        }
+    }, [fftData]);
 
     // Calculate what notes are visible in the time window
     const notes = noteWindow(midiData, currentTime, WINDOW_SIZE);
@@ -50,7 +66,7 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
         setIsFullPiano(octaveRange > 5)
     }, [midiData])
 
-    // Add event listeners
+    // Add event listeners for keyboard events
     useEffect(()=>{
         const handleKeyDownEvent = (e: KeyboardEvent) => {
             console.log(e.key)
@@ -85,6 +101,7 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
             window.removeEventListener("keydown", handleKeyDownEvent)
         })
     })
+
     useEffect(()=>{
 
         // Scrolling on piano roll will move currentTime
@@ -286,7 +303,26 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
             </div>
             
         </div>
-            
+        {
+            fftData && fftData.length &&
+            <LineChart
+            // xAxis={[{ data: [fftData.map((_, i) => i)].splice(0, 100)}]}
+            yAxis={[{ min: 0, max: 200 }]}
+            series={[
+                {
+                    data: [...fftData!].splice(0, 1000),
+                    area:false,
+                    showMark: false,
+                    stack: "total"
+                },
+            ]}
+            width={900}
+            height={300}
+            skipAnimation
+            />
+        }
+        
+
         <Footer />
     </section>
 }
@@ -303,4 +339,12 @@ function noteWindow(midiData: Midi, windowStart:number , windowDuration = 3): No
     );
   
     return notes
+}
+
+function getFrequencies(sampleRate: number, fftSize: number, targetLength: number): number[] {
+    const binSize = sampleRate / fftSize;
+    const fullBins = Array.from({ length: fftSize / 2 }, (_, i) => i * binSize);
+    
+    const step = Math.floor(fullBins.length / targetLength);
+    return fullBins.filter((_, i) => i % step === 0).slice(0, targetLength);
 }
