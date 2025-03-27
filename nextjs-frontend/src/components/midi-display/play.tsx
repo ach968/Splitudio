@@ -13,7 +13,8 @@ import { PolySynth, Synth, SynthOptions } from "tone";
 import Piano from "@/components/midi-display/piano";
 import EditorNav from "../loggedin-nav";
 import Knob from "./knob";
-
+import { useMicrophone } from "./use-microphone";
+import { LineChart } from '@mui/x-charts/LineChart';
 interface Note {
     midi: number; // e.g., 60 for middle C
     time: number; // in seconds, when the note starts
@@ -24,7 +25,7 @@ interface Note {
     velocity: number
 }
 
-
+  
 export default function Play({ midiData, duration } : {midiData : Midi, duration: number}) {
     
     const [currentTime, setCurrentTime] = useState(0);
@@ -34,6 +35,37 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
     
     const [WINDOW_SIZE, setWindowSize] = useState<number>(3);
     const MAX_WINDOW_SIZE = 30;
+
+    const { audioBuffer, fftData, midiUtils } = useMicrophone();
+
+    useEffect(() => {
+        if (audioBuffer) {
+
+        }
+    }, [audioBuffer]);
+
+    useEffect(() => {
+        if (fftData && audioBuffer) {
+            
+
+            // Create an array of [index, value] pairs
+            
+            const topFrequencies = midiUtils.getTopNFrequencies(10)
+            
+            console.log([
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[0].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[1].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[2].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[3].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[4].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[5].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[6].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[7].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[8].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[9].frequency)),  
+            ])
+        }
+    }, [fftData]);
 
     // Calculate what notes are visible in the time window
     const notes = noteWindow(midiData, currentTime, WINDOW_SIZE);
@@ -50,7 +82,7 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
         setIsFullPiano(octaveRange > 5)
     }, [midiData])
 
-    // Add event listeners
+    // Add event listeners for keyboard events
     useEffect(()=>{
         const handleKeyDownEvent = (e: KeyboardEvent) => {
             console.log(e.key)
@@ -85,6 +117,7 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
             window.removeEventListener("keydown", handleKeyDownEvent)
         })
     })
+
     useEffect(()=>{
 
         // Scrolling on piano roll will move currentTime
@@ -286,7 +319,26 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
             </div>
             
         </div>
-            
+        {
+            fftData && fftData.length &&
+            <LineChart
+            // xAxis={[{ data: [fftData.map((_, i) => i)].splice(0, 100)}]}
+            yAxis={[{ min: 0, max: 200 }]}
+            series={[
+                {
+                    data: [...fftData!].splice(0, 1000),
+                    area:false,
+                    showMark: false,
+                    stack: "total"
+                },
+            ]}
+            width={900}
+            height={300}
+            skipAnimation
+            />
+        }
+        
+
         <Footer />
     </section>
 }
