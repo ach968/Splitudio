@@ -2,3 +2,4 @@
 *.mid
 *.mp3
 /output
+/__pycache__

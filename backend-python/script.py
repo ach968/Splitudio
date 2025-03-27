@@ -1,6 +1,8 @@
 from basic_pitch.inference import predict_and_save, predict
 from basic_pitch import ICASSP_2022_MODEL_PATH
 import time
+import pandas as pd
+from frequency_lookup_table import frequency_to_note
 
 
 def mp3_midi_save(audio_path, output):
@@ -17,7 +19,21 @@ def mp3_midi_save(audio_path, output):
 
 def mp3_midi(audio_path: str):
     model_output, midi_data, note_events = predict(audio_path=audio_path)
-    print(note_events)
+    df = pd.DataFrame(
+        note_events,
+        columns=["start_time_s", "end_time_s", "pitch_midi", "velocity", "pitch_bend"],
+    )
+    df.sort_values(by=["start_time_s"], inplace=True, ascending=True)
+    df["note_duration"] = df["end_time_s"] - df["start_time_s"]
+    df["pitch_frequency"] = df["pitch_midi"].apply(pitch_midi_to_frequency)
+    df["note_name"] = df["pitch_frequency"].apply(
+        lambda x: frequency_to_note.get(x, "null")
+    )
+    print(df.head())
+
+
+def pitch_midi_to_frequency(pitch_midi: float) -> float:
+    return round(440.0 * 2 ** ((pitch_midi - 69) / 12), 2)
 
 
 if __name__ == "__main__":
