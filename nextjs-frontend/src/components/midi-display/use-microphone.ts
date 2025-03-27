@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 
+
+
+
 export function useMicrophone() {
+
 
     // Audio buffer states
     const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null);
@@ -11,9 +15,87 @@ export function useMicrophone() {
     const [fftData, setFftData] = useState<Uint8Array | null>(null);
     const analyserRef = useRef<AnalyserNode | null>(null);
 
+    const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+    function midiToNoteName(midi: number): string {
+        const name = noteNames[midi % 12];
+        const octave = Math.floor(midi / 12) - 1;
+        return `${name}${octave}`;
+    }
+
+    function noteNameToMidi(note: string): number {
+        const match = note.match(/^([A-G]#?)(-?\d+)$/);
+        if (!match) throw new Error("Invalid note format");
+        const [_, name, octaveStr] = match;
+        const pitchIndex = noteNames.indexOf(name);
+        const octave = parseInt(octaveStr);
+        return pitchIndex + (octave + 1) * 12;
+    }
+
+    function binToFreq(i: number) {
+        if(audioContextRef.current && analyserRef.current)
+            return i * audioContextRef.current.sampleRate / analyserRef.current.fftSize
+    
+        return -1
+    }
+
+    function freqToBin(freq: number) {
+        if(audioContextRef.current && analyserRef.current)
+            Math.max(0, Math.round(freq * analyserRef.current?.fftSize / audioContextRef.current.sampleRate))
+    
+        return -1
+    }
+    
+    function isNotePresent(fftData: Uint8Array, freq: number, threshold = 20) {
+        const bin = freqToBin(freq);
+        const power = fftData[bin];
+        const avgPower = fftData.reduce((a, b) => a + b, 0) / fftData.length;
+        return (power - avgPower) > threshold;
+    }
+
+    function midiToFreq(midi: number): number {
+        return 440 * Math.pow(2, (midi - 69) / 12);
+    }
+
+    function freqToMidi(freq: number): number {
+        return Math.max(0, Math.round(69 + 12 * Math.log2(freq / 440)));
+    }
+
+    function getTopNFrequencies(n: number): { frequency: number, amplitude: number }[] {
+        if(fftData) {
+            const indexedData = Array.from(fftData, (value, index) => ({ index, value }));
+
+            const topBins = indexedData.sort((a, b) => b.value - a.value)
+            .slice(0, n); // Top n bins
+
+            // Map bins to frequencies
+            const topFrequencies = topBins.map(({ index, value }) => {
+                const frequency = midiUtils.binToFreq(index)
+                return { frequency, amplitude: value };
+            });
+
+            return topFrequencies
+        }
+
+        return Array.from({ length: n }, () => ({ frequency: 0, amplitude: 0 }));
+    }
+
+    const midiUtils = {
+        midiToFreq,
+        freqToMidi,
+        binToFreq,
+        freqToBin,
+        isNotePresent,
+        midiToNoteName,
+        noteNameToMidi,
+        getTopNFrequencies
+    };
+
     useEffect(() => {
         async function initMic() {
             try {
+                
+
                 // javascript shit
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 const audioContext = new AudioContext();
@@ -101,11 +183,15 @@ export function useMicrophone() {
             };
     }, []);
 
+    
 
     // After processing, we have one long Float32Array that represents the entire segment of the raw time-domain audio
 
     // len(audioBuffer) is 4096 * 5
     // len(fftData) is 2048
-    // len(downSampledFftData) is around 100
-    return { audioBuffer, fftData };
+    // sampleRate is usually 4800
+    return { audioBuffer, fftData, midiUtils};
+
+    
 }
+

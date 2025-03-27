@@ -70,12 +70,12 @@ export default function Piano({notes, isFullPiano, sampler} : {notes: Set<string
           <div
             key={midi}
             className="absolute h-full border-black border rounded-sm hover:cursor-pointer select-none"
-            // onPointerDown={()=>{
-            //     sampler?.triggerAttack(midi, undefined, 2)
-            // }}
-            // onPointerUp={()=>{
-            //     sampler?.triggerRelease(midi)
-            // }}
+            onPointerDown={()=>{
+                sampler?.triggerAttack(midi, undefined, 2)
+            }}
+            onPointerUp={()=>{
+                sampler?.triggerRelease(midi)
+            }}
             style={{
               left: idx * KEY_WIDTH,
               width: KEY_WIDTH,

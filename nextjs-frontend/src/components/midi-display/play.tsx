@@ -36,18 +36,34 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
     const [WINDOW_SIZE, setWindowSize] = useState<number>(3);
     const MAX_WINDOW_SIZE = 30;
 
-    const { audioBuffer, fftData } = useMicrophone();
+    const { audioBuffer, fftData, midiUtils } = useMicrophone();
 
     useEffect(() => {
         if (audioBuffer) {
-            // Log details of the AudioBuffer.
+
         }
     }, [audioBuffer]);
 
     useEffect(() => {
-        if (fftData) {
-            console.log(fftData.length)
-            // getFrequencies(44100, 2048, downSampledFftData!.length);
+        if (fftData && audioBuffer) {
+            
+
+            // Create an array of [index, value] pairs
+            
+            const topFrequencies = midiUtils.getTopNFrequencies(10)
+            
+            console.log([
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[0].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[1].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[2].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[3].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[4].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[5].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[6].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[7].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[8].frequency)),
+                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[9].frequency)),  
+            ])
         }
     }, [fftData]);
 
@@ -339,12 +355,4 @@ function noteWindow(midiData: Midi, windowStart:number , windowDuration = 3): No
     );
   
     return notes
-}
-
-function getFrequencies(sampleRate: number, fftSize: number, targetLength: number): number[] {
-    const binSize = sampleRate / fftSize;
-    const fullBins = Array.from({ length: fftSize / 2 }, (_, i) => i * binSize);
-    
-    const step = Math.floor(fullBins.length / targetLength);
-    return fullBins.filter((_, i) => i % step === 0).slice(0, targetLength);
 }
