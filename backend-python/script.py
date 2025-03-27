@@ -5,6 +5,22 @@ import pandas as pd
 from frequency_lookup_table import frequency_to_note
 
 
+CHROMATIC_SCALE = {
+    0: "C",
+    1: "C#",
+    2: "D",
+    3: "D#",
+    4: "E",
+    5: "F",
+    6: "F#",
+    7: "G",
+    8: "G#",
+    9: "A",
+    10: "A#",
+    11: "B",
+}
+
+
 def mp3_midi_save(audio_path, output):
     predict_and_save(
         audio_path_list=[audio_path],
@@ -29,7 +45,7 @@ def mp3_midi(audio_path: str):
     df["note_name"] = df["pitch_frequency"].apply(
         lambda x: frequency_to_note.get(x, "null")
     )
-    print(df.head())
+    return df
 
 
 def pitch_midi_to_frequency(pitch_midi: float) -> float:
@@ -38,7 +54,7 @@ def pitch_midi_to_frequency(pitch_midi: float) -> float:
 
 def get_key_profiles():
     """
-    Generate key profiles for all 24 (12 major and minor) keys of the chromatic scale. 
+    Generate key profiles for all 24 (12 major and minor) keys of the chromatic scale.
     The base C major and C minor profiles are derived from Krumhansl's 1990 experiments.
 
     Returns:
@@ -52,19 +68,68 @@ def get_key_profiles():
     # Generate all 24 profiles by shifting
     key_profiles = {}
     for key in range(12):  # 0 = C, 1 = C#, ..., 11 = B
-        key_profiles[f"{key}m"] = [c_major[(i - key) % 12] for i in range(12)]
-        key_profiles[f"{key}n"] = [c_minor[(i - key) % 12] for i in range(12)]
+        key_profiles[f"{CHROMATIC_SCALE[key]}maj"] = [
+            c_major[(i - key) % 12] for i in range(12)
+        ]
+        key_profiles[f"{CHROMATIC_SCALE[key]}min"] = [
+            c_minor[(i - key) % 12] for i in range(12)
+        ]
 
     return key_profiles
+
+
+def get_pitch_distribution(df: pd.DataFrame) -> list:
+    """
+    Gets the pitch ditribution (total duration) of the given notes in the dataframe.
+
+    Args:
+        df (pd.DataFrame): Dataframe input of all the MIDI note events
+
+    Returns:
+        list: a vector of 12 elements representing the total duration of each pitch class
+    """
+    duration = [0] * 12
+    current_start_time = df.iloc[0]["start_time_s"]
+    for _, row in df.iterrows():
+        if row["start_time_s"] == current_start_time:
+            continue
+        current_start_time = row["start_time_s"]
+        pitch_class = row["pitch_midi"] % 12
+        if pitch_class not in duration:
+            duration[pitch_class] = row["note_duration"]
+        else:
+            duration[pitch_class] += row["note_duration"]
+
+    return duration
+
+
+def correlation(x, y):
+    x_mean = sum(x) / 12
+    y_mean = sum(y) / 12
+    num = sum((xi - x_mean) * (yi - y_mean) for xi, yi in zip(x, y))
+    den = (
+        sum((xi - x_mean) ** 2 for xi in x) * sum((yi - y_mean) ** 2 for yi in y)
+    ) ** 0.5
+
+    return num / den if den != 0 else 0
+
+
+def find_key(input_vector: list):
+    scores = {}
+    key_profiles = get_key_profiles()
+    for key, profile in key_profiles.items():
+        scores[key] = correlation(input_vector, profile)
+    best_key = max(scores, key=scores.get)
+    return best_key, scores[best_key]
 
 
 if __name__ == "__main__":
     start = time.time()
     audio_path = "pure-love-304010.mp3"
-    # mp3_midi_save(audio_path, "output")
-    mp3_midi(audio_path)
-    print("Track length: 1:18")
+    df: pd.DataFrame = mp3_midi(audio_path)
 
-    # print(get_key_profiles())
+    pitch_distribution = get_pitch_distribution(df)
+    key = find_key(pitch_distribution)
+    print("Key: ", key[0])
 
     print("Time taken: ", time.time() - start)
