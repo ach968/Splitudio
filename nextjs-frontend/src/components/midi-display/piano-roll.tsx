@@ -14,10 +14,12 @@ interface PianoRollProps {
     windowStart: number; // start time of the current window in seconds
     windowDuration: number; // e.g., 3 seconds
     isFullPiano: boolean
+    playAlong: boolean
+    playAlongBuffer: Map<string, boolean>
 }
 
 
-export default function PianoRoll({ notes, windowStart, windowDuration, isFullPiano } : PianoRollProps) {
+export default function PianoRoll({ notes, windowStart, windowDuration, isFullPiano, playAlong, playAlongBuffer } : PianoRollProps) {
     // init constants
     const MIN_MIDI = isFullPiano ? 21 : 36;
     const MAX_MIDI = isFullPiano ? 108 : 96;
@@ -56,17 +58,56 @@ export default function PianoRoll({ notes, windowStart, windowDuration, isFullPi
 
         // Calculate horizontal position: each key is keyWidth pixels wide
         const left = (note.midi - MIN_MIDI) * KEY_WIDTH;
+
+        
+        if(playAlong === true) {
+            const hash = `${note.name}-${note.time}-${note.duration}-${note.midi}`;
+            if(playAlongBuffer.has(hash) == true) {
+                const playing = playAlongBuffer.get(hash)
+
+                if(playing === false) {
+                    return <div
+                    key={index}
+                    className="absolute bg-blue-500 rounded-sm"
+                    style={{
+                        bottom: bottom,
+                        left,
+                        width: KEY_WIDTH,
+                        height,
+                        overflow: "hidden",
+                        zIndex: index+10
+                    }}></div>
+                    
+                }
+                else if(playing === true) {
+                    return <div
+                    key={index}
+                    className="absolute bg-green-500 rounded-sm"
+                    style={{
+                        bottom: bottom,
+                        left,
+                        width: KEY_WIDTH,
+                        height,
+                        overflow: "hidden",
+                        zIndex: index+10
+                    }}></div>
+                }
+            }
+            
+            // if !playAlongBuffer.has(hash), we render the note as normal
+        }
         return <div
-                key={index}
-                className="absolute bg-neutral-200 rounded-sm"
-                style={{
+            key={index}
+            className="absolute bg-neutral-200 rounded-sm"
+            style={{
                 bottom: bottom, // Clip if note starts above window
                 left,
                 width: KEY_WIDTH,
                 height,
                 overflow: "hidden",
                 zIndex: index+10
-                }}></div>
+            }}></div>
+        
     }
 
     return <div ref={containerRef}

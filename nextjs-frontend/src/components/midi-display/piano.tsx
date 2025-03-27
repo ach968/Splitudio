@@ -8,7 +8,15 @@ function isBlackKey(midi: number): boolean {
     return [1, 3, 6, 8, 10].includes(mod);
 }
 
-export default function Piano({notes, isFullPiano, sampler} : {notes: Set<string>, isFullPiano: boolean, sampler: PolySynth<Synth<SynthOptions>> | null} ) {
+interface PianoProps {
+    notes: Set<string>;
+    isFullPiano: boolean;
+    sampler: PolySynth<Synth<SynthOptions>> | null;
+    playAlong: boolean;
+    playAlongBuffer: Map<string, boolean>
+}
+
+export default function Piano({notes, isFullPiano, sampler, playAlong, playAlongBuffer} : PianoProps) {
     // init constants
     const MIN_MIDI = isFullPiano ? 21 : 36;
     const MAX_MIDI = isFullPiano ? 108 : 96;
@@ -17,15 +25,23 @@ export default function Piano({notes, isFullPiano, sampler} : {notes: Set<string
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0 });
     
-    const [keysDown, setKeysDown] = useState<number[]>([])
 
     // Encode:
     // ${note.name}-${note.time}-${note.duration}-${note.midi}
-    const activeMidis: Set<number> = new Set(
-        Array.from(notes).map(encodedNote => Number(encodedNote.split("-")[3]))
-      );
-    const KEY_WIDTH = dimensions.width / KEY_COUNT;
+    var activeMidis: Set<number> = new Set()
+    if(playAlong == false) {
+        activeMidis = new Set(
+            Array.from(notes).map(encodedNote => Number(encodedNote.split("-")[3]))
+        );
+    }
+    else {
+        activeMidis = new Set(
+            Array.from(playAlongBuffer.keys()).map(encodedNote => Number(encodedNote.split("-")[3]))
+        );
+    }
+        
 
+    const KEY_WIDTH = dimensions.width / KEY_COUNT;
 
     const getKeyColor = (midi: number) => {
         const baseColor = isBlackKey(midi) ? "#000" : "#fff";
@@ -71,7 +87,7 @@ export default function Piano({notes, isFullPiano, sampler} : {notes: Set<string
             key={midi}
             className="absolute h-full border-black border rounded-sm hover:cursor-pointer select-none"
             onPointerDown={()=>{
-                sampler?.triggerAttack(midi, undefined, 2)
+                sampler?.triggerAttack(midi, undefined, 5)
             }}
             onPointerUp={()=>{
                 sampler?.triggerRelease(midi)

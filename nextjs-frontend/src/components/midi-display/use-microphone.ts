@@ -32,25 +32,37 @@ export function useMicrophone() {
         return pitchIndex + (octave + 1) * 12;
     }
 
-    function binToFreq(i: number) {
+    function binToFreq(i: number): number {
         if(audioContextRef.current && analyserRef.current)
             return i * audioContextRef.current.sampleRate / analyserRef.current.fftSize
     
         return -1
     }
 
-    function freqToBin(freq: number) {
+    function freqToBin(freq: number): number {
         if(audioContextRef.current && analyserRef.current)
             Math.max(0, Math.round(freq * analyserRef.current?.fftSize / audioContextRef.current.sampleRate))
     
         return -1
     }
-    
-    function isNotePresent(fftData: Uint8Array, freq: number, threshold = 20) {
-        const bin = freqToBin(freq);
-        const power = fftData[bin];
-        const avgPower = fftData.reduce((a, b) => a + b, 0) / fftData.length;
-        return (power - avgPower) > threshold;
+
+    // When playing along to midi, instead of guessing what/how many notes the user 
+    // is playing and comparing it to the midi, we can benefit from going the other 
+    // way around: Knowing what midi notes SHOULD be played at a given time frame,
+    // and comparing that to the FFT buckets of the user.
+    function isMidiNotePresent(midi: number, threshold = 20): boolean {
+        if(fftData) {
+            // Add tolerance to the midi note
+            const freqRange: [number, number] = midiFreqRange(midi);
+            // Now find the range of user buckets that we want to check for
+            const [binStart, binEnd] = freqRangeToBinRange(freqRange);
+
+            // if any of these buckets are "prominent", return true, otherwise return false
+
+            return false;
+        }
+
+        return false;
     }
 
     function midiToFreq(midi: number): number {
@@ -61,12 +73,12 @@ export function useMicrophone() {
         return Math.max(0, Math.round(69 + 12 * Math.log2(freq / 440)));
     }
 
-    function getTopNFrequencies(n: number): { frequency: number, amplitude: number }[] {
+    function getTopNCandidates(n: number): { frequency: number, amplitude: number }[] {
         if(fftData) {
             const indexedData = Array.from(fftData, (value, index) => ({ index, value }));
 
-            const topBins = indexedData.sort((a, b) => b.value - a.value)
-            .slice(0, n); // Top n bins
+            // Top n bins
+            const topBins = indexedData.sort((a, b) => b.value - a.value).slice(0, n); 
 
             // Map bins to frequencies
             const topFrequencies = topBins.map(({ index, value }) => {
@@ -80,21 +92,68 @@ export function useMicrophone() {
         return Array.from({ length: n }, () => ({ frequency: 0, amplitude: 0 }));
     }
 
+    function midiFreqRange(midi: number): [number, number] {
+        const lower = midiToFreq(midi - 0.5);
+        const upper = midiToFreq(midi + 0.5);
+        return [lower, upper];
+    }
+
+    function freqRangeToBinRange(freqRange: [number, number]): [number, number] {
+        if (!audioContextRef.current || !analyserRef.current) return [0, 0];
+        const fftSize = analyserRef.current.fftSize;
+        const sampleRate = audioContextRef.current.sampleRate;
+    
+        const [fLow, fHigh] = freqRange;
+        const binLow = Math.floor(fLow * fftSize / sampleRate);
+        const binHigh = Math.ceil(fHigh * fftSize / sampleRate);
+    
+        return [binLow, binHigh];
+    }
+
+    // I TRIED TO COOK BUT THIS DOEST'T WORK
+    // function getTopNCandidates(n: number): { midi: number, frequency: number, amplitude: number }[] {
+    //     if (fftData && binToFreq && freqToMidi) {
+
+    //         // Buckets and midi have a many to one relationship
+    //         // so we want to add up the amplitudes of buckets that map to a midi note
+    //         const midiBins = new Map<number, number>(); // midi -> total amplitude
+            
+    //         for (let i = 0; i < fftData.length; i++) {
+    //             const freq = binToFreq(i);
+    //             const amp = fftData[i];
+    //             const midi = freqToMidi(freq);
+    
+    //             // Accumulate amplitude per midi
+    //             midiBins.set(midi, (midiBins.get(midi) ?? 0) + amp);
+    //         }
+    
+    //         // Convert midi map to array of objects
+    //         const candidates = Array.from(midiBins.entries()).map(([midi, amplitude]) => ({
+    //             midi,
+    //             frequency: midiToFreq(midi), // canonical frequency for that midi
+    //             amplitude,
+    //         }));
+    
+    //         // Sort and return top n
+    //         return candidates.sort((a, b) => b.amplitude - a.amplitude).slice(0, n);
+    //     }
+    
+    //     return Array.from({ length: n }, () => ({ midi: 0, frequency: 0, amplitude: 0 }));
+    // }
+
     const midiUtils = {
-        midiToFreq,
         freqToMidi,
         binToFreq,
-        freqToBin,
-        isNotePresent,
         midiToNoteName,
         noteNameToMidi,
-        getTopNFrequencies
+        getTopNCandidates,
+        freqToBin,
+        isMidiNotePresent
     };
 
     useEffect(() => {
         async function initMic() {
             try {
-                
 
                 // javascript shit
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });

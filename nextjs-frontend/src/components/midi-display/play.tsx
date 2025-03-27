@@ -7,7 +7,6 @@ import { Slider } from "../ui/slider";
 import Footer from "../footer";
 import { Button } from "../ui/button";
 import * as SliderPrimitive from "@radix-ui/react-slider"
-// import { Tone } from "tone";
 import * as Tone from "tone";
 import { PolySynth, Synth, SynthOptions } from "tone";
 import Piano from "@/components/midi-display/piano";
@@ -15,6 +14,7 @@ import EditorNav from "../loggedin-nav";
 import Knob from "./knob";
 import { useMicrophone } from "./use-microphone";
 import { LineChart } from '@mui/x-charts/LineChart';
+
 interface Note {
     midi: number; // e.g., 60 for middle C
     time: number; // in seconds, when the note starts
@@ -36,6 +36,8 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
     const [WINDOW_SIZE, setWindowSize] = useState<number>(3);
     const MAX_WINDOW_SIZE = 30;
 
+    const [playAlong, setPlayAlong] = useState(false);
+
     const { audioBuffer, fftData, midiUtils } = useMicrophone();
 
     useEffect(() => {
@@ -47,23 +49,46 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
     useEffect(() => {
         if (fftData && audioBuffer) {
             
+            const topFrequencies = midiUtils.getTopNCandidates(10)
+            const topMidis = topFrequencies.map((cand)=>midiUtils.freqToMidi(cand.frequency))
+            const topNotes = topMidis.map((cand)=>midiUtils.midiToNoteName(cand))
 
-            // Create an array of [index, value] pairs
-            
-            const topFrequencies = midiUtils.getTopNFrequencies(10)
-            
-            console.log([
-                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[0].frequency)),
-                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[1].frequency)),
-                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[2].frequency)),
-                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[3].frequency)),
-                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[4].frequency)),
-                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[5].frequency)),
-                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[6].frequency)),
-                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[7].frequency)),
-                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[8].frequency)),
-                midiUtils.midiToNoteName(midiUtils.freqToMidi(topFrequencies[9].frequency)),  
-            ])
+            // console.log([
+            //     topNotes[0],
+            //     topNotes[1],
+            //     topNotes[2],
+            //     topNotes[3],
+            //     topNotes[4],
+            //     topNotes[5],
+            //     topNotes[6],
+            //     topNotes[7],
+            //     topNotes[8],
+            //     topNotes[9],
+            // ])
+
+            // Guitar open strings
+            // if(topMidis.includes(52)) {
+            //     console.log("Low E")
+            // }
+            // if(topMidis.includes(57)) {
+            //     console.log("A")
+            // } 
+            // if(topMidis.includes(62)) {
+            //     console.log("D")
+            // }
+            // if(topMidis.includes(67)) {
+            //     console.log("G")
+            // }
+            // if(topMidis.includes(71)) {
+            //     console.log("B")
+            // }
+            // if(topMidis.includes(76)) {
+            //     console.log("High E")
+            // }
+
+            // if(topMidis.includes(52) && topMidis.includes(57) &&topMidis.includes(62) && topMidis.includes(67) && topMidis.includes(71) &&topMidis.includes(76)) {
+            //     console.log("ALL NOTES")
+            // }
         }
     }, [fftData]);
 
@@ -170,20 +195,24 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
         sampler.current!.volume.value =  (volume * 50) - 50;
     }, [volume])
 
-    // Hashed string: note.midi-note.time
+    // Hashed string: note.midi-note.time-note.duration-note.midi
+    // Subset of notes (which is a subset of midiData). Contains note that are currently being played,
+    //      ie start <= currentTime + tolerance and end >= currentTime
     const [buffer, setBuffer] = useState(new Set<string>()); // stores the recently used notes so we don't play them again
 
     useEffect(()=>{
-
-        console.log(buffer)
 
         // Notes are added to buffer when they 'hit' the currentTime
         // 1.   Makes sure that notes are not played twice by synth
         // 2.   Used for piano overlay
         notes.forEach((note: Note)=>{
-            const TOLERANCE = 0.02;
+            const TOLERANCE = 0.05;
             if(!buffer.has(`${note.name}-${note.time}-${note.duration}-${note.midi}`) && Math.abs(note.time - currentTime) < TOLERANCE) {
-                sampler.current?.triggerAttackRelease(note.name, note.duration, undefined, note.velocity);
+                if(playAlong == false)
+                    sampler.current?.triggerAttackRelease(note.name, note.duration, undefined, note.velocity);
+                else {
+                    
+                }
                 setBuffer((buff)=>new Set(buff).add(`${note.name}-${note.time}-${note.duration}-${note.midi}`))
             }
         })
@@ -206,7 +235,36 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
         
     }, [currentTime])
 
-    // For react
+    // Similar to buffer, but used for playing along.
+    const [playAlongBuffer, setPlayAlongBuffer] = useState(new Map<string, boolean>())
+    const PLAY_TOLERANCE = 0.5;
+
+    useEffect(() => {
+        if(playAlong == true) {
+            const newPlayAlongBuffer = new Map<string, boolean>();
+
+            // Check if the two ranges overlap:
+            // [currentTime - tolerance, currentTime + tolerance]
+            // [note.time, note.time + note.duration]
+            const window = noteWindow(midiData, currentTime-PLAY_TOLERANCE, PLAY_TOLERANCE*2);
+            
+            window.forEach(note => {
+                const id = `${note.name}-${note.time}-${note.duration}-${note.midi}`;
+                if(midiUtils.isMidiNotePresent(note.midi)) {
+                    newPlayAlongBuffer.set(id, true);
+                }
+                else {
+                    newPlayAlongBuffer.set(id, false)
+                }
+                
+            });
+    
+            setPlayAlongBuffer(newPlayAlongBuffer);
+            console.log(newPlayAlongBuffer)
+        }
+    }, [currentTime, playAlong]);
+
+    // Only for the stupid react button
     const [isPlaying, setIsPlaying] = useState(false);
 
     // High resolution clock using requestAnimationFrame
@@ -267,11 +325,13 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
                 windowStart={currentTime} 
                 windowDuration={WINDOW_SIZE} 
                 isFullPiano={isFullPiano}
+                playAlong={playAlong}
+                playAlongBuffer={playAlongBuffer}
                 />
             </div>
             
             <div className="w-full h-20">
-                <Piano notes={buffer} isFullPiano={isFullPiano} sampler={sampler.current}></Piano>
+                <Piano notes={buffer} playAlongBuffer={playAlongBuffer} isFullPiano={isFullPiano} sampler={sampler.current} playAlong={playAlong}></Piano>
             </div>
             
             <div className="w-full justify-center items-center flex flex-col">
@@ -309,9 +369,9 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
                             onValueChange={(e)=>setWindowSize(e[0])}></Slider>
                         </div>
                         {
-                            isPlaying ?
-                            <Button onClick={pause}>Pause</Button> :
-                            <Button onClick={play}>Play</Button>
+                            playAlong ?
+                            <Button onClick={()=>setPlayAlong(false)}>Hear</Button> :
+                            <Button onClick={()=> setPlayAlong(true)}>Play Along</Button>
                         }
                         <Knob size={30} value={volume} onChange={setVolume}></Knob>
                     </div>
@@ -319,7 +379,7 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
             </div>
             
         </div>
-        {
+        {/* {
             fftData && fftData.length &&
             <LineChart
             // xAxis={[{ data: [fftData.map((_, i) => i)].splice(0, 100)}]}
@@ -336,7 +396,7 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
             height={300}
             skipAnimation
             />
-        }
+        } */}
         
 
         <Footer />
@@ -348,10 +408,10 @@ function noteWindow(midiData: Midi, windowStart:number , windowDuration = 3): No
   
     // For each track, filter out the notes that start in our time window.
     const notes: Note[] = midiData.tracks.flatMap(track =>
-      track.notes.filter(note => 
-          // Check if [note.time,note.time+note.duration] overlaps with [windowStart,windowEnd]
-          (note.time + note.duration > windowStart) && (note.time < windowEnd)
-      )
+        track.notes.filter(note => 
+            // Check if [note.time,note.time+note.duration] overlaps with [windowStart,windowEnd]
+            (note.time + note.duration > windowStart) && (note.time < windowEnd)
+        )
     );
   
     return notes
