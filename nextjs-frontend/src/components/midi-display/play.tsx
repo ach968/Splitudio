@@ -246,7 +246,7 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
             // Check if the two ranges overlap:
             // [currentTime - tolerance, currentTime + tolerance]
             // [note.time, note.time + note.duration]
-            const window = noteWindow(midiData, currentTime-PLAY_TOLERANCE, PLAY_TOLERANCE*2);
+            const window = noteWindow(midiData, currentTime, PLAY_TOLERANCE);
             
             window.forEach(note => {
                 const id = `${note.name}-${note.time}-${note.duration}-${note.midi}`;
@@ -260,7 +260,7 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
             });
     
             setPlayAlongBuffer(newPlayAlongBuffer);
-            console.log(newPlayAlongBuffer)
+            // console.log(newPlayAlongBuffer)
         }
     }, [currentTime, playAlong]);
 
