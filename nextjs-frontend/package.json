@@ -43,6 +43,7 @@
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
     "tone": "^15.0.4",
+    "uuid": "^11.1.0",
     "wavesurfer-react": "^3.0.4"
   },
   "devDependencies": {
