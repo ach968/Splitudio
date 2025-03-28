@@ -2,6 +2,6 @@
 .venv/
 output/
 __pycache__/
-*.
 venv/
 /utils/*.mp3
+*.mp3
