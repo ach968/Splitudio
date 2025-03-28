@@ -26,17 +26,24 @@ export default function Piano({notes, isFullPiano, sampler, playAlong, playAlong
     const [dimensions, setDimensions] = useState({ width: 0 });
     
 
-    // Encode:
+    // Encoded:
     // ${note.name}-${note.time}-${note.duration}-${note.midi}
     var activeMidis: Set<number> = new Set()
-    if(playAlong == false) {
-        activeMidis = new Set(
-            Array.from(notes).map(encodedNote => Number(encodedNote.split("-")[3]))
-        );
-    }
-    else {
-        activeMidis = new Set(
+    var upcomingMidis: Set<number> = new Set();
+    var playingMidis: Set<number> = new Set();
+    
+    // Always calculate activeMidis
+    activeMidis = new Set(
+        Array.from(notes).map(encodedNote => Number(encodedNote.split("-")[3]))
+    );
+    // UpcomingMidis is the notes that are within the window for the user to play
+    // playingMidis are the notes that the user is actually playing
+    if(playAlong == true && playAlongBuffer) {
+        upcomingMidis = new Set(
             Array.from(playAlongBuffer.keys()).map(encodedNote => Number(encodedNote.split("-")[3]))
+        )
+        playingMidis = new Set(
+            Array.from(playAlongBuffer.keys()).filter((key)=>playAlongBuffer.get(key) === true).map(encodedNote => Number(encodedNote.split("-")[3]))
         );
     }
         
@@ -46,10 +53,26 @@ export default function Piano({notes, isFullPiano, sampler, playAlong, playAlong
     const getKeyColor = (midi: number) => {
         const baseColor = isBlackKey(midi) ? "#000" : "#fff";
 
-        if (activeMidis.has(midi)) {
+        if (playAlong == false && activeMidis.has(midi)) {
             // Apply a semi-transparent overlay
             return `linear-gradient(to bottom, #DD7DDFAA, #E1CD86AA, #BBCB92AA, #71C2EFAA, #3BFFFFAA, #DD7DDFAA), ${baseColor}`;
         }
+        else { // playAlong is true
+            var ret
+
+            if(upcomingMidis.has(midi)) {
+                ret = `linear-gradient(to bottom, #3b82f6, transparent), ${baseColor}`;
+            }
+            if(upcomingMidis.has(midi) && playingMidis.has(midi)) {
+                ret = `linear-gradient(to bottom, #22c55e, transparent), ${baseColor}`;
+            }
+            if(activeMidis.has(midi) && !playingMidis.has(midi)) {
+                ret = `linear-gradient(to bottom, #dc2626, transparent), ${baseColor}`;
+            }
+            
+            if(ret) return ret
+        }
+        
         return baseColor;
     }
 
