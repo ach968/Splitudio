@@ -7,4 +7,4 @@ from firebase_admin import initialize_app
 
 initialize_app()
 
-from .youtube_mp3 import youtube_to_mp3
+from youtube_mp3 import youtube_to_mp3

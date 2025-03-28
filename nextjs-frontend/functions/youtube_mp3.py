@@ -1,7 +1,7 @@
 import youtube_dl
 from firebase_functions import https_fn
+from firebase_functions.params import StringParam
 import os
-from dotenv import load_dotenv
 from google.cloud import storage as gcs
 
 
@@ -17,7 +17,6 @@ def youtube_to_mp3(req: https_fn.Request) -> https_fn.Response:
         https_fn.Response: The HTTP response object.
     """
     try:
-        load_dotenv()
         url = req.args.get("url")
         pid = req.args.get("pid")
         if not url:
@@ -32,12 +31,12 @@ def youtube_to_mp3(req: https_fn.Request) -> https_fn.Response:
             return https_fn.Response("Failed to download Youtube video", status=500)
 
         # Upload the mp3 to Firebase Storage
-        bucket_name = os.getenv("FIREBASE_STORAGE_BUCKET")
-        if not bucket_name:
+        bucket_name_value = StringParam("STORAGE_BUCKET").value
+        if not bucket_name_value:
             return https_fn.Response("No bucket name provided", status=500)
 
         upload_status = _upload_to_storage(
-            f"{video_title}.mp3", bucket_name, tmp_dir, pid
+            f"{video_title}.mp3", bucket_name_value, tmp_dir, pid
         )
         if not upload_status:
             return https_fn.Response("Failed to upload to Firebase Storage", status=500)
