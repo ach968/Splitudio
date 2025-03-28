@@ -15,8 +15,6 @@ decorator==5.2.1
 deprecation==2.1.0
 firebase-admin==6.7.0
 firebase-functions==0.4.2
-Flask==3.1.0
-flask-cors==5.0.1
 flatbuffers==25.2.10
 functions-framework==3.8.2
 gast==0.6.0
