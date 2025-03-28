@@ -16,7 +16,7 @@ import {
   getFirestore,
   serverTimestamp,
 } from "firebase/firestore";
-import { app, auth } from "@/lib/firebase/clientApp";
+import { app, auth } from "@/lib/firebase/firebase";
 
 const db = getFirestore(app);
 

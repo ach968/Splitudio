@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { app } from "@/lib/firebase/clientApp";
+import { app } from "@/lib/firebase/firebase";
 import {
   doc,
   getDoc,
@@ -27,7 +27,7 @@ export async function storeProject(project: Project) {
       name: project.pName,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-      ownerId: project.ownerId,
+      uid: project.uid,
       collaboratorIds: project.collaboratorIds,
       coverImage: project.coverImage,
       isPublic: project.isPublic,
@@ -45,6 +45,4 @@ export async function storeProject(project: Project) {
   }
 }
 
-export async function fetchProjects(user: User) {
-  
-}
+export async function fetchProjects(user: User) {}

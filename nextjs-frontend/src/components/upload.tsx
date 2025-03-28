@@ -15,19 +15,20 @@ import { useToast } from "@/hooks/use-toast";
 import EditorNav from "./loggedin-nav";
 import { storeProject } from "@/lib/utils";
 import { Project } from "@/types/firestore";
-import { useRouter } from "next/router";
 import { useAuth } from "./authContext";
+import { v4 as uuidv4 } from "uuid";
+import { ref, uploadBytesResumable } from "firebase/storage";
+import { storage } from "@/lib/firebase/firebase";
 
 export default function Upload({ isPremiumUser }: { isPremiumUser: boolean }) {
   // For drag and drop
   const [dragActive, setDragActive] = useState(false);
   const [loading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
-  
+
   // User instance
   const { user } = useAuth();
-  
+
   // For youtube link
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -48,7 +49,8 @@ export default function Upload({ isPremiumUser }: { isPremiumUser: boolean }) {
     setIsLoading(true);
     try {
       const result = await storeProject(project);
-      router.push(`/projects/${project.pid}`);
+      console.log("Project created:", project);
+      redirect(`/projects/${project.pid}`);
     } catch (err: any) {
       console.error(err);
     } finally {
@@ -58,36 +60,81 @@ export default function Upload({ isPremiumUser }: { isPremiumUser: boolean }) {
 
   // Function to process files (validate, then upload)
   const handleFiles = (files: FileList) => {
-    if (files.length !== 1) {
+    try {
+      setUploadProgress(0);
+      if (files.length !== 1) {
+        toast({
+          title: "ERROR",
+          description: "Please upload 1 file",
+        });
+        return;
+      }
+      const file = files[0];
+      const validExtensions = [".mp3", ".wav", ".flac", ".aac"];
+      const fileNameLC = file.name.toLowerCase();
+      if (!validExtensions.some((ext) => fileNameLC.endsWith(ext))) {
+        toast({
+          title: "ERROR",
+          description: "Please upload an mp3, wav, flac, or aac file",
+        });
+        return;
+      }
+      setFileName(file.name);
+      setUploadProgress(25);
+
+      // create firestore project entry
+      const newProject: Project = {
+        pid: uuidv4(),
+        uid: user?.uid,
+        pName: file.name,
+        collaboratorIds: [],
+        isPublic: false,
+        coverImage: "",
+      };
+      createProject(newProject);
+      console.log("New project:", newProject);
+
+      // Upload file to Firebase Storage
+      const storageRef = ref(
+        storage,
+        `projects/${newProject.pid}/` + file.name
+      );
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          // displaying progress
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(progress);
+        },
+        (error) => {
+          // Handle unsuccessful uploads
+          console.error("Upload failed", error);
+          toast({
+            title: "ERROR",
+            description: "Upload failed: " + error.message,
+          });
+          setUploadProgress(null);
+        },
+        () => {
+          setUploadProgress(100);
+          setUploadProgress(null);
+          console.log("File uploaded successfully!");
+          toast({
+            title: "File uploaded",
+            description: "File uploaded successfully!",
+          });
+        }
+      );
+    } catch (err: any) {
+      console.error(err);
       toast({
         title: "ERROR",
-        description: "Please upload 1 file",
+        description: "Something went wrong",
       });
-      return;
     }
-    const file = files[0];
-    const validExtensions = [".mp3", ".wav", ".flac", ".aac"];
-    const fileNameLC = file.name.toLowerCase();
-    if (!validExtensions.some((ext) => fileNameLC.endsWith(ext))) {
-      toast({
-        title: "ERROR",
-        description: "Please upload an mp3, wav, flac, or aac file",
-      });
-      return;
-    }
-    setFileName(file.name);
-
-    fakeLoading(8);
-
-    setTimeout(() => {
-      console.log("SERVER RESPONSE");
-      setServerReturn(true);
-      setTimeout(() => {
-        redirect("/editor/project-id-returned");
-      }, 500);
-    }, 10000);
-
-    console.log("Files selected:", file);
   };
 
   const handleLink = (youtubeLink: string) => {
