@@ -1,4 +1,4 @@
-import youtube_dl
+import yt_dlp as youtube_dl
 from firebase_functions import https_fn
 from firebase_functions.params import StringParam
 import os
@@ -43,6 +43,7 @@ def youtube_to_mp3(req: https_fn.Request) -> https_fn.Response:
 
         # Clean up the tmp directory
         os.remove(os.path.join(tmp_dir, f"{video_title}.mp3"))
+        print(f"Deleted {video_title}.mp3 from tmp directory")
         return https_fn.Response(
             f"Converted and updated {video_title}.mp3!", status=200
         )
@@ -63,19 +64,21 @@ def _download_youtube_audio(youtube_url: str, tmp_dir: str) -> str:
     Returns:
         str: The title of the downloaded video.
     """
-    ydl_opts = {
-        "format": "bestaudio/best",
-        "extractaudio": True,
-        "audioformat": "mp3",
-        "outtmpl": os.path.join(tmp_dir, "%(title)s.%(ext)s"),
-        "noplaylist": True,
-    }
 
     try:
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(youtube_url, download=True)
-            video_title = info_dict.get("title", None)
-            return video_title
+        video_info = youtube_dl.YoutubeDL().extract_info(youtube_url, download=False)
+        filename = f"{video_info['title']}.mp3"
+
+        options = {
+            "format": "bestaudio/best",
+            "keepvideo": False,
+            "outtmpl": os.path.join(tmp_dir, filename),
+        }
+
+        with youtube_dl.YoutubeDL(options) as ydl:
+            ydl.download([video_info["webpage_url"]])
+
+        return video_info["title"]
     except Exception as e:
         print(f"Error downloading YouTube audio: {e}")
         return None
@@ -95,11 +98,13 @@ def _upload_to_storage(filename, bucket_name, tmp_dir, pid):
         bool: True if the upload was successful, False otherwise.
     """
     try:
+        print(f"Uploading {filename} to bucket {bucket_name}...")
         bucket = gcs.Client().bucket(bucket_name)
-        blob = bucket.blob(f"{pid}/{filename}")
+        blob = bucket.blob(f"projects/{pid}/{filename}")
         blob.upload_from_filename(
             os.path.join(tmp_dir, filename)
         )  # Upload from tmp directory
+        print(f"Uploaded {filename} to {bucket_name}/{pid}/!")
         return True
     except Exception as e:
         print(f"Error uploading to storage: {e}")
