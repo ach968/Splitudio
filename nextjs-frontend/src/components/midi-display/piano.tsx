@@ -57,7 +57,7 @@ export default function Piano({notes, isFullPiano, sampler, playAlong, playAlong
             // Apply a semi-transparent overlay
             return `linear-gradient(to bottom, #DD7DDFAA, #E1CD86AA, #BBCB92AA, #71C2EFAA, #3BFFFFAA, #DD7DDFAA), ${baseColor}`;
         }
-        else { // playAlong is true
+        else { // playAlong == true
             var ret
 
             if(upcomingMidis.has(midi)) {
@@ -77,10 +77,22 @@ export default function Piano({notes, isFullPiano, sampler, playAlong, playAlong
     }
 
     const getShadow = (midi: number) => {
-        if(activeMidis.has(midi)) {
-            return '0 -5px 10px #F87BFF33, 0 -10px 15px #FB92CF44, 0 -15px 20px #FFDD9B55, 0 -20px 25px #C2F0B166, 0 -25px 30px #2FD8FE77'
+        if(playAlong == false) {
+            if(activeMidis.has(midi)) {
+                return '0 -5px 10px #F87BFF33, 0 -10px 15px #FB92CF44, 0 -15px 20px #FFDD9B55, 0 -20px 25px #C2F0B166, 0 -25px 30px #2FD8FE77'
+            }
+            else {
+                return ''
+            }
         }
-        return ''
+        else { // playAlong == true
+            if(activeMidis.has(midi) && playingMidis.has(midi)) {
+                return '0 -5px 10px #F87BFF33, 0 -10px 15px #FB92CF44, 0 -15px 20px #FFDD9B55, 0 -20px 25px #C2F0B166, 0 -25px 30px #2FD8FE77'
+            }
+            return '';
+        }
+
+        
     }
 
     useEffect(() => {

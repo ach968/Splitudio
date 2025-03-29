@@ -50,7 +50,7 @@ export function useMicrophone() {
     // is playing and comparing it to the midi, we can benefit from going the other 
     // way around: Knowing what midi notes (and how many) SHOULD be played at a 
     // given time frame, and comparing that to the FFT buckets of the user.
-    function isMidiNotePresent(midi: number, totalNotes = 10): boolean {
+    function isMidiNotePresent(midi: number, totalNotes = 10, tolerance = 20): boolean {
         if(fftData) {
             // Add tolerance to the midi note
             const freqRange: [number, number] = midiFreqRange(midi);
@@ -58,7 +58,7 @@ export function useMicrophone() {
             const [binStart, binEnd] = freqRangeToBinRange(freqRange);
 
             // if any of these buckets are "prominent", return true, otherwise return false
-            const candidates = getTopNCandidates(50);
+            const candidates = getTopNCandidates(totalNotes * 1.5);
 
             const prominentBins = new Set<number>(
                 candidates.map((cand) => freqToBin(cand.frequency))
@@ -67,7 +67,6 @@ export function useMicrophone() {
             // If any bin in the note's range is in the prominent bins set, it's present
             for (let i = binStart; i <= binEnd; i++) {
                 if (prominentBins.has(i)) {
-                    console.log("AJKHDSJKHS")
                     return true
                 }
             }

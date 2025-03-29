@@ -237,7 +237,7 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
 
     // Similar to buffer, but used for playing along.
     const [playAlongBuffer, setPlayAlongBuffer] = useState(new Map<string, boolean>())
-    const PLAY_TOLERANCE = 0.5;
+    const PLAY_TOLERANCE = 0.3;
 
     useEffect(() => {
         if(playAlong == true) {
@@ -250,7 +250,8 @@ export default function Play({ midiData, duration } : {midiData : Midi, duration
             
             window.forEach(note => {
                 const id = `${note.name}-${note.time}-${note.duration}-${note.midi}`;
-                if(midiUtils.isMidiNotePresent(note.midi)) {
+                console.log(playAlongBuffer.size)
+                if(midiUtils.isMidiNotePresent(note.midi, playAlongBuffer.size)) {
                     newPlayAlongBuffer.set(id, true);
                 }
                 else {
