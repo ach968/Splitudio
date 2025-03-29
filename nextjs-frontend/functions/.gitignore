@@ -6,3 +6,4 @@ venv/
 /utils/*.mp3
 *.mp3
 .env
+tmp/*

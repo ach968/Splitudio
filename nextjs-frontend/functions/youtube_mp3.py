@@ -1,3 +1,4 @@
+from urllib.parse import urlparse
 import yt_dlp as youtube_dl
 from firebase_functions import https_fn
 from firebase_functions.params import StringParam
@@ -21,6 +22,8 @@ def youtube_to_mp3(req: https_fn.Request) -> https_fn.Response:
         pid = req.args.get("pid")
         if not url:
             return https_fn.Response("No URL provided", status=400)
+        if not pid:
+            return https_fn.Response("No pid provided", status=400)
 
         # tmp directory existence check
         tmp_dir = os.path.join(os.getcwd(), "tmp")
@@ -44,6 +47,7 @@ def youtube_to_mp3(req: https_fn.Request) -> https_fn.Response:
         # Clean up the tmp directory
         os.remove(os.path.join(tmp_dir, f"{video_title}.mp3"))
         print(f"Deleted {video_title}.mp3 from tmp directory")
+
         return https_fn.Response(
             f"Converted and updated {video_title}.mp3!", status=200
         )
@@ -51,6 +55,13 @@ def youtube_to_mp3(req: https_fn.Request) -> https_fn.Response:
         return https_fn.Response(
             f"An error occured when converting youtube to mp3: {str(e)}", status=500
         )
+
+
+def _normalize_youtube_url(url):
+    parsed = urlparse(url)
+    if parsed.netloc == "youtu.be":
+        return f"https://www.youtube.com/watch?v={parsed.path[1:]}"
+    return url
 
 
 def _download_youtube_audio(youtube_url: str, tmp_dir: str) -> str:
@@ -66,8 +77,12 @@ def _download_youtube_audio(youtube_url: str, tmp_dir: str) -> str:
     """
 
     try:
+        youtube_url = _normalize_youtube_url(youtube_url)
+        print(f"Downloading audio from {youtube_url}...")
         video_info = youtube_dl.YoutubeDL().extract_info(youtube_url, download=False)
-        filename = f"{video_info['title']}.mp3"
+        title = video_info["title"]
+
+        filename = f"{title}.mp3"
 
         options = {
             "format": "bestaudio/best",
@@ -78,7 +93,7 @@ def _download_youtube_audio(youtube_url: str, tmp_dir: str) -> str:
         with youtube_dl.YoutubeDL(options) as ydl:
             ydl.download([video_info["webpage_url"]])
 
-        return video_info["title"]
+        return title
     except Exception as e:
         print(f"Error downloading YouTube audio: {e}")
         return None
