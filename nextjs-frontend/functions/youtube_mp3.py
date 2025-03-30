@@ -4,7 +4,7 @@ from firebase_functions import https_fn
 from firebase_functions.params import StringParam
 import os
 from google.cloud import storage as gcs
-
+import subprocess
 
 @https_fn.on_request(memory=512)
 def youtube_to_mp3(req: https_fn.Request) -> https_fn.Response:
@@ -77,21 +77,44 @@ def _download_youtube_audio(youtube_url: str, tmp_dir: str) -> str:
     """
 
     try:
+
+        if not tmp_dir:
+            print("tmp_dir not found, defaulting to /tmp")
+            tmp_dir = "/tmp"
+
         youtube_url = _normalize_youtube_url(youtube_url)
         print(f"Downloading audio from {youtube_url}...")
-        video_info = youtube_dl.YoutubeDL().extract_info(youtube_url, download=False)
-        title = video_info["title"]
 
+        yt_dlp_binary = os.path.join(os.path.dirname(__file__), 'binaries', 'yt-dlp')
+        ffmpeg_path = os.path.join(os.path.dirname(__file__), 'binaries', 'ffmpeg')
+
+        # First, get the video's title using --get-title.
+        get_title_cmd = [yt_dlp_binary, "--get-title", youtube_url]
+        title_result = subprocess.run(get_title_cmd, capture_output=True, text=True)
+        if title_result.returncode != 0:
+            print(f"Error retrieving title: {title_result.stderr}")
+            return None
+        title = title_result.stdout.strip()
+
+        # Construct the output file path with the title.
         filename = f"{title}.mp3"
+        output_path = os.path.join(tmp_dir, filename)
 
-        options = {
-            "format": "bestaudio/best",
-            "keepvideo": False,
-            "outtmpl": os.path.join(tmp_dir, filename),
-        }
+        # Download the audio
+        download_cmd = [
+            yt_dlp_binary,
+            "-x",
+            "--verbose",
+            "--audio-format", "mp3",
+            "--ffmpeg-location", ffmpeg_path,
+            "-o", output_path,
+            youtube_url
+        ]
 
-        with youtube_dl.YoutubeDL(options) as ydl:
-            ydl.download([video_info["webpage_url"]])
+        download_result = subprocess.run(download_cmd, capture_output=True, text=True)
+        if download_result.returncode != 0:
+            print(f"Error downloading audio: {download_result.stderr}")
+            return None
 
         return title
     except Exception as e:
