@@ -20,7 +20,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "@/lib/firebase/firebase";
 
-export default function Upload({ isPremiumUser }: { isPremiumUser: boolean }) {
+export default function Upload() {
   // For drag and drop
   const [dragActive, setDragActive] = useState(false);
   const [loading, setIsLoading] = useState(false);
@@ -28,7 +28,8 @@ export default function Upload({ isPremiumUser }: { isPremiumUser: boolean }) {
 
   // User instance
   const { user } = useAuth();
-
+  const isPremiumUser = true;
+  
   // For youtube link
   const inputRef = useRef<HTMLInputElement>(null);
 

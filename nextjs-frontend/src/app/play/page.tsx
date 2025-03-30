@@ -1,24 +1,22 @@
-
-
-import Play from '@/components/midi-display/play'
-import { Midi } from '@tonejs/midi'
+import Play from "@/components/midi-display/play";
+import { Midi } from "@tonejs/midi";
 
 export default async function Page() {
-    async function getMidi() {
-        // Simulate a delay (e.g. network request)
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-    }
+  async function getMidi() {
+    // Simulate a delay (e.g. network request)
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+  }
 
-    // simulate waiting for backend
-    const wait = await getMidi();
-    
-    var data = await Midi.fromUrl("https://bitmidi.com/uploads/112561.mid")
-    
-    // bring out the complex stuff we need
-    const duration = data.tracks[0].duration;
+  // simulate waiting for backend
+  const wait = await getMidi();
 
-    // get rid of complex objects so next can pass ts
-    data = JSON.parse(JSON.stringify(data));
+  var data = await Midi.fromUrl("https://bitmidi.com/uploads/112561.mid");
 
-    return <Play midiData={data} duration={duration}/>
+  // bring out the complex stuff we need
+  const duration = data.tracks[0].duration;
+
+  // get rid of complex objects so next can pass ts
+  data = JSON.parse(JSON.stringify(data));
+
+  return <Play midiData={data} duration={duration} />;
 }

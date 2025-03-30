@@ -2,7 +2,6 @@
 
 // CHATGPT AHHH CODE
 
-
 import { useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
@@ -10,10 +9,15 @@ interface KnobProps {
   value: number;
   onChange: (newValue: number) => void;
   size?: number; // in pixels, default to 100
-  className?: string
+  className?: string;
 }
 
-export default function Knob({ className, value, onChange, size = 100 }: KnobProps) {
+export default function Knob({
+  className,
+  value,
+  onChange,
+  size = 100,
+}: KnobProps) {
   const knobRef = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState(false);
 
@@ -70,15 +74,18 @@ export default function Knob({ className, value, onChange, size = 100 }: KnobPro
     <div
       ref={knobRef}
       onMouseDown={handleMouseDown}
-      className={twMerge("bg-gray-700 rounded-full flex items-center justify-center cursor-pointer select-none", className)}
+      className={twMerge(
+        "bg-gray-700 rounded-full flex items-center justify-center cursor-pointer select-none",
+        className
+      )}
       style={{ width: size, height: size, position: "relative" }}
     >
       {/* Knob indicator */}
       <div
-      onClick={()=>{
-        onChange(1);
-      }}
-      className="rounded-full bg-white"
+        onClick={() => {
+          onChange(1);
+        }}
+        className="rounded-full bg-white"
         style={{
           width: size / 6,
           height: size / 2.5,

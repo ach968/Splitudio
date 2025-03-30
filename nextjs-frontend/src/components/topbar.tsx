@@ -47,7 +47,9 @@ export default function Topbar() {
                 "text-sm font-medium transition-colors hover:text-white",
                 pathname === "/logout" ? "text-white" : "text-neutral-400"
               )}
-            >Logout</Link>
+            >
+              Logout
+            </Link>
           ) : (
             <Link
               href="/login"
