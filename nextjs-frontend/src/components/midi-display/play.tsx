@@ -258,8 +258,9 @@ export default function Play({
 
       window.forEach((note) => {
         const id = `${note.name}-${note.time}-${note.duration}-${note.midi}`;
-        console.log(playAlongBuffer.size);
-        if (midiUtils.isMidiNotePresent(note.midi, playAlongBuffer.size)) {
+        
+        if (midiUtils.isMidiNotePresent(note.midi, playAlongBuffer.size, 150)) {
+          console.log(id)
           newPlayAlongBuffer.set(id, true);
         } else {
           newPlayAlongBuffer.set(id, false);
@@ -267,7 +268,6 @@ export default function Play({
       });
 
       setPlayAlongBuffer(newPlayAlongBuffer);
-      // console.log(newPlayAlongBuffer)
     }
   }, [currentTime, playAlong]);
 

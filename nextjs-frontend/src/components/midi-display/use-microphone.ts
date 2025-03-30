@@ -68,8 +68,8 @@ export function useMicrophone() {
   // given time frame, and comparing that to the FFT buckets of the user.
   function isMidiNotePresent(
     midi: number,
-    totalNotes = 10,
-    tolerance = 20
+    totalNotes: number,
+    tolerance = 50
   ): boolean {
     if (fftData) {
       // Add tolerance to the midi note
@@ -78,18 +78,31 @@ export function useMicrophone() {
       const [binStart, binEnd] = freqRangeToBinRange(freqRange);
 
       // if any of these buckets are "prominent", return true, otherwise return false
-      const candidates = getTopNCandidates(totalNotes * 1.5);
+      var candidates = getTopNCandidates(totalNotes * 2);
 
-      const prominentBins = new Set<number>(
-        candidates.map((cand) => freqToBin(cand.frequency))
-      );
-      console.log(prominentBins);
-      // If any bin in the note's range is in the prominent bins set, it's present
-      for (let i = binStart; i <= binEnd; i++) {
-        if (prominentBins.has(i)) {
+      const avg = fftData.slice(0, 1000).reduce((prev, i)=>prev+i, 0)/fftData.length
+      candidates = candidates.filter((cand)=> cand.amplitude > avg + tolerance)
+      
+      if(fftData[freqToBin(midiToFreq(midi))] > avg + tolerance) {
+        return true;
+      }
+      for(let i = binStart; i<binEnd; i++) {
+        if(fftData[i] > avg + tolerance) {
           return true;
         }
       }
+
+      // console.log(candidates)
+      // const prominentBins = new Set<number>(
+      //   candidates.map((cand) => freqToBin(cand.frequency))
+      // );
+
+      // If any bin in the note's range is in the prominent bins set, it's present
+      // for (let i = binStart; i <= binEnd; i++) {
+      //   if (prominentBins.has(i)) {
+      //     return true;
+      //   }
+      // }
 
       return false;
     }
