@@ -8,6 +8,7 @@ async function getProject() {
 export default async function Page() {
   const project = await getProject();
 
+  // if project doesn't exist or if trying to access a project that you're not allowed to
   // redirect("/projects")
 
   return <Editor />;

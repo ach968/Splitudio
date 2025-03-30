@@ -20,16 +20,31 @@ import { v4 as uuidv4 } from "uuid";
 import { ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "@/lib/firebase/firebase";
 
+const validateFileDuration = (file: File, isPremium: boolean): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    const audio = new Audio();
+    audio.src = URL.createObjectURL(file);
+    audio.addEventListener("loadedmetadata", () => {
+      const duration = audio.duration;
+      const maxDuration = isPremium ? 20 * 60 : 2 * 60; // 20 minutes for premium, 2 minutes for free
+      URL.revokeObjectURL(audio.src);
+      resolve(duration <= maxDuration);
+    });
+    audio.addEventListener("error", () => {
+      reject(new Error("Failed to load audio metadata"));
+    });
+  });
+};
+
 export default function Upload() {
   // For drag and drop
   const [dragActive, setDragActive] = useState(false);
-  const [loading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // User instance
   const { user } = useAuth();
   const isPremiumUser = true;
-  
+
   // For youtube link
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -42,25 +57,22 @@ export default function Upload() {
 
   // For showing upload progress (simulate for now)
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
-  const [fileName, setFileName] = useState<string>("");
+  const [fileName, setFileName] = useState<string | null>(null);
 
   const { toast } = useToast();
 
   const createProject = async (project: Project) => {
-    setIsLoading(true);
     try {
       const result = await storeProject(project);
       console.log("Project created:", project);
       redirect(`/projects/${project.pid}`);
     } catch (err: any) {
       console.error(err);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   // Function to process files (validate, then upload)
-  const handleFiles = (files: FileList) => {
+  const handleFiles = async (files: FileList) => {
     try {
       setUploadProgress(0);
       if (files.length !== 1) {
@@ -78,10 +90,21 @@ export default function Upload() {
           title: "ERROR",
           description: "Please upload an mp3, wav, flac, or aac file",
         });
+        setUploadProgress(null);
         return;
       }
       setFileName(file.name);
       setUploadProgress(25);
+
+      // client side duration check
+      const isValidDuration = await validateFileDuration(file, isPremiumUser).catch(() => false);
+      if (!isValidDuration) {
+        const maxAllowed = isPremiumUser ? "20 minutes" : "2 minutes";
+        toast({ title: "ERROR", description: `Please upload a file shorter than ${maxAllowed}` });
+        setUploadProgress(null);
+        setFileName(null);
+        return;
+      }
 
       // create firestore project entry
       const newProject: Project = {
@@ -93,7 +116,6 @@ export default function Upload() {
         coverImage: "",
       };
       createProject(newProject);
-      console.log("New project:", newProject);
 
       // Upload file to Firebase Storage
       const storageRef = ref(
@@ -118,15 +140,20 @@ export default function Upload() {
             description: "Upload failed: " + error.message,
           });
           setUploadProgress(null);
+          setFileName(null);
         },
         () => {
           setUploadProgress(100);
-          setUploadProgress(null);
           console.log("File uploaded successfully!");
           toast({
             title: "File uploaded",
             description: "File uploaded successfully!",
           });
+          setTimeout(()=> {
+            setUploadProgress(null);
+            redirect(`/editor/${newProject.pid}`)
+          }, 300)
+          
         }
       );
     } catch (err: any) {
@@ -135,6 +162,8 @@ export default function Upload() {
         title: "ERROR",
         description: "Something went wrong",
       });
+      setUploadProgress(null);
+      setFileName(null);
     }
   };
 
@@ -277,9 +306,9 @@ export default function Upload() {
                           <Progress value={uploadProgress}></Progress>
                         </div>
                       )}
-                      {/* { fileName && uploadProgress === 100 && (
-                                                <p className="text-green-500 mt-2">Uploaded {fileName} successfully!</p>
-                                            )} */}
+                      { fileName && (
+                        <p className="text-neutral-400 mt-2 truncate max-w-[400px]">Uploading {fileName} ...</p>
+                      )}
                     </div>
                     {/* Hidden file input to open file explorer */}
                     {uploadProgress == null && (
