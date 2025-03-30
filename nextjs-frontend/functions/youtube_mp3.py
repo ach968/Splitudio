@@ -77,7 +77,9 @@ def _download_youtube_audio(youtube_url: str, tmp_dir: str) -> str:
     """
 
     try:
-        youtube_url = _normalize_youtube_url(youtube_url)
+        if isinstance(youtube_url, bytes):
+            youtube_url = youtube_url.decode("utf-8")
+
         print(f"Downloading audio from {youtube_url}...")
         video_info = youtube_dl.YoutubeDL().extract_info(youtube_url, download=False)
         title = video_info["title"]

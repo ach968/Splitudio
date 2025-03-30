@@ -103,7 +103,7 @@ if __name__ == "__main__":
     start = time.time()
     audio_path = "file1.mp3"
 
-    # mp3_midi_save(audio_path, "output")df: pd.DataFrame = mp3_midi(audio_path)
+    # mp3_midi_save(audio_path, "utils/output")
 
     df: pd.DataFrame = mp3_midi(audio_path)
     pitch_distribution = get_pitch_distribution(df)
