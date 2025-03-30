@@ -307,7 +307,7 @@ export default function Upload() {
                         </div>
                       )}
                       { fileName && (
-                        <p className="text-neutral-400 mt-2 truncate max-w-[400px]">Uploading {fileName} ...</p>
+                        <p className="text-neutral-400 text-sm mt-2 truncate max-w-[400px]">Uploading {fileName} ...</p>
                       )}
                     </div>
                     {/* Hidden file input to open file explorer */}
