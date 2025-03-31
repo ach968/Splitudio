@@ -6,6 +6,7 @@ import os
 from google.cloud import storage as gcs
 import subprocess
 
+
 @https_fn.on_request(memory=512)
 def youtube_to_mp3(req: https_fn.Request) -> https_fn.Response:
     """
@@ -77,22 +78,18 @@ def _download_youtube_audio(youtube_url: str, tmp_dir: str) -> str:
     """
 
     try:
-<<<<<<< HEAD
         if isinstance(youtube_url, bytes):
             youtube_url = youtube_url.decode("utf-8")
-
-=======
 
         if not tmp_dir:
             print("tmp_dir not found, defaulting to /tmp")
             tmp_dir = "/tmp"
 
         youtube_url = _normalize_youtube_url(youtube_url)
->>>>>>> e5fcf46482b9a4631c5f28af9c7b6d8d3d03dcb0
         print(f"Downloading audio from {youtube_url}...")
 
-        yt_dlp_binary = os.path.join(os.path.dirname(__file__), 'binaries', 'yt-dlp')
-        ffmpeg_path = os.path.join(os.path.dirname(__file__), 'binaries', 'ffmpeg')
+        yt_dlp_binary = os.path.join(os.path.dirname(__file__), "binaries", "yt-dlp")
+        ffmpeg_path = os.path.join(os.path.dirname(__file__), "binaries", "ffmpeg")
 
         # First, get the video's title using --get-title.
         get_title_cmd = [yt_dlp_binary, "--get-title", youtube_url]
@@ -111,10 +108,13 @@ def _download_youtube_audio(youtube_url: str, tmp_dir: str) -> str:
             yt_dlp_binary,
             "-x",
             "--verbose",
-            "--audio-format", "mp3",
-            "--ffmpeg-location", ffmpeg_path,
-            "-o", output_path,
-            youtube_url
+            "--audio-format",
+            "mp3",
+            "--ffmpeg-location",
+            ffmpeg_path,
+            "-o",
+            output_path,
+            youtube_url,
         ]
 
         download_result = subprocess.run(download_cmd, capture_output=True, text=True)
