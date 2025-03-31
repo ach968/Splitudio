@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
+
 export function useMicrophone() {
   // Audio buffer states
   const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null);
@@ -62,6 +63,29 @@ export function useMicrophone() {
     return -1;
   }
 
+
+  // TODO: Factor in the number of notes passed in.
+  function getPeaks(fftData: Uint8Array, tolerance: number, totalNotes: number): number[] {
+    const peaks: number[] = [];
+
+    // Calculate the average amplitude across the entire FFT array.
+    const avg = fftData.slice(0, 500).reduce((sum, value) => sum + value, 0) / 500;
+
+    console.log(avg)
+    // Iterate through fftData and pick peaks that exceed both neighboring bins
+    // and our dynamic threshold.
+    for (let i = 1; i < fftData.length - 1; i++) {
+      if (
+        fftData[i] > fftData[i - 1] &&
+        fftData[i] >= fftData[i + 1] &&
+        fftData[i] > avg + tolerance
+      ) {
+        peaks.push(i);
+      }
+    }
+    return peaks;
+  }
+
   // When playing along to midi, instead of guessing what/how many notes the user
   // is playing and comparing it to the midi, we can benefit from going the other
   // way around: Knowing what midi notes (and how many) SHOULD be played at a
@@ -71,33 +95,47 @@ export function useMicrophone() {
     totalNotes: number,
     tolerance = 50
   ): boolean {
+    
     if (fftData) {
+      
       // Add tolerance to the midi note
       const freqRange: [number, number] = midiFreqRange(midi);
       // Now find the range of user buckets that we want to check for
       const [binStart, binEnd] = freqRangeToBinRange(freqRange);
+      // const freq = midiToFreq(midi);
+      // const bin = freqToBin(freq);
+
+      var max = 0;
+      for(let i = binStart; i<binEnd; i++) {
+        max = Math.max(max, fftData[i])
+      }
+      
+      const peaks = getPeaks(fftData, tolerance, totalNotes);
+      const isPeak = peaks.some((peak) => peak >= binStart && peak <= binEnd);
+      
+      return isPeak
 
       // if any of these buckets are "prominent", return true, otherwise return false
-      var candidates = getTopNCandidates(totalNotes * 2);
+      // var candidates = getTopNCandidates(totalNotes * 2);
 
-      const avg = fftData.slice(0, 1000).reduce((prev, i)=>prev+i, 0)/fftData.length
-      candidates = candidates.filter((cand)=> cand.amplitude > avg + tolerance)
+      // const avg = fftData.slice(0, 1000).reduce((prev, i)=>prev+i, 0) / 1000
+      // candidates = candidates.filter((cand)=> cand.amplitude > avg + tolerance)
       
-      if(fftData[freqToBin(midiToFreq(midi))] > avg + tolerance) {
-        return true;
-      }
-      for(let i = binStart; i<binEnd; i++) {
-        if(fftData[i] > avg + tolerance) {
-          return true;
-        }
-      }
+      // if(fftData[freqToBin(midiToFreq(midi))] > avg + tolerance) {
+      //   return true;
+      // }
+      // for(let i = binStart; i<binEnd; i++) {
+      //   if(fftData[i] > avg + tolerance) {
+      //     return true;
+      //   }
+      // }
 
       // console.log(candidates)
       // const prominentBins = new Set<number>(
       //   candidates.map((cand) => freqToBin(cand.frequency))
       // );
 
-      // If any bin in the note's range is in the prominent bins set, it's present
+      // // If any bin in the note's range is in the prominent bins set, it's present
       // for (let i = binStart; i <= binEnd; i++) {
       //   if (prominentBins.has(i)) {
       //     return true;

@@ -51,11 +51,11 @@ export default function Play({
 
   useEffect(() => {
     if (fftData && audioBuffer) {
-      const topFrequencies = midiUtils.getTopNCandidates(10);
-      const topMidis = topFrequencies.map((cand) =>
-        midiUtils.freqToMidi(cand.frequency)
-      );
-      const topNotes = topMidis.map((cand) => midiUtils.midiToNoteName(cand));
+      // const topFrequencies = midiUtils.getTopNCandidates(10);
+      // const topMidis = topFrequencies.map((cand) =>
+      //   midiUtils.freqToMidi(cand.frequency)
+      // );
+      // const topNotes = topMidis.map((cand) => midiUtils.midiToNoteName(cand));
 
       // console.log([
       //     topNotes[0],
@@ -101,7 +101,6 @@ export default function Play({
 
   // Define piano size
   useEffect(() => {
-    console.log(midiData);
 
     const noteOctaves = midiData.tracks[0].notes.map((note) => note.octave);
     const minOctave = Math.min(...noteOctaves);
@@ -114,7 +113,6 @@ export default function Play({
   // Add event listeners for keyboard events
   useEffect(() => {
     const handleKeyDownEvent = (e: KeyboardEvent) => {
-      console.log(e.key);
       if (e.keyCode === 32) {
         e.preventDefault();
         if (isPlaying) pause();
@@ -127,10 +125,10 @@ export default function Play({
         e.preventDefault();
         setBuffer(new Set());
         setCurrentTime((prev) => Math.min(duration, prev + WINDOW_SIZE * 0.5));
-      } else if (e.ctrlKey || (e.metaKey && e.key === "=")) {
+      } else if ((e.ctrlKey || e.metaKey) && e.key === "=") {
         e.preventDefault();
         setWindowSize((prev) => Math.max(0.5, prev - 2));
-      } else if (e.ctrlKey || (e.metaKey && e.key === "-")) {
+      } else if ((e.ctrlKey || e.metaKey) && e.key === "-") {
         e.preventDefault();
         setWindowSize((prev) => Math.min(MAX_WINDOW_SIZE, prev + 2));
       }
@@ -259,8 +257,7 @@ export default function Play({
       window.forEach((note) => {
         const id = `${note.name}-${note.time}-${note.duration}-${note.midi}`;
         
-        if (midiUtils.isMidiNotePresent(note.midi, playAlongBuffer.size, 150)) {
-          console.log(id)
+        if (midiUtils.isMidiNotePresent(note.midi, playAlongBuffer.size, 100)) {
           newPlayAlongBuffer.set(id, true);
         } else {
           newPlayAlongBuffer.set(id, false);
@@ -398,10 +395,10 @@ export default function Play({
             fftData && fftData.length &&
             <LineChart
             // xAxis={[{ data: [fftData.map((_, i) => i)].splice(0, 100)}]}
-            yAxis={[{ min: 0, max: 200 }]}
+            yAxis={[{ min: 0, max: 255 }]}
             series={[
                 {
-                    data: [...fftData!].splice(0, 1000),
+                    data: [...fftData!].splice(0, 500),
                     area:false,
                     showMark: false,
                     stack: "total"
