@@ -91,6 +91,15 @@ def _download_youtube_audio(youtube_url: str, tmp_dir: str) -> str:
         yt_dlp_binary = os.path.join(os.path.dirname(__file__), "binaries", "yt-dlp")
         ffmpeg_path = os.path.join(os.path.dirname(__file__), "binaries", "ffmpeg")
 
+        update_yt_dlp_cmd = [yt_dlp_binary, "-U"]
+        update_result = subprocess.run(
+            update_yt_dlp_cmd, capture_output=True, text=True
+        )
+
+        if update_result.returncode != 0:
+            print(f"Error updating yt-dlp: {update_result.stderr}")
+            return None
+
         # First, get the video's title using --get-title.
         get_title_cmd = [yt_dlp_binary, "--get-title", youtube_url]
         title_result = subprocess.run(get_title_cmd, capture_output=True, text=True)
