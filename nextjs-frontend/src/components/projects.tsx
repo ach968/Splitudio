@@ -29,7 +29,7 @@ import { Dialog, DialogClose, DialogContent, DialogTrigger } from "./ui/dialog";
 import EnterSVG from "@/assets/enter";
 import { Button } from "./ui/button";
 import Topbar from "./topbar";
-import EditorNav from "./loggedin-nav";
+import EditorNav from "./editor-nav";
 
 interface Project {
   id: string;

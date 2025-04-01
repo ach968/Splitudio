@@ -10,7 +10,7 @@ import * as SliderPrimitive from "@radix-ui/react-slider";
 import * as Tone from "tone";
 import { PolySynth, Synth, SynthOptions } from "tone";
 import Piano from "@/components/midi-display/piano";
-import EditorNav from "../loggedin-nav";
+import EditorNav from "../editor-nav";
 import Knob from "./knob";
 import { useMicrophone } from "./use-microphone";
 import { LineChart } from "@mui/x-charts/LineChart";

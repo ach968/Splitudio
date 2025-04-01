@@ -13,7 +13,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import SkeletonTrack from "@/components/skeleton-track";
-import EditorNav from "@/components/loggedin-nav";
+import EditorNav from "@/components/editor-nav";
 
 export default function Loading() {
   return (

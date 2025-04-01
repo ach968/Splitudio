@@ -9,7 +9,7 @@ import PremiumText from "@/components/premium-text";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Topbar from "@/components/topbar";
-import EditorNav from "@/components/loggedin-nav";
+import EditorNav from "@/components/editor-nav";
 export default function Profile() {
   const subscriptionStatus: number = 1;
 
@@ -46,7 +46,7 @@ export default function Profile() {
   return (
     <section>
       <EditorNav />
-      
+
       <div className="flex flex-col items-center w-full min-h-screen bg-black">
         
 

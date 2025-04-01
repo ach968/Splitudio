@@ -1,6 +1,6 @@
 "use client";
 import Footer from "@/components/footer";
-import EditorNav from "@/components/loggedin-nav";
+import EditorNav from "@/components/editor-nav";
 import PianoRoll from "@/components/midi-display/piano-roll";
 import Piano from "@/components/midi-display/piano";
 import LoadingSpinnerSVG from "@/assets/loading-spinner";

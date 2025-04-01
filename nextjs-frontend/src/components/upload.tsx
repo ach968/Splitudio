@@ -12,7 +12,7 @@ import { redirect } from "next/navigation";
 import { Progress } from "./ui/progress";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import EditorNav from "./loggedin-nav";
+import EditorNav from "./editor-nav";
 import { storeProject } from "@/lib/utils";
 import { Project } from "@/types/firestore";
 import { useAuth } from "./authContext";
