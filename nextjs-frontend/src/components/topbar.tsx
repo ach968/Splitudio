@@ -58,7 +58,16 @@ export default function Topbar() {
         <NavigationMenu>
           
             {user==null ?
-            <NavigationMenuList>
+            <NavigationMenuList className="flex flex-row">
+              <NavigationMenuItem>
+                <Link href="/signup" legacyBehavior passHref>
+                  <NavigationMenuLink
+                    className={navigationMenuTriggerStyle()}
+                  >
+                    <p className="text-sm">Signup</p>
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link href="/login" legacyBehavior passHref>
                   <NavigationMenuLink
@@ -69,7 +78,8 @@ export default function Topbar() {
                 </Link>
               </NavigationMenuItem>
             </NavigationMenuList>
-            :<NavigationMenuList className="flex flex-row">
+            :
+            <NavigationMenuList className="flex flex-row">
               <NavigationMenuItem>
                 <Link href="/profile" legacyBehavior passHref>
                   <NavigationMenuLink

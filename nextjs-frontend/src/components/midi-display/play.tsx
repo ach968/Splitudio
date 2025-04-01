@@ -39,7 +39,7 @@ export default function Play({
   const pianoRollContainerRef = useRef<HTMLDivElement>(null);
 
   const [WINDOW_SIZE, setWindowSize] = useState<number>(3);
-  const MAX_WINDOW_SIZE = 30;
+  const MAX_WINDOW_SIZE = 20;
 
   const [playAlong, setPlayAlong] = useState(false);
 
@@ -322,85 +322,88 @@ export default function Play({
             </div>
 
             <div className="flex justify-between w-full items-center mt-2">
-              <div className="flex flex-col gap-2 w-[200px] items-center">
-                <span 
-                onClick={()=>setWindowSize(3)}
-                className="font-mono text-xs truncate hover:cursor-pointer">
-                  Zoom:&nbsp;{WINDOW_SIZE.toFixed(2)}s
-                </span>
-                <div className="flex flex-row gap-3 w-full">
-                  <Button 
-                  onClick={()=>setWindowSize((prev)=> {
-                    if(prev+2 > MAX_WINDOW_SIZE) {
-                      return MAX_WINDOW_SIZE
-                    }
-                    return prev+2
-                  })}
-                  size="icon" 
-                  variant="secondary" 
-                  className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
-                    -
-                  </Button>      
-                  <Slider
-                  className="w-full"
-                  min={0.5}
-                  max={MAX_WINDOW_SIZE}
-                  step={0.01}
-                  value={[WINDOW_SIZE]}
-                  onValueChange={(e) => setWindowSize(e[0])}
-                  ></Slider>
-                  <Button
-                  onClick={()=>setWindowSize((prev)=> {
-                    if(prev-2 < 0.5) {
-                      return 0.5
-                    }
-                    return prev-2
-                  })}
-                  size="icon" 
-                  variant="secondary" 
-                  className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
-                    +
-                  </Button>                
-                </div>
-              </div>
-              <div className="flex flex-col gap-2 w-[200px] items-center">
-                <span
-                onClick={()=>playbackSpeedRef.current = 1} 
-                className="font-mono text-xs truncate hover:cursor-pointer">
-                  Playback&nbsp;Speed:&nbsp;{playbackSpeedRef.current.toFixed(1)}x
-                </span>
-                <div className="flex flex-row gap-3 w-full">
-                  <Button 
-                  onClick={()=>playbackSpeedRef.current = playbackSpeedRef.current - 0.2}
-                  size="icon" 
-                  variant="secondary" 
-                  className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
-                    -
-                  </Button>      
-                  <Slider
+              <div className="flex flex-row gap-3">
+                <div className="flex flex-col gap-1 w-[150px] items-center">
+                  <span 
+                  onClick={()=>setWindowSize(3)}
+                  className="font-mono text-xs truncate hover:cursor-pointer">
+                    Zoom:&nbsp;{WINDOW_SIZE.toFixed(2)}s
+                  </span>
+                  <div className="flex flex-row gap-1 w-full">
+                    <Button 
+                    onClick={()=>setWindowSize((prev)=> {
+                      if(prev+2 > MAX_WINDOW_SIZE) {
+                        return MAX_WINDOW_SIZE
+                      }
+                      return prev+2
+                    })}
+                    size="icon" 
+                    variant="ghost" 
+                    className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
+                      -
+                    </Button>      
+                    <Slider
                     className="w-full"
-                    min={0.1}
-                    max={2}
+                    min={MAX_WINDOW_SIZE}
+                    max={0.5}
                     step={0.01}
-                    value={[playbackSpeedRef.current]}
-                    onValueChange={(e) => playbackSpeedRef.current = e[0]}
-                  ></Slider>
-                  <Button
-                  onClick={()=>playbackSpeedRef.current = playbackSpeedRef.current + 0.2}
-                  size="icon" 
-                  variant="secondary" 
-                  className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
-                    +
-                  </Button>                
+                    value={[WINDOW_SIZE]}
+                    onValueChange={(e) => setWindowSize(e[0])}
+                    ></Slider>
+                    <Button
+                    onClick={()=>setWindowSize((prev)=> {
+                      if(prev-2 < 0.5) {
+                        return 0.5
+                      }
+                      return prev-2
+                    })}
+                    size="icon" 
+                    variant="ghost" 
+                    className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
+                      +
+                    </Button>                
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1 w-[150px] items-center">
+                  <span
+                  onClick={()=>playbackSpeedRef.current = 1} 
+                  className="font-mono text-xs truncate hover:cursor-pointer">
+                    Speed:&nbsp;{playbackSpeedRef.current.toFixed(1)}x
+                  </span>
+                  <div className="flex flex-row gap-1 w-full">
+                    <Button 
+                    onClick={()=>playbackSpeedRef.current = playbackSpeedRef.current - 0.2}
+                    size="icon" 
+                    variant="ghost" 
+                    className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
+                      -
+                    </Button>      
+                    <Slider
+                      className="w-full"
+                      min={0.1}
+                      max={2}
+                      step={0.01}
+                      value={[playbackSpeedRef.current]}
+                      onValueChange={(e) => playbackSpeedRef.current = e[0]}
+                    ></Slider>
+                    <Button
+                    onClick={()=>playbackSpeedRef.current = playbackSpeedRef.current + 0.2}
+                    size="icon" 
+                    variant="ghost" 
+                    className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
+                      +
+                    </Button>                
+                  </div>
                 </div>
               </div>
+              
 
               {playAlong ? (
                 <Button onClick={() => setPlayAlong(false)}>Hear</Button>
               ) : (
                 <Button onClick={() => setPlayAlong(true)}>Play Along</Button>
               )}
-              <Knob size={30} value={volume} onChange={setVolume}></Knob>
+              <Knob size={35} value={volume} onChange={setVolume}></Knob>
             </div>
           </div>
         </div>

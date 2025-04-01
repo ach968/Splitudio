@@ -39,7 +39,7 @@ export default function AuthPage() {
             transition={{ duration: 0.5 }}
             className="container pt-28 flex flex-col justify-center items-center"
           >
-            <h1 className="text-2xl font-bold text-white mb-6">Login</h1>
+            <h1 className="text-2xl font-bold text-white mb-6">Log in</h1>
 
             {error && <p className="text-red-500 mb-4">{error}</p>}
 

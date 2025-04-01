@@ -9,7 +9,7 @@ export default function Logo() {
         </p>
       </div>
 
-      <div className="flex group relative -top-8 group-hover:top-0 flex-row group text-white gap-2 items-center transition-all duration-500 ease-in-out">
+      <div className="flex group relative -top-8 group-hover:top-0 flex-row group gap-2 items-center transition-all duration-500 ease-in-out">
         {/* Left side */}
         <div
           className="rounded-full h-[20px] group-hover:h-[40px] transition-all duration-500"
