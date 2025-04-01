@@ -7,6 +7,7 @@ import { useAuth } from "./authContext";
 import { twMerge } from "tailwind-merge";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, navigationMenuTriggerStyle } from "./ui/navigation-menu";
 import { NavigationMenuList } from "@radix-ui/react-navigation-menu";
+import Logo from "@/components/logo";
 
 export default function Topbar() {
   const pathname = usePathname();
@@ -18,9 +19,16 @@ export default function Topbar() {
   ];
 
   return (
-    <nav className="bg-black/50 backdrop-blur-md h-[70px] z-[999] justify-center items-center w-screen flex fixed top-0">
-      <div className="flex flex-row w-full container items-baseline justify-between px-6 text-sm">
-        <div className="flex gap-5 text-neutral-400 underline-offset-4">
+    <nav className="bg-black/50 backdrop-blur-md h-[80px] z-[999] justify-center items-center w-screen flex fixed top-0">
+      <div className="flex flex-row w-full container items-center justify-between px-6 text-sm">
+        <div className="flex flex-row items-center gap-5 text-neutral-400 underline-offset-4">
+          <Link 
+          href="/"
+          className="relative flex items-center justify-center w-[80px] h-[53px]">
+            <div className="scale-[0.3]">
+              <Logo />
+            </div>
+          </Link>
           
           
           <Link href="/projects">
@@ -45,6 +53,7 @@ export default function Topbar() {
           </Link>
         </div>
 
+        
 
         <NavigationMenu>
           

@@ -10,7 +10,7 @@ export default async function Page() {
   // simulate waiting for backend
   const wait = await getMidi();
 
-  var data = await Midi.fromUrl("https://bitmidi.com/uploads/79829.mid");
+  var data = await Midi.fromUrl("https://bitmidi.com/uploads/112561.mid");
 
   // bring out the complex stuff we need
   const duration = data.tracks[0].duration;

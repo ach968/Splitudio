@@ -38,8 +38,8 @@ const trackList = [
     id: "track-id-2",
     fileUrl: "/drums.wav",
     trackName: "Drums",
-    waveColor: "#efb100",
-    className: "border-orange-400 shadow-[0px_0px_50px_#efb10033]",
+    waveColor: "#f97316",
+    className: "border-orange-500 shadow-[0px_0px_50px_#f9731633]",
   },
   {
     id: "track-id-3",

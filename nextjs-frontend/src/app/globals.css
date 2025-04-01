@@ -75,6 +75,11 @@ body {
   .premium-gradient {
     background: linear-gradient(to right, #DD7DDF, #E1CD86, #BBCB92, #71C2EF, #3BFFFF, #DD7DDF)
   }
+
+  .logo-gradient {
+    background: linear-gradient(to right, #F87BFF, #FB92CF, #FFDD9B, #C2F0B1, #2FD8FE)
+  }
+
   .premium-background {
     text-shadow: 
       0 0 10px #F87BFF33,

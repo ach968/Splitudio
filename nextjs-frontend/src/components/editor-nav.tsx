@@ -14,6 +14,7 @@ import { twMerge } from "tailwind-merge";
 import { redirect, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "./authContext";
+import Logo from "./logo";
 
 export default function EditorNav({
   projectId,
@@ -37,9 +38,17 @@ export default function EditorNav({
   }, [user]);
 
   return (
-    <nav className="bg-black/50 backdrop-blur-md h-[70px] z-[999] justify-center items-center w-screen flex fixed top-0">
-      <div className="flex flex-row w-full container items-baseline justify-between px-6 text-sm">
-        <div className="flex gap-5 text-neutral-400 underline-offset-4">
+    <nav className="bg-black/50 backdrop-blur-md h-[80px] z-[999] justify-center items-center w-screen flex fixed top-0">
+      <div className="flex flex-row w-full container items-center justify-between px-6 text-sm">
+        <div className="flex gap-5 text-neutral-400 items-center underline-offset-4">
+          <Link 
+          href="/"
+          className="relative flex items-center justify-center w-[80px] h-[53px]">
+            <div className="scale-[0.3]">
+              <Logo />
+            </div>
+          </Link>
+
           <Link onClick={pauseCallback} href="/projects">
             <p
               className={twMerge(
