@@ -6,6 +6,8 @@ export function useMicrophone() {
   const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const recordedDataRef = useRef<Float32Array[]>([]);
+  const streamRef = useRef<MediaStream | null>(null);
+  const processorRef = useRef<ScriptProcessorNode | null>(null);
 
   // FFT states
   const [fftData, setFftData] = useState<Uint8Array | null>(null);
@@ -112,7 +114,7 @@ export function useMicrophone() {
       
       const peaks = getPeaks(fftData, tolerance, totalNotes);
       const isPeak = peaks.some((peak) => peak >= binStart && peak <= binEnd);
-      
+
       return isPeak
 
       // if any of these buckets are "prominent", return true, otherwise return false
@@ -142,7 +144,7 @@ export function useMicrophone() {
       //   }
       // }
 
-      return false;
+      // return false;
     }
 
     return false;
@@ -243,20 +245,20 @@ export function useMicrophone() {
     async function initMic() {
       try {
         // javascript shit
-        const stream = await navigator.mediaDevices.getUserMedia({
+        streamRef.current = await navigator.mediaDevices.getUserMedia({
           audio: true,
         });
         const audioContext = new AudioContext();
         audioContextRef.current = audioContext;
-        const source = audioContext.createMediaStreamSource(stream);
-
+        const source = audioContext.createMediaStreamSource(streamRef.current);
+        
         // Script processor processes samples in chucks; 4kb of samples on every callback
         // Each chunk represents a time frame
-        const processor = audioContext.createScriptProcessor(4096, 1, 1);
+        processorRef.current = audioContext.createScriptProcessor(4096, 1, 1);
 
         // Connect source to script processor
-        source.connect(processor);
-        processor.connect(audioContext.destination);
+        source.connect(processorRef.current);
+        processorRef.current.connect(audioContext.destination);
 
         // Create analyzer for realtime FFT
         const analyser = audioContext.createAnalyser();
@@ -267,7 +269,7 @@ export function useMicrophone() {
         source.connect(analyser);
 
         // Script processor callback every time it collects 4kb of samples
-        processor.onaudioprocess = (event) => {
+        processorRef.current.onaudioprocess = (event) => {
           // We copy the chunk into our buffer
           const inputData = event.inputBuffer.getChannelData(0);
           recordedDataRef.current.push(new Float32Array(inputData));
@@ -326,6 +328,19 @@ export function useMicrophone() {
     return () => {
       if (audioContextRef.current) {
         audioContextRef.current.close();
+        streamRef.current?.getTracks()[0].stop();
+      }
+
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+
+      if (analyserRef.current) {
+        analyserRef.current.disconnect();
+      }
+
+      if (processorRef.current) {
+        processorRef.current.disconnect();
       }
     };
   }, []);

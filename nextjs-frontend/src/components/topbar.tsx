@@ -52,13 +52,12 @@ export default function Topbar() {
             </p>
           </Link>
         </div>
-
         
 
         <NavigationMenu>
           
             {user==null ?
-            <NavigationMenuList className="flex flex-row">
+            <NavigationMenuList className="flex flex-row gap-1">
               <NavigationMenuItem>
                 <Link href="/signup" legacyBehavior passHref>
                   <NavigationMenuLink
@@ -79,7 +78,7 @@ export default function Topbar() {
               </NavigationMenuItem>
             </NavigationMenuList>
             :
-            <NavigationMenuList className="flex flex-row">
+            <NavigationMenuList className="flex flex-row gap-1">
               <NavigationMenuItem>
                 <Link href="/profile" legacyBehavior passHref>
                   <NavigationMenuLink
