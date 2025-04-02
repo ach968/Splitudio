@@ -1,4 +1,4 @@
-import { serverTimestamp } from "firebase/firestore";
+import { serverTimestamp, Timestamp } from "firebase/firestore";
 
 export interface CloudFile { 
   fid: string; 
@@ -13,8 +13,8 @@ export interface Project {
   pid: string;
   uid: string | null; 
   pName: string;
-  createdAt?: typeof serverTimestamp;
-  updatedAt?: typeof serverTimestamp;
+  createdAt?: typeof Timestamp;
+  updatedAt?: typeof Timestamp;
   collaboratorIds?: string[];
   coverImage?: string;
   isPublic: boolean;

@@ -172,6 +172,12 @@ export default function Upload() {
               title: "File uploaded",
               description: "File uploaded successfully!",
             });
+            
+            setTimeout(() => {
+              setUploadProgress(null);
+              redirect(`/editor/${newProject.pid}`);
+            }, 300);
+
           } catch (error: any) {
             console.error("Failed to store file info to cloud file", error);
             toast({
@@ -179,11 +185,6 @@ export default function Upload() {
               description: "Failed to store file info: " + error.message,
             });
           }
-
-          setTimeout(() => {
-            setUploadProgress(null);
-            redirect(`/editor/${newProject.pid}`);
-          }, 300);
         }
       );
     } catch (err: any) {

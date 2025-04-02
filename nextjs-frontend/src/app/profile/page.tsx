@@ -8,40 +8,12 @@ import Footer from "@/components/footer";
 import PremiumText from "@/components/premium-text";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import Topbar from "@/components/topbar";
 import EditorNav from "@/components/editor-nav";
+import { useAuth } from "@/components/authContext";
 export default function Profile() {
+  const user = useAuth();
+  
   const subscriptionStatus: number = 1;
-
-  // // username tab
-  // const [password_1, setPassword_1] = useState("");
-  // const [username_1, setUsername_1] = useState("user123");
-  // // password tab
-  // const [currpassword_2, setCurrpassword_2] = useState("");
-  // const [newpassword_2, setNewpassword_2] = useState("");
-
-  // const [disableButtons, setDisableButtons] = useState(false);
-
-  // const saveUsername = () => {
-  //     setDisableButtons(true);
-
-  //     // fetch logic
-
-  //     setTimeout(()=> {
-  //         // finally
-  //         setDisableButtons(false);
-  //     }, 300)
-  // }
-  // const savePassword = () => {
-  //     setDisableButtons(true);
-
-  //     // fetch logic
-
-  //     setTimeout(()=> {
-  //         // finally
-  //         setDisableButtons(false);
-  //     }, 300)
-  // }
 
   return (
     <section>
@@ -78,7 +50,11 @@ export default function Profile() {
                     <p className="text-white">Current Plan: Free</p>
 
                     <Button variant="secondary" className="max-w-[200px]">
-                      Upgrade to Premium
+                      <Link href={`https://buy.stripe.com/test_dR6003eO45Bebx65kk?client_reference_id=${user.uid}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer" >
+                        Upgrade to Premium
+                      </Link>
                     </Button>
                   </div>
                 </>
@@ -97,9 +73,10 @@ export default function Profile() {
                     <p className="text-white">
                       Current Plan: <PremiumText />
                     </p>
-                    <Link href="/">
+                    <Link href="https://billing.stripe.com/p/login/test_6oEfZv32v0vV79C000"
+                    target="_blank" 
+                    rel="noopener noreferrer" >
                       <p className="text-neutral-400 underline underline-offset-4 text-sm">
-                        {" "}
                         Manage my subscription
                       </p>
                     </Link>
