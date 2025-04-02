@@ -22,8 +22,10 @@ export interface Project {
 }
 
 export interface Customer {
-  user: User // firebase useAuth wrapper
-  subscription: string,
-  stripeSubscriptionId: null
+  user: User; // firebase useAuth wrapper
+  subscription: string;
+  stripeSubscriptionId: null;
+  projects: Project[];
+  apiUsage: number;
 }
 
