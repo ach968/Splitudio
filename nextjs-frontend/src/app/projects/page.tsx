@@ -1,3 +1,4 @@
+'use client'
 import Projects from "@/components/projects";
 import { fetchProjects } from "@/lib/utils";
 import { useAuth } from "@/components/authContext";

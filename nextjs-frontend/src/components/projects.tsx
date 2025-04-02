@@ -30,13 +30,7 @@ import EnterSVG from "@/assets/enter";
 import { Button } from "./ui/button";
 import Topbar from "./topbar";
 import EditorNav from "./editor-nav";
-
-interface Project {
-  id: string;
-  title: string;
-  file: string;
-  lastModified: string;
-}
+import { Project } from "@/types/firestore";
 
 export default function Projects({
   initialProjects,
@@ -63,7 +57,7 @@ export default function Projects({
   const filteredProjects = projects.filter((project) => {
     const lowerQuery = searchQuery.toLowerCase();
     return (
-      project.title.toLowerCase().includes(lowerQuery) ||
+      project.pName.toLowerCase().includes(lowerQuery) ||
       project.file.toLowerCase().includes(lowerQuery)
     );
   });
@@ -80,13 +74,13 @@ export default function Projects({
   }, [renaming]);
 
   // Create a sorted copy based on the active sort:
-  // If dateDown is not null, sort by lastModified.
-  // Else if alphabeticalDown is not null, sort by title.
+  // If dateDown is not null, sort by updatedAt.
+  // Else if alphabeticalDown is not null, sort by pName.
   let sortedProjects = [...filteredProjects];
   if (dateDown !== null) {
     sortedProjects.sort((a, b) => {
-      const dateA = new Date(a.lastModified);
-      const dateB = new Date(b.lastModified);
+      const dateA = new Date(a.updatedAt);
+      const dateB = new Date(b.updatedAt);
       // If dateDown is true, sort descending (newest first), yes it's counter intuitive but that's how UI works.
       return dateDown
         ? dateB.getTime() - dateA.getTime()
@@ -95,8 +89,8 @@ export default function Projects({
   } else if (alphabeticalDown !== null) {
     sortedProjects.sort((a, b) => {
       return alphabeticalDown
-        ? a.title.localeCompare(b.title)
-        : b.title.localeCompare(a.title);
+        ? a.pName.localeCompare(b.pName)
+        : b.pName.localeCompare(a.pName);
     });
   }
 
@@ -112,7 +106,7 @@ export default function Projects({
       // update dummy list
       setProjects((prevProjects) =>
         prevProjects!.map((project) =>
-          project.id === projectId ? { ...project, title: newName } : project
+          project.id === projectId ? { ...project, pName: newName } : project
         )
       );
     } catch (error) {
@@ -267,7 +261,7 @@ export default function Projects({
                                   className="flex gap-3 items-baseline"
                                 >
                                   <p className="line-clamp-1">
-                                    {project.title}
+                                    {project.pName}
                                   </p>
                                   <p className="text-neutral-400 text-sm line-clamp-1">
                                     / {project.file}
@@ -285,7 +279,7 @@ export default function Projects({
                                   className="text-neutral-400 text-sm line-clamp-1"
                                 >
                                   {new Date(
-                                    project.lastModified
+                                    project.updatedAt
                                   ).toDateString()}
                                 </motion.p>
                               </TableCell>
@@ -330,7 +324,7 @@ export default function Projects({
                                 <div className="flex items-center h-full">
                                   <p className="text-neutral-400 text-sm line-clamp-1">
                                     {new Date(
-                                      project.lastModified
+                                      project.updatedAt
                                     ).toDateString()}
                                   </p>
                                 </div>
@@ -342,7 +336,7 @@ export default function Projects({
                           <ContextMenuItem
                             onClick={() => {
                               setRenaming(project.id);
-                              setNewName(project.title);
+                              setNewName(project.pName);
                             }}
                           >
                             <p className="flex w-full h-full hover:cursor-pointer">
@@ -364,7 +358,7 @@ export default function Projects({
                             <DialogContent>
                               <Share
                                 projectId={project.id}
-                                projectName={project.title}
+                                projectName={project.pName}
                               />
                             </DialogContent>
                           </Dialog>
