@@ -1,12 +1,14 @@
 import os
 import stripe
+from dotenv import load_dotenv
 from firebase_functions import https_fn
 from firebase_functions.params import StringParam
 
 @https_fn.on_request(memory=512)
 def stripe_webhook(req: https_fn.Request) -> https_fn.Response:
     
-    endpoint_secret = os.environ["ENDPOINT_SECRET"]
+    load_dotenv()
+    endpoint_secret = os.getenv("ENDPOINT_SECRET")
 
     payload = req.data
     sig_header = req.headers.get("Stripe-Signature")
