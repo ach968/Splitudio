@@ -112,6 +112,8 @@ def _download_youtube_audio(youtube_url: str, tmp_dir: str) -> str:
         filename = f"{title}.mp3"
         output_path = os.path.join(tmp_dir, filename)
 
+        cookies_path = "cookies.txt"
+
         # Download the audio
         download_cmd = [
             yt_dlp_binary,
@@ -119,6 +121,8 @@ def _download_youtube_audio(youtube_url: str, tmp_dir: str) -> str:
             "--verbose",
             "--audio-format",
             "mp3",
+            "--cookies",
+            cookies_path,
             "--ffmpeg-location",
             ffmpeg_path,
             "-o",
