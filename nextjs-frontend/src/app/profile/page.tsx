@@ -10,10 +10,9 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import EditorNav from "@/components/editor-nav";
 import { useAuth } from "@/components/authContext";
+
 export default function Profile() {
   const user = useAuth();
-  
-  const subscriptionStatus: number = 1;
 
   return (
     <section>
