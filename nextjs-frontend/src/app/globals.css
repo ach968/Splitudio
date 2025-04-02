@@ -86,7 +86,7 @@ body {
   }
 
   .tag {
-    @apply text-sm inline-flex border border-[#222]/20 px-3 py-1 rounded-lg tracking-tight
+    @apply text-sm inline-flex text-neutral-400 border border-neutral-400/30 px-3 py-1 rounded-lg tracking-tight
   }
 
   .premium-background {

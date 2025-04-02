@@ -8,6 +8,7 @@ import { twMerge } from "tailwind-merge";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, navigationMenuTriggerStyle } from "./ui/navigation-menu";
 import { NavigationMenuList } from "@radix-ui/react-navigation-menu";
 import Logo from "@/components/logo";
+import { ClassNames } from "@emotion/react";
 
 export default function Topbar() {
   const pathname = usePathname();
@@ -29,33 +30,30 @@ export default function Topbar() {
               <Logo />
             </div>
           </Link>
-          
-          
-          <Link href="/projects">
+          <Link href="/pricing">
             <p
               className={twMerge(
                 pathname === "/projects" && "text-white",
                 "hover:cursor-pointer hover:text-white hover:underline"
               )}
             >
-              Projects
+              Pricing
             </p>
           </Link>
-          <Link href="/editor">
+          <Link href="/about">
             <p
               className={twMerge(
-                pathname.startsWith("/editor") && "text-white",
+                pathname === "/projects" && "text-white",
                 "hover:cursor-pointer hover:text-white hover:underline"
               )}
             >
-              Editor
+              About
             </p>
           </Link>
         </div>
         
 
         <NavigationMenu>
-          
             {user==null ?
             <NavigationMenuList className="flex flex-row gap-1">
               <NavigationMenuItem>
@@ -79,6 +77,18 @@ export default function Topbar() {
             </NavigationMenuList>
             :
             <NavigationMenuList className="flex flex-row gap-1">
+              <NavigationMenuItem>
+                <Link href="/projects" legacyBehavior passHref>
+                  <NavigationMenuLink
+                    className={twMerge(
+                      navigationMenuTriggerStyle(),
+                      "bg-white text-black hover:bg-white/80 hover:scale-[1.03] transition-all"
+                    )}
+                  >
+                    <p className="text-sm">Enter Studio</p>
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
               <NavigationMenuItem>
                 <Link href="/profile" legacyBehavior passHref>
                   <NavigationMenuLink

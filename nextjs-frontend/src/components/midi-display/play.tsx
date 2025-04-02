@@ -270,7 +270,7 @@ export default function Play({
 
   return (
     <section>
-      <EditorNav />
+      <EditorNav projectId="id" projectName="Untitled Project" pauseCallback={pause} />
 
       <div className="flex flex-col w-full min-h-screen h-screen bg-black text-white p-6">
         <div

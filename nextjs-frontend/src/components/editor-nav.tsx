@@ -33,7 +33,7 @@ export default function EditorNav({
   // REDIRECT TO HOME PAGE IF NOT LOGGED IN
   useEffect(() => {
     if (!user) {
-      redirect("/");
+      redirect("/login");
     }
   }, [user]);
 
