@@ -20,6 +20,7 @@ def stripe_webhook(req: https_fn.Request) -> https_fn.Response:
     except stripe.error.SignatureVerificationError as e:
         return https_fn.Response("Invalid Signature", 400)
 
+    # user subscribes
     if event["type"] == "checkout.session.completed":
         checkout_session = event["data"]["object"]
         print("Checkout session:", checkout_session)
@@ -29,7 +30,8 @@ def stripe_webhook(req: https_fn.Request) -> https_fn.Response:
             print("Client id from frontend " + checkout_session["client_reference_id"])
             # save this so we know when they cancel
             print("Save this for subscription cancelation " + checkout_session["subscription"])
-
+   
+    # user unsubscribes
     elif event["type"] == "customer.subscription.deleted":
         cancel_intent = event["data"]["object"]
         print("Subscription cancelled:", cancel_intent)
