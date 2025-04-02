@@ -202,7 +202,7 @@ export default function Track({
                   className="w-20 h-9 rounded-full group"
                   variant="outline"
                 >
-                  <Link href="/play">
+                  <Link href={`/play/${id}`}>
                     <p>Play Midi</p>
                   </Link>
                 </Button>

@@ -10,7 +10,7 @@ import * as SliderPrimitive from "@radix-ui/react-slider";
 import * as Tone from "tone";
 import { PolySynth, Synth, SynthOptions } from "tone";
 import Piano from "@/components/midi-display/piano";
-import EditorNav from "../loggedin-nav";
+import EditorNav from "../editor-nav";
 import Knob from "./knob";
 import { useMicrophone } from "./use-microphone";
 import { LineChart } from "@mui/x-charts/LineChart";
@@ -34,11 +34,12 @@ export default function Play({
 }) {
   const [currentTime, setCurrentTime] = useState(0);
   const [isFullPiano, setIsFullPiano] = useState(true); // minMidi 21 : 36, maxMidi 108 : 96
+  const playbackSpeedRef = useRef(1);
 
   const pianoRollContainerRef = useRef<HTMLDivElement>(null);
 
   const [WINDOW_SIZE, setWindowSize] = useState<number>(3);
-  const MAX_WINDOW_SIZE = 30;
+  const MAX_WINDOW_SIZE = 20;
 
   const [playAlong, setPlayAlong] = useState(false);
 
@@ -49,59 +50,11 @@ export default function Play({
     }
   }, [audioBuffer]);
 
-  useEffect(() => {
-    if (fftData && audioBuffer) {
-      const topFrequencies = midiUtils.getTopNCandidates(10);
-      const topMidis = topFrequencies.map((cand) =>
-        midiUtils.freqToMidi(cand.frequency)
-      );
-      const topNotes = topMidis.map((cand) => midiUtils.midiToNoteName(cand));
-
-      // console.log([
-      //     topNotes[0],
-      //     topNotes[1],
-      //     topNotes[2],
-      //     topNotes[3],
-      //     topNotes[4],
-      //     topNotes[5],
-      //     topNotes[6],
-      //     topNotes[7],
-      //     topNotes[8],
-      //     topNotes[9],
-      // ])
-
-      // Guitar open strings
-      // if(topMidis.includes(52)) {
-      //     console.log("Low E")
-      // }
-      // if(topMidis.includes(57)) {
-      //     console.log("A")
-      // }
-      // if(topMidis.includes(62)) {
-      //     console.log("D")
-      // }
-      // if(topMidis.includes(67)) {
-      //     console.log("G")
-      // }
-      // if(topMidis.includes(71)) {
-      //     console.log("B")
-      // }
-      // if(topMidis.includes(76)) {
-      //     console.log("High E")
-      // }
-
-      // if(topMidis.includes(52) && topMidis.includes(57) &&topMidis.includes(62) && topMidis.includes(67) && topMidis.includes(71) &&topMidis.includes(76)) {
-      //     console.log("ALL NOTES")
-      // }
-    }
-  }, [fftData]);
-
   // Calculate what notes are visible in the time window
   const notes = noteWindow(midiData, currentTime, WINDOW_SIZE);
 
   // Define piano size
   useEffect(() => {
-    console.log(midiData);
 
     const noteOctaves = midiData.tracks[0].notes.map((note) => note.octave);
     const minOctave = Math.min(...noteOctaves);
@@ -114,7 +67,6 @@ export default function Play({
   // Add event listeners for keyboard events
   useEffect(() => {
     const handleKeyDownEvent = (e: KeyboardEvent) => {
-      console.log(e.key);
       if (e.keyCode === 32) {
         e.preventDefault();
         if (isPlaying) pause();
@@ -127,10 +79,10 @@ export default function Play({
         e.preventDefault();
         setBuffer(new Set());
         setCurrentTime((prev) => Math.min(duration, prev + WINDOW_SIZE * 0.5));
-      } else if (e.ctrlKey || (e.metaKey && e.key === "=")) {
+      } else if ((e.ctrlKey || e.metaKey) && e.key === "=") {
         e.preventDefault();
         setWindowSize((prev) => Math.max(0.5, prev - 2));
-      } else if (e.ctrlKey || (e.metaKey && e.key === "-")) {
+      } else if ((e.ctrlKey || e.metaKey) && e.key === "-") {
         e.preventDefault();
         setWindowSize((prev) => Math.min(MAX_WINDOW_SIZE, prev + 2));
       }
@@ -212,7 +164,7 @@ export default function Play({
         if (playAlong == false)
           sampler.current?.triggerAttackRelease(
             note.name,
-            note.duration,
+            (note.duration * 1/playbackSpeedRef.current),
             undefined,
             note.velocity
           );
@@ -259,8 +211,7 @@ export default function Play({
       window.forEach((note) => {
         const id = `${note.name}-${note.time}-${note.duration}-${note.midi}`;
         
-        if (midiUtils.isMidiNotePresent(note.midi, playAlongBuffer.size, 150)) {
-          console.log(id)
+        if (midiUtils.isMidiNotePresent(note.midi, playAlongBuffer.size, 100)) {
           newPlayAlongBuffer.set(id, true);
         } else {
           newPlayAlongBuffer.set(id, false);
@@ -283,7 +234,7 @@ export default function Play({
   const animate = (time: number) => {
     if (previousTimeRef.current != null && isPlayingRef.current) {
       const delta = (time - previousTimeRef.current) / 1000; // convert to seconds
-      setCurrentTime((prev) => prev + delta);
+      setCurrentTime((prev) => prev + delta * playbackSpeedRef.current);
     }
     previousTimeRef.current = time;
     requestRef.current = requestAnimationFrame(animate);
@@ -319,7 +270,7 @@ export default function Play({
 
   return (
     <section>
-      <EditorNav />
+      <EditorNav projectId="id" projectName="Untitled Project" pauseCallback={pause} />
 
       <div className="flex flex-col w-full min-h-screen h-screen bg-black text-white p-6">
         <div
@@ -371,25 +322,88 @@ export default function Play({
             </div>
 
             <div className="flex justify-between w-full items-center mt-2">
-              <div className="flex gap-2 w-[200px] items-center">
-                <span className="font-mono text-xs">
-                  Window:{WINDOW_SIZE.toFixed(2)}s
-                </span>
-                <Slider
-                  className="w-full"
-                  min={0.5}
-                  max={MAX_WINDOW_SIZE}
-                  step={0.01}
-                  value={[WINDOW_SIZE]}
-                  onValueChange={(e) => setWindowSize(e[0])}
-                ></Slider>
+              <div className="flex flex-row gap-3">
+                <div className="flex flex-col gap-1 w-[150px] items-center">
+                  <span 
+                  onClick={()=>setWindowSize(3)}
+                  className="font-mono text-xs truncate hover:cursor-pointer">
+                    Zoom:&nbsp;{WINDOW_SIZE.toFixed(2)}s
+                  </span>
+                  <div className="flex flex-row gap-1 w-full">
+                    <Button 
+                    onClick={()=>setWindowSize((prev)=> {
+                      if(prev+2 > MAX_WINDOW_SIZE) {
+                        return MAX_WINDOW_SIZE
+                      }
+                      return prev+2
+                    })}
+                    size="icon" 
+                    variant="ghost" 
+                    className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
+                      -
+                    </Button>      
+                    <Slider
+                    className="w-full"
+                    min={MAX_WINDOW_SIZE}
+                    max={0.5}
+                    step={0.01}
+                    value={[WINDOW_SIZE]}
+                    onValueChange={(e) => setWindowSize(e[0])}
+                    ></Slider>
+                    <Button
+                    onClick={()=>setWindowSize((prev)=> {
+                      if(prev-2 < 0.5) {
+                        return 0.5
+                      }
+                      return prev-2
+                    })}
+                    size="icon" 
+                    variant="ghost" 
+                    className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
+                      +
+                    </Button>                
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1 w-[150px] items-center">
+                  <span
+                  onClick={()=>playbackSpeedRef.current = 1} 
+                  className="font-mono text-xs truncate hover:cursor-pointer">
+                    Speed:&nbsp;{playbackSpeedRef.current.toFixed(1)}x
+                  </span>
+                  <div className="flex flex-row gap-1 w-full">
+                    <Button 
+                    onClick={()=>playbackSpeedRef.current = playbackSpeedRef.current - 0.2}
+                    size="icon" 
+                    variant="ghost" 
+                    className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
+                      -
+                    </Button>      
+                    <Slider
+                      className="w-full"
+                      min={0.1}
+                      max={2}
+                      step={0.01}
+                      value={[playbackSpeedRef.current]}
+                      onValueChange={(e) => playbackSpeedRef.current = e[0]}
+                    ></Slider>
+                    <Button
+                    onClick={()=>playbackSpeedRef.current = playbackSpeedRef.current + 0.2}
+                    size="icon" 
+                    variant="ghost" 
+                    className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
+                      +
+                    </Button>                
+                  </div>
+                </div>
               </div>
+              
+
               {playAlong ? (
                 <Button onClick={() => setPlayAlong(false)}>Hear</Button>
               ) : (
                 <Button onClick={() => setPlayAlong(true)}>Play Along</Button>
               )}
-              <Knob size={30} value={volume} onChange={setVolume}></Knob>
+              <Knob size={35} value={volume} onChange={setVolume}></Knob>
             </div>
           </div>
         </div>
@@ -398,10 +412,10 @@ export default function Play({
             fftData && fftData.length &&
             <LineChart
             // xAxis={[{ data: [fftData.map((_, i) => i)].splice(0, 100)}]}
-            yAxis={[{ min: 0, max: 200 }]}
+            yAxis={[{ min: 0, max: 255 }]}
             series={[
                 {
-                    data: [...fftData!].splice(0, 1000),
+                    data: [...fftData!].splice(0, 500),
                     area:false,
                     showMark: false,
                     stack: "total"

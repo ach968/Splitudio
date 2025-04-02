@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Footer from "@/components/footer";
-import EditorNav from "@/components/loggedin-nav";
+import EditorNav from "@/components/editor-nav";
 
 export default function Loading() {
   return (

@@ -39,7 +39,7 @@ export default function AuthPage() {
             transition={{ duration: 0.5 }}
             className="container pt-28 flex flex-col justify-center items-center"
           >
-            <h1 className="text-2xl font-bold text-white mb-6">Sign in</h1>
+            <h1 className="text-2xl font-bold text-white mb-6">Log in</h1>
 
             {error && <p className="text-red-500 mb-4">{error}</p>}
 
@@ -70,7 +70,7 @@ export default function AuthPage() {
               </svg>
               Continue with Google
             </Button>
-            <p className="text-neutral-400 mt-4 text-sm">Sign up with Google</p>
+            <p className="text-neutral-400 mt-4 text-sm">Login with Google</p>
           </motion.div>
         </div>
         <Footer />

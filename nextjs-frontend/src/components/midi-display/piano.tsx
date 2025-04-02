@@ -69,7 +69,7 @@ export default function Piano({
       var ret;
 
       if (upcomingMidis.has(midi)) {
-        ret = `linear-gradient(to bottom, #3b82f6, transparent), ${baseColor}`;
+        ret = `linear-gradient(to bottom, #fde047, transparent), ${baseColor}`;
       }
       if (upcomingMidis.has(midi) && playingMidis.has(midi)) {
         ret = `linear-gradient(to bottom, #22c55e, transparent), ${baseColor}`;

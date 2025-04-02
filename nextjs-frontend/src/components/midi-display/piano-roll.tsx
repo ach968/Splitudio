@@ -74,7 +74,7 @@ export default function PianoRoll({
           return (
             <div
               key={index}
-              className="absolute bg-blue-500 rounded-sm"
+              className="absolute bg-neutral-200 rounded-sm"
               style={{
                 bottom: bottom,
                 left,
@@ -102,8 +102,20 @@ export default function PianoRoll({
           );
         }
       }
-
-      // if !playAlongBuffer.has(hash), we render the note as normal
+      return (
+        <div
+          key={index}
+          className="absolute bg-neutral-500 rounded-sm"
+          style={{
+            bottom: bottom, // Clip if note starts above window
+            left,
+            width: KEY_WIDTH,
+            height,
+            overflow: "hidden",
+            zIndex: index + 10,
+          }}
+        ></div>
+      );
     }
     return (
       <div

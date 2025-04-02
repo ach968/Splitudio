@@ -4,64 +4,116 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useAuth } from "./authContext";
+import { twMerge } from "tailwind-merge";
+import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, navigationMenuTriggerStyle } from "./ui/navigation-menu";
+import { NavigationMenuList } from "@radix-ui/react-navigation-menu";
+import Logo from "@/components/logo";
+import { ClassNames } from "@emotion/react";
 
 export default function Topbar() {
   const pathname = usePathname();
   const { user, loading } = useAuth();
-  const publicNavigation: never[] = [];
 
   const privateNavigation = [
     { name: "Projects", href: "/projects" },
     { name: "Editor", href: "/editor" },
-    { name: "Play", href: "/play" },
-    { name: "Profile", href: "/profile" },
   ];
 
-  const navigation = user ? privateNavigation : publicNavigation;
-
   return (
-    <nav className="pl-10 pr-10 fixed top-0 z-50 w-full border-b border-neutral-800 bg-black/95 backdrop-blur supports-[backdrop-filter]:bg-black/60">
-      <div className="container flex h-14 items-center">
-        <Link href="/" className="mr-6 flex items-center space-x-2">
-          <span className="font-bold text-white">Splitudio</span>
-        </Link>
-        <div className="flex gap-6 md:gap-10">
-          {navigation.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "text-sm font-medium transition-colors hover:text-white",
-                pathname === item.href ? "text-white" : "text-neutral-400"
+    <nav className="bg-black/50 backdrop-blur-md h-[80px] z-[999] justify-center items-center w-screen flex fixed top-0">
+      <div className="flex flex-row w-full container items-center justify-between px-6 text-sm">
+        <div className="flex flex-row items-center gap-5 text-neutral-400 underline-offset-4">
+          <Link 
+          href="/"
+          className="relative flex items-center justify-center w-[80px] h-[53px]">
+            <div className="scale-[0.3]">
+              <Logo />
+            </div>
+          </Link>
+          <Link href="/pricing">
+            <p
+              className={twMerge(
+                pathname === "/projects" && "text-white",
+                "hover:cursor-pointer hover:text-white hover:underline"
               )}
             >
-              {item.name}
-            </Link>
-          ))}
+              Pricing
+            </p>
+          </Link>
+          <Link href="/about">
+            <p
+              className={twMerge(
+                pathname === "/projects" && "text-white",
+                "hover:cursor-pointer hover:text-white hover:underline"
+              )}
+            >
+              About
+            </p>
+          </Link>
         </div>
-        <div className="ml-auto flex items-center">
-          {user ? (
-            <Link
-              href="/logout"
-              className={cn(
-                "text-sm font-medium transition-colors hover:text-white",
-                pathname === "/logout" ? "text-white" : "text-neutral-400"
-              )}
-            >
-              Logout
-            </Link>
-          ) : (
-            <Link
-              href="/login"
-              className={cn(
-                "text-sm font-medium transition-colors hover:text-white",
-                pathname === "/login" ? "text-white" : "text-neutral-400"
-              )}
-            >
-              Login
-            </Link>
-          )}
-        </div>
+        
+
+        <NavigationMenu>
+            {user==null ?
+            <NavigationMenuList className="flex flex-row gap-1">
+              <NavigationMenuItem>
+                <Link href="/signup" legacyBehavior passHref>
+                  <NavigationMenuLink
+                    className={navigationMenuTriggerStyle()}
+                  >
+                    <p className="text-sm">Signup</p>
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link href="/login" legacyBehavior passHref>
+                  <NavigationMenuLink
+                    className={navigationMenuTriggerStyle()}
+                  >
+                    <p className="text-sm">Login</p>
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+            :
+            <NavigationMenuList className="flex flex-row gap-1">
+              <NavigationMenuItem>
+                <Link href="/projects" legacyBehavior passHref>
+                  <NavigationMenuLink
+                    className={twMerge(
+                      navigationMenuTriggerStyle(),
+                      "bg-white text-black hover:bg-white/80 hover:scale-[1.03] transition-all"
+                    )}
+                  >
+                    <p className="text-sm">Enter Studio</p>
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link href="/profile" legacyBehavior passHref>
+                  <NavigationMenuLink
+                    className={twMerge(
+                      navigationMenuTriggerStyle(),
+                      pathname.startsWith("/profile") &&
+                        "bg-white text-black hover:bg-white/80"
+                    )}
+                  >
+                    <p className="text-sm">Profile</p>
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link href="/logout" legacyBehavior passHref>
+                  <NavigationMenuLink
+                    className={navigationMenuTriggerStyle()}
+                  >
+                    <p className="text-sm">Logout</p>
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+            }
+        </NavigationMenu>
       </div>
     </nav>
   );

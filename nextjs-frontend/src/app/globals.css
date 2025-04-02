@@ -72,9 +72,23 @@ body {
 }
 
 @layer components {
+  .header-gradient {
+    background: linear-gradient(to top right, #f87171, #fb923c, #fde047, #4ade80, #60a5fa, #8b5cf6, #c084fc, #f472b6);
+    background-clip: text;
+    color:transparent;
+  }
   .premium-gradient {
     background: linear-gradient(to right, #DD7DDF, #E1CD86, #BBCB92, #71C2EF, #3BFFFF, #DD7DDF)
   }
+
+  .logo-gradient {
+    background: linear-gradient(to right, #f87171, #fb923c, #fde047, #4ade80, #60a5fa, #8b5cf6, #c084fc, #f472b6)
+  }
+
+  .tag {
+    @apply text-sm inline-flex text-neutral-400 border border-neutral-400/30 px-3 py-1 rounded-lg tracking-tight
+  }
+
   .premium-background {
     text-shadow: 
       0 0 10px #F87BFF33,

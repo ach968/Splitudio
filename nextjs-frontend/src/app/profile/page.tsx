@@ -9,7 +9,7 @@ import PremiumText from "@/components/premium-text";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Topbar from "@/components/topbar";
-import EditorNav from "@/components/loggedin-nav";
+import EditorNav from "@/components/editor-nav";
 export default function Profile() {
   const subscriptionStatus: number = 1;
 
@@ -45,108 +45,10 @@ export default function Profile() {
 
   return (
     <section>
+      <EditorNav />
+
       <div className="flex flex-col items-center w-full min-h-screen bg-black">
-        <EditorNav />
-
-        {/* Username and password */}
-        {/* <motion.div 
-            initial={{opacity: 0, y:5}}
-            animate={{opacity: 1, y:0}}
-            transition={{duration: 0.5}}
-            className="container mt-20 flex justify-center items-center">
-
-                <Tabs defaultValue="username" className="px-3 lg:px-5 max-w-[700px] w-full">
-                    <TabsList className="flex w-full">
-                        <TabsTrigger value="username" className="w-full py-2">
-                            <p>
-                                Username
-                            </p>
-                        </TabsTrigger>
-                        <TabsTrigger value="password" className="w-full py-2">
-                            <p className="font-medium">
-                                Password
-                            </p>
-                        </TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="username">
-                        <div className="border gap-7 flex flex-col p-6 justify-center rounded-lg border-neutral-500">
-                            <div>
-                                <p className="text-white text-2xl font-semibold">Username</p>
-                                <p className="text-neutral-400">Confirm your password to make changes to your username</p>
-                            </div>
-                            
-                            <div className="flex flex-col gap-3">
-                                <span>
-                                    <p className="text-neutral-400 leading-8">Current password</p>
-                                    <Input 
-                                    placeholder="********" 
-                                    type="password" 
-                                    className="border-neutral-500 text-white"
-                                    value={password_1}
-                                    required
-                                    onChange={(e:any)=>setPassword_1(e.target.value)}></Input>
-                                </span>
-                                
-                                <span>
-                                    <p className="text-neutral-400 leading-8">Username</p>
-                                    <Input 
-                                    value={username_1}
-                                    required
-                                    onChange={(e:any)=>setUsername_1(e.target.value)} 
-                                    className="border-neutral-500 text-white"></Input>
-                                </span>
-                                
-                            </div>
-                            
-                            <Button 
-                            variant="secondary" 
-                            className="max-w-[200px]"
-                            disabled={disableButtons}
-                            onClick={saveUsername}>Save changes</Button>
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="password">
-                    <div className="border gap-7 flex flex-col p-6 justify-center rounded-lg border-neutral-500">
-                            <div>
-                                <p className="text-white text-2xl font-semibold">Password</p>
-                                <p className="text-neutral-400">Confirm your existing password to make changes</p>
-                            </div>
-                            
-
-                            <div className="flex flex-col gap-3">
-                                <span>
-                                    <p className="text-neutral-400 leading-8">Current password</p>
-                                    <Input 
-                                    placeholder="********" 
-                                    type="password" 
-                                    className="border-neutral-500 text-white"
-                                    value={currpassword_2}
-                                    required
-                                    onChange={(e:any)=>setCurrpassword_2(e.target.value)}></Input>
-                                </span>
-                                
-                                <span>
-                                    <p className="text-neutral-400 leading-8">New password</p>
-                                    <Input 
-                                    placeholder="********" 
-                                    type="password" 
-                                    className="border-neutral-500 text-white"
-                                    value={newpassword_2} 
-                                    required
-                                    onChange={(e:any)=>setNewpassword_2(e.target.value)}></Input>
-                                </span>
-                                
-                            </div>
-                            
-                            <Button 
-                            variant="secondary" 
-                            className="max-w-[200px]"
-                            disabled={disableButtons}
-                            onClick={saveUsername}>Save changes</Button>
-                        </div>
-                    </TabsContent>
-                </Tabs>
-            </motion.div> */}
+        
 
         {/* Subscription */}
         <motion.div
