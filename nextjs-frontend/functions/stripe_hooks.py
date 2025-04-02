@@ -3,18 +3,15 @@ import stripe
 from firebase_functions import https_fn
 from firebase_functions.params import StringParam
 
-# Set your Stripe API key and webhook secret from environment variables.
-secret_key = "sk_test_51R9UXABHIOhhV1jQ8tYhzHEFRBhHxRx87txxwBoOVFq5oCYOqDAC21qzm8MmAB6SdmV04Gmn76qdYCkuvrDRHAeO00D7Gu1f6A"
-endpoint_secret = "whsec_b6b37bb2e40689c6931bab30f38562a97a7abd1cf2b5612fb399dfd96f494095"
 @https_fn.on_request(memory=512)
 def stripe_webhook(req: https_fn.Request) -> https_fn.Response:
     
-    # Get the raw request data as bytes for signature verification
+    endpoint_secret = os.environ["ENDPOINT_SECRET"]
+
     payload = req.data
     sig_header = req.headers.get("Stripe-Signature")
     
     try:
-        # Construct the event using the Stripe library to verify the signature
         event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
     except ValueError as e:
         return https_fn.Response("Invalid payload", 400)
