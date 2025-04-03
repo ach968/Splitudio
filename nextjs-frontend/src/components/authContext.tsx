@@ -32,6 +32,7 @@ import { auth } from "@/lib/firebase/firebase";
 interface AuthContextProps {
   user: User | null;
   loading: boolean;
+  uid?: string;
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -46,17 +47,19 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [uid, setuid] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
+      setuid(user ? user.uid : undefined);
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, [auth]);
 
-  const value: AuthContextProps = { user, loading };
+  const value: AuthContextProps = { user, loading, uid };
 
   return (
     <AuthContext.Provider value={value}>

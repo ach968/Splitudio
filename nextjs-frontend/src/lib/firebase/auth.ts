@@ -42,6 +42,8 @@ async function storeUser(userCredential: UserCredential) {
       uid: user.uid,
       email: user.email,
       displayName: user.displayName,
+      subscription: "free",
+      stripeSubscriptionId: null,
       createdAt: serverTimestamp(),
       lastLoginAt: serverTimestamp(),
     });

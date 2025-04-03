@@ -1,5 +1,5 @@
-script:
-	python utils/script.py
+midi_sheets:
+	python midi_sheets.py
 
-mido:
-	python utils/mido_script.py
+mp3_midi:
+	python mp3_midi.py

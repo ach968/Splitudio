@@ -13,14 +13,17 @@ import { Progress } from "./ui/progress";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import EditorNav from "./editor-nav";
-import { storeProject } from "@/lib/utils";
+import { storeProject, storeCloudFile } from "@/lib/utils";
 import { Project } from "@/types/firestore";
 import { useAuth } from "./authContext";
 import { v4 as uuidv4 } from "uuid";
-import { ref, uploadBytesResumable } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebase/firebase";
 
-const validateFileDuration = (file: File, isPremium: boolean): Promise<boolean> => {
+const validateFileDuration = (
+  file: File,
+  isPremium: boolean
+): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const audio = new Audio();
     audio.src = URL.createObjectURL(file);
@@ -97,10 +100,16 @@ export default function Upload() {
       setUploadProgress(25);
 
       // client side duration check
-      const isValidDuration = await validateFileDuration(file, isPremiumUser).catch(() => false);
+      const isValidDuration = await validateFileDuration(
+        file,
+        isPremiumUser
+      ).catch(() => false);
       if (!isValidDuration) {
         const maxAllowed = isPremiumUser ? "20 minutes" : "2 minutes";
-        toast({ title: "ERROR", description: `Please upload a file shorter than ${maxAllowed}` });
+        toast({
+          title: "ERROR",
+          description: `Please upload a file shorter than ${maxAllowed}`,
+        });
         setUploadProgress(null);
         setFileName(null);
         return;
@@ -109,7 +118,7 @@ export default function Upload() {
       // create firestore project entry
       const newProject: Project = {
         pid: uuidv4(),
-        uid: user?.uid,
+        uid: user?.uid || null,
         pName: file.name,
         collaboratorIds: [],
         isPublic: false,
@@ -142,18 +151,40 @@ export default function Upload() {
           setUploadProgress(null);
           setFileName(null);
         },
-        () => {
+        async () => {
           setUploadProgress(100);
           console.log("File uploaded successfully!");
-          toast({
-            title: "File uploaded",
-            description: "File uploaded successfully!",
-          });
-          setTimeout(()=> {
-            setUploadProgress(null);
-            redirect(`/editor/${newProject.pid}`)
-          }, 300)
-          
+
+          // Get the download URL
+          const downloadURL = await getDownloadURL(storageRef);
+
+          // Store file information in Firestore
+          const cloudFile = {
+            url: downloadURL,
+            size: file.size,
+            contentType: file.type,
+            storagePath: storageRef.fullPath,
+          };
+
+          try {
+            await storeCloudFile(newProject.pid, cloudFile);
+            toast({
+              title: "File uploaded",
+              description: "File uploaded successfully!",
+            });
+            
+            setTimeout(() => {
+              setUploadProgress(null);
+              redirect(`/editor/${newProject.pid}`);
+            }, 300);
+
+          } catch (error: any) {
+            console.error("Failed to store file info to cloud file", error);
+            toast({
+              title: "ERROR",
+              description: "Failed to store file info: " + error.message,
+            });
+          }
         }
       );
     } catch (err: any) {
@@ -306,8 +337,10 @@ export default function Upload() {
                           <Progress value={uploadProgress}></Progress>
                         </div>
                       )}
-                      { fileName && (
-                        <p className="text-neutral-400 text-sm mt-2 truncate max-w-[400px]">Uploading {fileName} ...</p>
+                      {fileName && (
+                        <p className="text-neutral-400 text-sm mt-2 truncate max-w-[400px]">
+                          Uploading {fileName} ...
+                        </p>
                       )}
                     </div>
                     {/* Hidden file input to open file explorer */}

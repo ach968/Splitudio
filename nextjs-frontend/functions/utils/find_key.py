@@ -1,42 +1,6 @@
-from basic_pitch.inference import predict_and_save, predict
-from basic_pitch import ICASSP_2022_MODEL_PATH
 import time
 import pandas as pd
-from lookup_tables import (
-    FREQUENCY_TO_NOTE,
-    KEY_PROFILES,
-)
-
-
-def mp3_midi_save(audio_path, output):
-    predict_and_save(
-        audio_path_list=[audio_path],
-        output_directory=output,
-        save_midi=True,
-        save_model_outputs=False,  # npz file
-        save_notes=False,  # csv file
-        model_or_model_path=ICASSP_2022_MODEL_PATH,
-        sonify_midi=False,  # .wav file
-    )
-
-
-def mp3_midi(audio_path: str):
-    model_output, midi_data, note_events = predict(audio_path=audio_path)
-    df = pd.DataFrame(
-        note_events,
-        columns=["start_time_s", "end_time_s", "pitch_midi", "velocity", "pitch_bend"],
-    )
-    df.sort_values(by=["start_time_s"], inplace=True, ascending=True)
-    df["note_duration"] = df["end_time_s"] - df["start_time_s"]
-    df["pitch_frequency"] = df["pitch_midi"].apply(pitch_midi_to_frequency)
-    df["note_name"] = df["pitch_frequency"].apply(
-        lambda x: FREQUENCY_TO_NOTE.get(x, "null")
-    )
-    return df
-
-
-def pitch_midi_to_frequency(pitch_midi: float) -> float:
-    return round(440.0 * 2 ** ((pitch_midi - 69) / 12), 2)
+from utils.lookup_tables import KEY_PROFILES
 
 
 def get_pitch_distribution(df: pd.DataFrame) -> list:
@@ -97,17 +61,3 @@ def find_key(input_vector: list, key_profiles: dict = KEY_PROFILES) -> tuple:
         scores[key] = correlation(input_vector, profile)
     best_key = max(scores, key=scores.get)
     return best_key, scores[best_key]
-
-
-if __name__ == "__main__":
-    start = time.time()
-    audio_path = "file1.mp3"
-
-    # mp3_midi_save(audio_path, "output")df: pd.DataFrame = mp3_midi(audio_path)
-
-    df: pd.DataFrame = mp3_midi(audio_path)
-    pitch_distribution = get_pitch_distribution(df)
-    key = find_key(pitch_distribution)
-    print("Key: ", key[0])
-
-    print("Time taken: ", time.time() - start)
