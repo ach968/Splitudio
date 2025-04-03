@@ -26,6 +26,7 @@
     "@radix-ui/react-toggle": "^1.1.2",
     "@radix-ui/react-toggle-group": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.1.8",
+    "@react-midi/hooks": "^2.0.1",
     "@tonejs/midi": "^2.0.28",
     "@wavesurfer/react": "^1.0.9",
     "chart.js": "^4.4.8",

@@ -14,6 +14,8 @@ import EditorNav from "../editor-nav";
 import Knob from "./knob";
 import { useMicrophone } from "./use-microphone";
 import { LineChart } from "@mui/x-charts/LineChart";
+import { useMIDIInputs, useMIDINotes } from "@react-midi/hooks";
+import { MIDINote } from "@react-midi/hooks/dist/types";
 
 interface Note {
   midi: number; // e.g., 60 for middle C
@@ -42,13 +44,22 @@ export default function Play({
   const MAX_WINDOW_SIZE = 20;
 
   const [playAlong, setPlayAlong] = useState(false);
-
+  
   const { audioBuffer, fftData, midiUtils } = useMicrophone();
+  const { input, inputs, selectInput, selectedInputId } = useMIDIInputs()
 
   useEffect(() => {
-    if (audioBuffer) {
-    }
-  }, [audioBuffer]);
+    inputs.forEach((input)=> {
+      console.log(input)
+    })
+  }, [inputs]);
+
+  const activeNotes = useMIDINotes({ channel: 1 })
+  useEffect(()=> {
+    activeNotes.forEach((note: MIDINote)=> {
+      console.log(note)
+    })
+  }, [activeNotes])
 
   // Calculate what notes are visible in the time window
   const notes = noteWindow(midiData, currentTime, WINDOW_SIZE);
@@ -199,6 +210,7 @@ export default function Play({
   const [playAlongBuffer, setPlayAlongBuffer] = useState(new Map<string, boolean>());
   const PLAY_TOLERANCE = 0.3;
 
+  // Here is where we check if the user is playing along
   useEffect(() => {
     if (playAlong == true) {
       const newPlayAlongBuffer = new Map<string, boolean>();

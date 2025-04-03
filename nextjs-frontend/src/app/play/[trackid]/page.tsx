@@ -4,7 +4,6 @@ import Play from "@/components/midi-display/play";
 import { Midi } from "@tonejs/midi";
 import { redirect } from 'next/navigation';
 
-
 export default async function Page() {
   // cursed ahhh way to get params on server side
   const headersList = await headers();
@@ -31,5 +30,5 @@ export default async function Page() {
   // get rid of complex objects so next can pass ts
   data = JSON.parse(JSON.stringify(data));
 
-  return <Play midiData={data} duration={duration} />;
+  return <Play midiData={data} duration={duration} />
 }
