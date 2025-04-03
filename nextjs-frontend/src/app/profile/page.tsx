@@ -13,7 +13,8 @@ import { useAuth } from "@/components/authContext";
 
 export default function Profile() {
   const user = useAuth();
-
+  const subscriptionStatus = 0;
+  
   return (
     <section>
       <EditorNav />

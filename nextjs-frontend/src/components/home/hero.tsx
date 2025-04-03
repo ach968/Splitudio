@@ -3,7 +3,7 @@ import Image from "next/image";
 import trackImage from "@/assets/bruh.png"
 import Link from "next/link";
 export default function Hero() {
-  return <section className="w-full flex justify-center pt-20 md:pt-5 md:pb-10 overflow-x-clip">
+  return <section className="w-full flex justify-center mt-24 md:pb-10 overflow-x-clip">
     <div className="container">
       <div className="md:flex items-center justify-center px-5">
         <div className="md:w-[578px]">

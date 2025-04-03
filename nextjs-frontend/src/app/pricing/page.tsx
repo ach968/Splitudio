@@ -6,10 +6,15 @@ import Link from "next/link";
 export default function Page() {
   return <div className="min-h-screen bg-black justify-center flex flex-col">
     <Topbar></Topbar>
-    <section className="w-full flex justify-center pt-20 pb-20 md:pt-5 md:pb-10 overflow-x-clip">
+    <section className="w-full flex justify-center mt-24 pb-20 md:pb-10 overflow-x-clip">
       <div className="container">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="border border-white rounded-2xl p-8 flex flex-col items-start bg-white text-black justify-between">
+        <div className="text-center mb-12 text-white">
+          <h2 className="md:text-4xl text-3xl font-bold mb-4 premium-background">Simple, Transparent Pricing</h2>
+          <p className="text-neutral-400">Start for free—upgrade when you're ready to unlock more.</p>
+        </div>
+
+        <div className="flex flex-col items-center md:justify-center md:items-stretch md:flex-row gap-8">
+          <div className="border max-w-[400px] border-white rounded-2xl p-8 flex flex-col items-start bg-white text-black justify-between">
             <div>
               <h3 className="text-2xl font-bold mb-2">Free Plan</h3>
               <p className="text-3xl font-bold mb-4">$0<span className="text-base text-neutral-700"> / month</span></p>
@@ -29,7 +34,7 @@ export default function Page() {
             </Button>
           </div>
 
-          <div className="border border-white rounded-2xl p-8 flex flex-col items-start bg-black text-white justify-between">
+          <div className="border max-w-[400px] border-white rounded-2xl p-8 flex flex-col items-start bg-black text-white justify-between">
             <div>
               <h3 className="text-2xl font-bold mb-2"><PremiumText></PremiumText></h3>
               <p className="text-3xl font-bold mb-4">$5<span className="text-base text-neutral-400"> / month</span></p>
