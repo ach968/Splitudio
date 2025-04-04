@@ -103,7 +103,7 @@ export default function Editor() {
 
   const { projectId } = useParams<{ projectId: string }>(); // THIS IS PASSED INTO PATH BY PARENT EDITOR PAGE OR PROJECTS PAGE
   const PROJECTNAME = "Untitled Project"; // TODO HOOK UP TO BACKEND
-  const FILENAME = "this_is_a_filler_file_name.mp3"; // TODO HOOK UP TO BACKEND
+  const FILENAME = "untilited_name.mp3"; // TODO HOOK UP TO BACKEND
 
   useEffect(() => {
     if (containerRef.current && wrapperRef.current) {
@@ -495,7 +495,7 @@ export default function Editor() {
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Seek Forward (Left Arrow)</p>
+                        <p>Seek Backward (Left Arrow)</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

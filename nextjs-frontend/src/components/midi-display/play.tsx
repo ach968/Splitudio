@@ -13,9 +13,17 @@ import Piano from "@/components/midi-display/piano";
 import EditorNav from "../editor-nav";
 import Knob from "./knob";
 import { useMicrophone } from "./use-microphone";
-import { LineChart } from "@mui/x-charts/LineChart";
+import MicrophoneSVG from "@/assets/microphone";
+import HeadphoneSVG from "@/assets/headphone";
 import { useMIDIInputs, useMIDINotes } from "@react-midi/hooks";
 import { MIDINote } from "@react-midi/hooks/dist/types";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import LoopSVG from "@/assets/loop";
+import BackwardSVG from "@/assets/backward";
+import PauseSVG from "@/assets/pause";
+import PlaySVG from "@/assets/play";
+import ForwardSVG from "@/assets/forward";
+import SettingsSVG from "@/assets/settings";
 
 interface Note {
   midi: number; // e.g., 60 for middle C
@@ -75,21 +83,30 @@ export default function Play({
     setIsFullPiano(octaveRange > 5);
   }, [midiData]);
 
+  function skipBackward() {
+    setBuffer(new Set());
+    setCurrentTime((prev) => Math.max(0, prev - WINDOW_SIZE * 0.2));
+  }
+  function skipForward() {
+    setBuffer(new Set());
+    setCurrentTime((prev) => Math.min(duration, prev + WINDOW_SIZE * 0.2));
+  }
+  function playPause() {
+    if (isPlaying) pause();
+    else play();
+  }
   // Add event listeners for keyboard events
   useEffect(() => {
     const handleKeyDownEvent = (e: KeyboardEvent) => {
       if (e.keyCode === 32) {
         e.preventDefault();
-        if (isPlaying) pause();
-        else play();
+        playPause();
       } else if (e.keyCode === 37) {
         e.preventDefault();
-        setBuffer(new Set());
-        setCurrentTime((prev) => Math.max(0, prev - WINDOW_SIZE * 0.5));
+        skipBackward();
       } else if (e.keyCode === 39) {
         e.preventDefault();
-        setBuffer(new Set());
-        setCurrentTime((prev) => Math.min(duration, prev + WINDOW_SIZE * 0.5));
+        skipForward();
       } else if ((e.ctrlKey || e.metaKey) && e.key === "=") {
         e.preventDefault();
         setWindowSize((prev) => Math.max(0.5, prev - 2));
@@ -333,9 +350,10 @@ export default function Play({
               <p className="font-mono text-xs">{formatTime(duration)}</p>
             </div>
 
-            <div className="flex justify-between w-full items-center mt-2">
-              <div className="flex flex-row gap-3">
-                <div className="flex flex-col gap-1 w-[150px] items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 w-full items-center mt-2">
+
+              <div className="flex justify-center sm:justify-start flex-row gap-3">
+                <div className="flex flex-col gap-1 w-[150px] items-center border border-white rounded-md p-2">
                   <span 
                   onClick={()=>setWindowSize(3)}
                   className="font-mono text-xs truncate hover:cursor-pointer">
@@ -376,7 +394,8 @@ export default function Play({
                     </Button>                
                   </div>
                 </div>
-                <div className="flex flex-col gap-1 w-[150px] items-center">
+
+                <div className="flex flex-col gap-1 border border-white rounded-md p-2 w-[150px] items-center">
                   <span
                   onClick={()=>playbackSpeedRef.current = 1} 
                   className="font-mono text-xs truncate hover:cursor-pointer">
@@ -409,13 +428,107 @@ export default function Play({
                 </div>
               </div>
               
+              <div className="flex justify-center gap-3">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        size="icon"
+                        variant={"ghost"}
+                        className="w-7 h-7 group"
+                      >
+                        <LoopSVG className="invert-0 group-hover:invert" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Enable Looping</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="w-7 h-7 group"
+                        onClick={skipBackward}
+                      >
+                        <BackwardSVG className="invert-0 group-hover:invert" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Seek Backward (Left Arrow)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="w-7 h-7 group"
+                        onClick={playPause}
+                      >
+                        {isPlaying === true ? (
+                          <PauseSVG className="invert-0 group-hover:invert" />
+                        ) : (
+                          <PlaySVG className="invert-0 group-hover:invert" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Play/Pause (Space)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="w-7 h-7 group"
+                        onClick={skipForward}
+                      >
+                        <ForwardSVG className="invert-0 group-hover:invert" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Seek Forward (Right Arrow)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="w-7 h-7 group"
+                        // TODO: On click
+                      >
+                        <SettingsSVG className="invert-0 group-hover:invert" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Settings</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
 
-              {playAlong ? (
-                <Button onClick={() => setPlayAlong(false)}>Hear</Button>
-              ) : (
-                <Button onClick={() => setPlayAlong(true)}>Play Along</Button>
-              )}
-              <Knob size={35} value={volume} onChange={setVolume}></Knob>
+              <div className="flex gap-3 items-center justify-center sm:justify-end">
+                {playAlong ? (
+                  <Button
+                  className="group"
+                  variant="outline"
+                  onClick={() => setPlayAlong(false)}>
+                    <HeadphoneSVG className="group-hover:invert"/>Listen
+                  </Button>
+                ) : (
+                  <Button
+                  className="group"
+                  variant="outline" 
+                  onClick={() => setPlayAlong(true)}>
+                    <MicrophoneSVG className="group-hover:invert"/>Play Along
+                  </Button>
+                )}
+                <Knob size={40} value={volume} onChange={setVolume}></Knob>
+              </div>
             </div>
           </div>
         </div>

@@ -82,7 +82,7 @@ export default function Topbar() {
                   <NavigationMenuLink
                     className={twMerge(
                       navigationMenuTriggerStyle(),
-                      "bg-white text-black hover:bg-white/80 hover:scale-[1.03] transition-all"
+                      "bg-black text-white border border-white hover:bg-white hover:scale-[1.03] transition-all"
                     )}
                   >
                     <p className="text-sm">Enter Studio</p>

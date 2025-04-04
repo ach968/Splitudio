@@ -1,13 +1,14 @@
 import { Button } from "../ui/button";
 import Image from "next/image";
-import trackImage from "@/assets/bruh.png"
+import heroImage from "@/assets/hero-image.png"
 import Link from "next/link";
+
 export default function Hero() {
   return <section className="w-full flex justify-center mt-24 md:pb-10 overflow-x-clip">
     <div className="container">
       <div className="md:flex items-center justify-center px-5">
         <div className="md:w-[578px]">
-          <div className="tag">Powered by AI</div>
+          {/* <div className="tag">Powered by AI</div> */}
           <h1 className="text-5xl lg:text-7xl font-bold tracking-tighter header-gradient mt-6">
             Unleash the Hidden Layers of Your Music
           </h1>
@@ -30,8 +31,8 @@ export default function Hero() {
           </div>
         </div>
         <div className="mt-10 overflow-clip relative items-center flex">
-          <div className="xl:w-[700px] lg:w-[600px] md:w-[450px]">
-            <Image src={trackImage} alt="image of tracks" width={800} height={800}></Image>
+          <div className="xl:w-[700px] lg:w-[600px] md:w-[450px] select-none">
+            <Image className="filter animate-pulse-filters saturate-150 brightness-125 pointer-events-none" src={heroImage} alt="image of tracks" width={800} height={800}></Image>
           </div>
           
         </div>

@@ -203,7 +203,7 @@ export default function Track({
                   variant="outline"
                 >
                   <Link href={`/play/${id}`}>
-                    <p>Play Midi</p>
+                    <p>play midi</p>
                   </Link>
                 </Button>
               </TooltipTrigger>
