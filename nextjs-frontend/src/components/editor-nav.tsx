@@ -43,8 +43,8 @@ export default function EditorNav({
         <div className="flex gap-5 text-neutral-400 items-center underline-offset-4">
           <Link 
           href="/"
-          className="relative flex items-center justify-center w-[70px]">
-            <div className="scale-[0.2]">
+          className="relative flex w-[40px] h-[40px] items-center justify-center">
+            <div className="scale-[0.2] ">
               <Logo />
             </div>
           </Link>

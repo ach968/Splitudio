@@ -25,7 +25,7 @@ export default function Topbar() {
         <div className="flex flex-row items-center gap-5 text-neutral-400 underline-offset-4">
           <Link 
           href="/"
-          className="relative flex items-center justify-center w-[70px]">
+          className="relative flex items-center justify-center w-[40px] h-[40px]">
             <div className="scale-[0.2]">
               <Logo />
             </div>
