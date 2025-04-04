@@ -4,7 +4,7 @@ import Link from "next/link";
 import {easeOut, motion} from "motion/react"
 
 export default function Hero() {
-  return <section className="w-full flex justify-center mt-24 md:pb-10 overflow-x-clip">
+  return <section className="w-full flex justify-center mt-24 md:mt-5 md:pb-10 overflow-x-clip">
     <div className="container">
       <div className="md:flex items-center justify-center px-5">
         <div className="md:w-[578px]">
