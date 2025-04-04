@@ -8,11 +8,10 @@ export default function Product() {
 
   const scroll = useScroll({
     target: containerRef,
-    offset: ["start start", "end end"]
+    offset: ["start center", "end end"]
   });
-  const step1Opacity = useTransform(scroll.scrollYProgress, [0,1/7,2/7,3/7,4/7,5/7,6/7,1], [2,2,0,0,0,0,0,0])
-  const step2Opacity = useTransform(scroll.scrollYProgress, [0,1/7,2/7,3/7,4/7,5/7,6/7,1], [0,0,0,2,2,0,0,0])
-  const step3Opacity = useTransform(scroll.scrollYProgress, [0,1/7,2/7,3/7,4/7,5/7,6/7,1], [0,0,0,0,0,0,2,2])
+  const step1Opacity = useTransform(scroll.scrollYProgress, [0,1], [2,-2])
+  const step2Opacity = useTransform(scroll.scrollYProgress, [0,1], [-2,2])
 
   return <motion.section
   initial={{
@@ -26,12 +25,12 @@ export default function Product() {
     delay: 0.3
   }}
   ref={containerRef} 
-  className="bg-black min-h-[400vh] mt-28 md:mt-72 xl:mt-80 py-20 px-5 w-full flex flex-col md:pt-7 items-center justify-start overflow-x-clip">
+  className="bg-black min-h-[100vh] mt-28 md:mt-72 py-20 px-5 w-full flex flex-col md:pt-7 items-center justify-start overflow-x-clip">
     <motion.div
     style={{
       opacity: step1Opacity
     }}
-    className="sticky top-1/2 -translate-y-1/2 min-h-screen justify-center
+    className="sticky top-1/2 -translate-y-1/2 h-[25vh] justify-center
     mt-5 container text-white flex flex-col items-center">
       <div className="flex w-full flex-col justify-center items-center">
         <div className="tag">
@@ -55,7 +54,7 @@ export default function Product() {
     style={{
       opacity: step2Opacity
     }}
-    className="sticky top-1/2 -translate-y-1/2 min-h-screen justify-center
+    className="sticky top-1/2 -translate-y-1/2 h-[25vh] justify-center
     container text-white mt-5 flex flex-col items-center">
       <div className="flex w-full flex-col justify-center items-center">
         <div className="tag">
@@ -71,29 +70,6 @@ export default function Product() {
       </div>
       <div className="md:max-w-[700px] xl:max-w-[900px] saturate-150 mt-10 select-none">
         <Image className="md:max-h-[50vh] w-auto pointer-events-none" src={tracksImage} alt="editor demo image"></Image>
-      </div>
-    </motion.div>
-
-    <motion.div 
-    style={{
-      opacity: step3Opacity
-    }}
-    className="sticky top-1/2 -translate-y-1/2 min-h-screen justify-center
-    container text-white mt-5 flex flex-col items-center">
-      <div className="flex w-full flex-col justify-center items-center">
-        <div className="tag">
-          3
-        </div>
-        <h2 className="text-2xl md:text-3xl lg:text-4xl premium-background mt-5">
-          Stem-to-Midi Conversion
-        </h2>
-        <p className="text-neutral-400 text-sm mt-5 max-w-[670px] text-center">
-          Transform stems into MIDI files with a single click.
-          Listen to them in-browser, practice along in real time, or download and create your own arrangements.
-        </p>
-      </div>
-      <div className="saturate-150 mt-10 select-none">
-        <Image className="md:max-h-[50vh] md:max-w-[700px] xl:max-w-[900px] w-auto pointer-events-none" src={tracksImage} alt="editor demo image"></Image>
       </div>
     </motion.div>
   </motion.section>;
