@@ -9,21 +9,6 @@ export default {
   ],
   theme: {
   	extend: {
-			keyframes: {
-        pulseFilters: {
-          '0%, 100%': {
-            filter: 'saturate(1) brightness(0.5)',
-						opacity: "0"
-          },
-          '100%': {
-            filter: 'saturate(1.5) brightness(1.25)',
-						opacity: '1'
-          },
-        },
-      },
-      animation: {
-        'pulse-filters': 'pulseFilters 2s ease-out',
-      },
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
