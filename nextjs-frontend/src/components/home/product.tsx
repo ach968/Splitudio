@@ -26,7 +26,7 @@ export default function Product() {
     delay: 0.3
   }}
   ref={containerRef} 
-  className="bg-black h-[150vh] mt-28 md:mt-72 py-20 px-5 w-full flex flex-col md:pt-7 items-center justify-start overflow-x-clip">
+  className="bg-black min-h-[150vh] mt-28 md:mt-72 py-20 px-5 w-full flex flex-col md:pt-7 items-center justify-start overflow-x-clip">
     <motion.div
     style={{
       opacity: step1Opacity
