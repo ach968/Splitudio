@@ -294,6 +294,7 @@ export default function Upload() {
                       <p className="text-base leading-7 mx-2">Upload</p>
                     </TabsTrigger>
                     <TabsTrigger
+                      onClick={()=>console.log("AKJSDAKJLDKJLASD")}
                       className="data-[state=active]:bg-transparent data-[state=active]:text-white border-b-2 data-[state=active]:border-white border-neutral-500 rounded-none"
                       value="youtube-link"
                     >

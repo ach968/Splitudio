@@ -26,7 +26,7 @@ export default function Product() {
     delay: 0.3
   }}
   ref={containerRef} 
-  className="bg-black min-h-[150vh] mt-28 md:mt-72 py-20 px-5 w-full flex flex-col md:pt-7 items-center justify-start overflow-x-clip">
+  className="bg-black min-h-[1500px] mt-28 md:mt-72 py-20 px-5 w-full flex flex-col md:pt-7 items-center justify-start overflow-x-clip">
     <motion.div
     style={{
       opacity: step1Opacity
@@ -70,7 +70,7 @@ export default function Product() {
         </p>
       </div>
       <div className="md:max-w-[700px] xl:max-w-[900px] saturate-150 mt-10 select-none">
-        <Image className="md:max-h-[50vh] w-auto pointer-events-none" src={tracksImage} alt="editor demo image"></Image>
+        {/* <Image className="md:max-h-[50vh] w-auto pointer-events-none" src={tracksImage} alt="editor demo image"></Image> */}
       </div>
     </motion.div>
 
@@ -93,7 +93,7 @@ export default function Product() {
         </p>
       </div>
       <div className="md:max-w-[700px] xl:max-w-[900px] saturate-150 mt-10 select-none">
-        <Image className="md:max-h-[50vh] w-auto pointer-events-none" src={tracksImage} alt="editor demo image"></Image>
+        {/* <Image className="md:max-h-[50vh] w-auto pointer-events-none" src={tracksImage} alt="editor demo image"></Image> */}
       </div>
     </motion.div>
   </motion.section>;
