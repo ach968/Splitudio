@@ -66,6 +66,7 @@ export async function storeCloudFile(
   pid: string,
   cloudFile: Omit<CloudFile, "fid" | "uploadDate" | "storagePath">
 ) {
+  
   const projectDocRef = doc(db, "projects", pid);
   const filesCollectionRef = collection(projectDocRef, "files");
 

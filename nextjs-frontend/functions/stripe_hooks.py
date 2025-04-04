@@ -28,6 +28,7 @@ def stripe_webhook(req: https_fn.Request) -> https_fn.Response:
         if checkout_session["payment_status"] == "paid":
             # userid added in the frontend
             print("Client id from frontend " + checkout_session["client_reference_id"])
+            
             # save this so we know when they cancel
             print("Save this for subscription cancelation " + checkout_session["subscription"])
    
