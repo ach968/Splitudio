@@ -73,6 +73,7 @@ export default function Product() {
         <Image className="md:max-h-[50vh] w-auto pointer-events-none" src={tracksImage} alt="editor demo image"></Image>
       </div>
     </motion.div>
+
     <motion.div 
     style={{
       opacity: step3Opacity
