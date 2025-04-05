@@ -53,20 +53,17 @@ export default function Play({
 
   const [playAlong, setPlayAlong] = useState(false);
   
+  const [micOrMidi, setMicOrMidi] = useState("mic");
   const { audioBuffer, fftData, midiUtils } = useMicrophone();
   const { input, inputs, selectInput, selectedInputId } = useMIDIInputs()
 
   useEffect(() => {
-    inputs.forEach((input)=> {
-      console.log(input)
-    })
+    console.log(inputs.length)
   }, [inputs]);
 
   const activeNotes = useMIDINotes({ channel: 1 })
   useEffect(()=> {
-    activeNotes.forEach((note: MIDINote)=> {
-      console.log(note)
-    })
+    console.log(activeNotes)
   }, [activeNotes])
 
   // Calculate what notes are visible in the time window
@@ -229,7 +226,7 @@ export default function Play({
 
   // Here is where we check if the user is playing along
   useEffect(() => {
-    if (playAlong == true) {
+    if (playAlong == true && micOrMidi == "mic") {
       const newPlayAlongBuffer = new Map<string, boolean>();
 
       // Check if the two ranges overlap:
@@ -246,10 +243,37 @@ export default function Play({
           newPlayAlongBuffer.set(id, false);
         }
       });
-
       setPlayAlongBuffer(newPlayAlongBuffer);
     }
-  }, [currentTime, playAlong]);
+  }, [currentTime, playAlong, micOrMidi]);
+
+  useEffect(() => {
+    if (playAlong == true && micOrMidi == "midi") {
+      const newPlayAlongBuffer = new Map<string, boolean>();
+
+      // Check if the two ranges overlap:
+      // [currentTime - tolerance, currentTime + tolerance]
+      // [note.time, note.time + note.duration]
+      const window = noteWindow(midiData, currentTime, PLAY_TOLERANCE);
+
+      window.forEach((note) => {
+        const id = `${note.name}-${note.time}-${note.duration}-${note.midi}`;
+        
+        activeNotes.forEach((obj)=>{
+          if(obj.note == note.midi && obj.velocity > 0) {
+            newPlayAlongBuffer.set(id, true);
+          }
+          else if(obj.note == note.midi && obj.velocity == 0){
+            newPlayAlongBuffer.set(id, false);
+          }
+          else {
+            newPlayAlongBuffer.set(id, false);
+          }
+        })
+      });
+      setPlayAlongBuffer(newPlayAlongBuffer);
+    }
+  }, [currentTime, playAlong, micOrMidi, activeNotes]);
 
   // Only for the stupid react button
   const [isPlaying, setIsPlaying] = useState(false);
@@ -513,18 +537,38 @@ export default function Play({
 
               <div className="flex gap-3 items-center justify-center sm:justify-end">
                 {playAlong ? (
-                  <Button
-                  className="group"
-                  variant="outline"
-                  onClick={() => setPlayAlong(false)}>
-                    <HeadphoneSVG className="group-hover:invert"/>Listen
-                  </Button>
+                  <div className="flex flex-row gap-2">
+                    {micOrMidi == "midi" ?
+                      <Button
+                      className="group w-[40px]"
+                      variant="destructive"
+                      onClick={()=>setMicOrMidi("mic")}>
+                        MIDI
+                      </Button>
+                      :
+                      <Button
+                      className="group w-[40px]"
+                      variant="destructive"
+                      onClick={()=>setMicOrMidi("midi")}>
+                        MIC
+                      </Button>
+                    }
+                    
+                    <Button
+                    className="group w-[40px]"
+                    variant="secondary"
+                    onClick={() => setPlayAlong(false)}>
+                      <MicrophoneSVG className="invert"/>
+                    </Button>
+                  </div>
+                  
                 ) : (
                   <Button
-                  className="group"
-                  variant="outline" 
+                  className="group w-[40px]"
+                  variant="outline"
+                  size="icon"
                   onClick={() => setPlayAlong(true)}>
-                    <MicrophoneSVG className="group-hover:invert"/>Play Along
+                    <HeadphoneSVG className="group-hover:invert"/>
                   </Button>
                 )}
                 <Knob size={40} value={volume} onChange={setVolume}></Knob>

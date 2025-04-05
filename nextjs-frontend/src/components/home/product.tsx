@@ -66,7 +66,7 @@ export default function Product() {
         </h2>
         <p className="text-neutral-400 text-sm mt-5 max-w-[670px] text-center">
           Transform stems into MIDI files with a single click.
-          Listen to them in-browser, practice along in real time, or download and create your own arrangements.
+          Listen to them in-browser or download and create your own arrangements.
         </p>
       </div>
       <div className="md:max-w-[700px] xl:max-w-[900px] saturate-150 mt-10 select-none">
@@ -85,11 +85,10 @@ export default function Product() {
           3
         </div>
         <h2 className="text-2xl md:text-3xl lg:text-4xl premium-background mt-5">
-          Stem-to-Midi Conversion
+          Interactive Play-Along Mode
         </h2>
         <p className="text-neutral-400 text-sm mt-5 max-w-[670px] text-center">
-          Transform stems into MIDI files with a single click.
-          Listen to them in-browser, practice along in real time, or download and create your own arrangements.
+          Whether you're using a MIDI keyboard or playing with your instrument into the microphone, take your practice to the next level by playing along with your tracks in real time.
         </p>
       </div>
       <div className="md:max-w-[700px] xl:max-w-[900px] saturate-150 mt-10 select-none">
