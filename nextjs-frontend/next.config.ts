@@ -1,16 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-    webpack: (config, { isServer }) => {
-        if (!isServer) {
-          // Prevents "fs" from being included in the client bundle.
-          config.resolve.fallback = {
-            ...config.resolve.fallback,
-            fs: false,
-          };
-        }
-        return config;
-      },
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.svg$/,
+      issuer: /\.[jt]sx?$/,
+      use: ['@svgr/webpack'],
+    });
+    return config;
+  },
+
 };
 
 export default nextConfig;

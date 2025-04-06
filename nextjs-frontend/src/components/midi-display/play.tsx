@@ -392,7 +392,7 @@ export default function Play({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 w-full items-center mt-2">
 
               <div className="flex justify-center sm:justify-start flex-row gap-3">
-                <div className="flex flex-col gap-1 w-[150px] items-center border border-white rounded-md p-2">
+                <div className="flex flex-col gap-1 w-[150px] items-center border border-neutral-500 rounded-md p-2">
                   <span 
                   onClick={()=>setWindowSize(3)}
                   className="font-mono text-xs truncate hover:cursor-pointer">
@@ -434,7 +434,7 @@ export default function Play({
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-1 border border-white rounded-md p-2 w-[150px] items-center">
+                <div className="flex flex-col gap-1 border border-neutral-500 rounded-md p-2 w-[150px] items-center">
                   <span
                   onClick={()=>playbackSpeedRef.current = 1} 
                   className="font-mono text-xs truncate hover:cursor-pointer">
