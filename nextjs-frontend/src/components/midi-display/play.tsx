@@ -52,20 +52,19 @@ export default function Play({
   const MAX_WINDOW_SIZE = 20;
 
   const [playAlong, setPlayAlong] = useState(false);
-  
   const [micOrMidi, setMicOrMidi] = useState("mic");
-  const { audioBuffer, fftData, midiUtils } = useMicrophone();
-  const { input, inputs, selectInput, selectedInputId } = useMIDIInputs()
 
-  useEffect(() => {
-    console.log(inputs.length)
-  }, [inputs]);
+  const micEnabled = playAlong && micOrMidi === "mic";
+  const midiEnabled = playAlong && micOrMidi === "midi";
 
+  const { fftData, midiUtils } = useMicrophone();
+    
+  const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
   const activeNotes = useMIDINotes({ channel: 1 })
-  useEffect(()=> {
-    console.log(activeNotes)
-  }, [activeNotes])
-
+  
+  useEffect(()=>{
+    console.log(inputs.length)
+  },[inputs])
   // Calculate what notes are visible in the time window
   const notes = noteWindow(midiData, currentTime, WINDOW_SIZE);
 
@@ -227,8 +226,9 @@ export default function Play({
   // Here is where we check if the user is playing along
   useEffect(() => {
     if (playAlong == true && micOrMidi == "mic") {
+      
       const newPlayAlongBuffer = new Map<string, boolean>();
-
+      console.log(fftData)
       // Check if the two ranges overlap:
       // [currentTime - tolerance, currentTime + tolerance]
       // [note.time, note.time + note.duration]
@@ -249,8 +249,9 @@ export default function Play({
 
   useEffect(() => {
     if (playAlong == true && micOrMidi == "midi") {
+      
       const newPlayAlongBuffer = new Map<string, boolean>();
-
+      console.log(activeNotes)
       // Check if the two ranges overlap:
       // [currentTime - tolerance, currentTime + tolerance]
       // [note.time, note.time + note.duration]
@@ -270,8 +271,23 @@ export default function Play({
             newPlayAlongBuffer.set(id, false);
           }
         })
+
+        if(!newPlayAlongBuffer.get(id))
+          newPlayAlongBuffer.set(id, false);
       });
-      setPlayAlongBuffer(newPlayAlongBuffer);
+
+      activeNotes.forEach((obj) => {
+        // Check if there's already an entry for this MIDI note in the buffer.
+        const exists = Array.from(newPlayAlongBuffer.keys()).some((key) =>
+          key.endsWith(`-${obj.note}`)
+        );
+        if (!exists) { 
+          // Add with the correct state.
+          newPlayAlongBuffer.set(`unknown-0-0-${obj.note}`, false);
+        }
+      });
+
+      setPlayAlongBuffer(newPlayAlongBuffer); 
     }
   }, [currentTime, playAlong, micOrMidi, activeNotes]);
 
@@ -324,7 +340,6 @@ export default function Play({
   return (
     <section>
       <EditorNav projectId="id" projectName="Untitled Project" pauseCallback={pause} />
-
       <div className="flex flex-col w-full min-h-screen h-screen bg-black text-white p-6">
         <div
           className="w-full h-full overflow-y-auto"

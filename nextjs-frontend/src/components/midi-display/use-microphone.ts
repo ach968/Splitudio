@@ -73,7 +73,6 @@ export function useMicrophone() {
     // Calculate the average amplitude across the entire FFT array.
     const avg = fftData.slice(0, 500).reduce((sum, value) => sum + value, 0) / 500;
 
-    console.log(avg)
     // Iterate through fftData and pick peaks that exceed both neighboring bins
     // and our dynamic threshold.
     for (let i = 1; i < fftData.length - 1; i++) {

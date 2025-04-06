@@ -117,6 +117,7 @@ export default function PianoRoll({
         ></div>
       );
     }
+    
     return (
       <div
         key={index}
