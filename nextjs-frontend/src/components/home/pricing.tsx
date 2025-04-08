@@ -21,7 +21,7 @@ export default function Pricing() {
             initial={{opacity:0}}
             animate={{opacity:1}}
             transition={{duration:0.5, delay: 0.2}} 
-            className="text-neutral-400">Start for free—upgrade when you're ready to unlock more.</motion.p>
+            className="text-neutral-400 text-sm">Start for free—upgrade when you're ready to unlock more.</motion.p>
           </div>
 
           <div className="flex flex-col items-center md:justify-center md:items-stretch md:flex-row gap-8">
@@ -33,7 +33,7 @@ export default function Pricing() {
               <div>
                 <h3 className="text-2xl font-bold mb-2">Free Plan</h3>
                 <p className="text-3xl font-bold mb-4">$0<span className="text-base text-neutral-700"> / month</span></p>
-                <ul className="space-y-3 text-sm text-neutral-700">
+                <ul className="space-y-2 text-sm text-neutral-700">
                   <li>Upload songs up to <span className="font-semibold text-black">2 minutes</span> in length</li>
                   <li>Limited number of projects</li>
                   <li>Stem separation + MIDI conversion</li>
@@ -59,7 +59,7 @@ export default function Pricing() {
               <div>
                 <h3 className="text-2xl font-bold mb-2"><PremiumText></PremiumText></h3>
                 <p className="text-3xl font-bold mb-4">$5<span className="text-base text-neutral-400"> / month</span></p>
-                <ul className="space-y-3 text-sm text-neutral-400">
+                <ul className="space-y-2 text-sm text-neutral-400">
                   <li>Upload songs up to <span className="font-semibold text-white">20 minutes</span> in length</li>
                   <li><span className="font-semibold text-white">Unlimited</span> projects</li>
                   <li>And everything from the free tier!</li>

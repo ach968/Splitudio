@@ -26,7 +26,7 @@ export default function Product() {
     delay: 0.3
   }}
   ref={containerRef} 
-  className="bg-black min-h-[1500px] mt-28 md:mt-72 py-20 px-5 w-full select-none flex flex-col md:pt-7 items-center relative justify-start overflow-x-clip">
+  className="bg-black min-h-[1500px] mt-28 md:mt-72 mb-32 py-20 px-5 w-full select-none flex flex-col md:pt-7 items-center relative justify-start overflow-x-clip">
 
     <motion.div
     style={{

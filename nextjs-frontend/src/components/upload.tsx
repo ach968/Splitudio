@@ -288,15 +288,17 @@ export default function Upload() {
                 <Tabs defaultValue="upload" className="w-[700px]">
                   <TabsList className="flex w-full bg-transparent justify-start border-neutral-500 border-b-2 rounded-none p-0 m-0">
                     <TabsTrigger
+                      disabled={uploadProgress != null}
                       className="data-[state=active]:bg-transparent data-[state=active]:text-white border-b-2 data-[state=active]:border-white border-neutral-500 rounded-none"
                       value="upload"
                     >
                       <p className="text-base leading-7 mx-2">Upload</p>
                     </TabsTrigger>
                     <TabsTrigger
-                      onClick={()=>console.log("AKJSDAKJLDKJLASD")}
+                      disabled={uploadProgress != null}
                       className="data-[state=active]:bg-transparent data-[state=active]:text-white border-b-2 data-[state=active]:border-white border-neutral-500 rounded-none"
                       value="youtube-link"
+
                     >
                       <p className="text-base leading-7 mx-2">Youtube Link</p>
                     </TabsTrigger>
