@@ -37,7 +37,9 @@ export default function Pricing() {
                   <li>Upload songs up to <span className="font-semibold text-black">2 minutes</span> in length</li>
                   <li>Limited number of projects</li>
                   <li>Stem separation + MIDI conversion</li>
+                  <li>Download stems as MP3</li>
                   <li>MIDI playback in browser</li>
+                  <li>Play along to MIDI in browser</li>
                   <li>Store your projects on the cloud</li>
                 </ul>
               </div>
