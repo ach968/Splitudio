@@ -9,7 +9,7 @@ import Link from "next/link";
 export default function Pricing() {
   return <section className="select-none">
       <div className="min-h-screen bg-black justify-center flex flex-col">
-      <div className="w-full flex justify-center mt-24 md:mt-0 pb-20 md:pb-10 overflow-x-clip">
+      <div className="w-full flex justify-center mt-24 pb-20 md:pb-10 overflow-x-clip">
         <div className="container">
           <div className="text-center mb-12 text-white">
             <motion.h2

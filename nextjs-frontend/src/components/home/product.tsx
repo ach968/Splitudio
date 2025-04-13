@@ -5,6 +5,14 @@ import { useRef } from "react";
 
 export default function Product() {
   const containerRef = useRef(null);
+  
+  const mainScroll = useScroll({
+    target: containerRef,
+    offset: ["start end", "end center"]
+  });
+
+  const mainFade = useTransform(mainScroll.scrollYProgress, [0,0.1,0.9,1], [0.5,1,1,0])
+
 
   const scroll = useScroll({
     target: containerRef,
@@ -25,9 +33,11 @@ export default function Product() {
     duration:1,
     delay: 0.3
   }}
+  style={{
+    opacity: mainFade
+  }}
   ref={containerRef} 
-  className="bg-black min-h-[1500px] mt-28 md:mt-72 mb-32 py-20 px-5 w-full select-none flex flex-col md:pt-7 items-center relative justify-start overflow-x-clip">
-
+  className="bg-black min-h-[1500px] mt-28 md:mt-72 px-5 w-full select-none flex flex-col md:pt-7 items-center relative justify-start overflow-x-clip">
     <motion.div
     style={{
       opacity: step1Opacity
@@ -97,6 +107,8 @@ export default function Product() {
       </div>
     </motion.div>
 
+
+    {/* Waves on the left and right sides */}
     <motion.img 
     style={{
       opacity: waveOpacity
@@ -115,6 +127,6 @@ export default function Product() {
       opacity: waveOpacity
     }}
     src="/waveform.svg" alt="Waveform" width={1800} height={1800} />
-    
+
   </motion.section>;
 }

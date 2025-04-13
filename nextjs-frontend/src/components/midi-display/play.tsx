@@ -591,7 +591,17 @@ export default function Play({
                     <HeadphoneSVG className="group-hover:invert"/>
                   </Button>
                 )}
-                <Knob size={40} value={volume} onChange={setVolume}></Knob>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Knob size={40} value={volume} onChange={setVolume}></Knob>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Volume Knob</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                
               </div>
             </div>
           </div>
