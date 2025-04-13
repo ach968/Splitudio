@@ -410,7 +410,8 @@ export default function Play({
                     variant="ghost" 
                     className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
                       -
-                    </Button>      
+                    </Button>
+                       
                     <Slider
                     className="w-full"
                     min={MAX_WINDOW_SIZE}
@@ -419,6 +420,7 @@ export default function Play({
                     value={[WINDOW_SIZE]}
                     onValueChange={(e) => setWindowSize(e[0])}
                     ></Slider>
+
                     <Button
                     onClick={()=>setWindowSize((prev)=> {
                       if(prev-2 < 0.5) {
@@ -430,7 +432,8 @@ export default function Play({
                     variant="ghost" 
                     className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
                       +
-                    </Button>                
+                    </Button>
+                                  
                   </div>
                 </div>
 
@@ -447,7 +450,8 @@ export default function Play({
                     variant="ghost" 
                     className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
                       -
-                    </Button>      
+                    </Button>   
+                        
                     <Slider
                       className="w-full"
                       min={0.1}
@@ -456,13 +460,14 @@ export default function Play({
                       value={[playbackSpeedRef.current]}
                       onValueChange={(e) => playbackSpeedRef.current = e[0]}
                     ></Slider>
+
                     <Button
                     onClick={()=>playbackSpeedRef.current = playbackSpeedRef.current + 0.2}
                     size="icon" 
                     variant="ghost" 
                     className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
                       +
-                    </Button>                
+                    </Button>
                   </div>
                 </div>
               </div>
