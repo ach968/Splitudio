@@ -208,7 +208,7 @@ export default function Track({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Launch interactive midi player</p>
+                <p>Launch Interactive Midi Player</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

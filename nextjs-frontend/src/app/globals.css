@@ -89,6 +89,9 @@ body {
     @apply text-sm inline-flex text-neutral-400 border border-neutral-400/30 px-3 py-1 rounded-lg tracking-tight
   }
 
+  .waveform-mask {
+    mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%)
+  }
   .premium-background {
     text-shadow: 
       0 0 10px #F87BFF33,

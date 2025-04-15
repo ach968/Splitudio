@@ -5,6 +5,14 @@ import { useRef } from "react";
 
 export default function Product() {
   const containerRef = useRef(null);
+  
+  const mainScroll = useScroll({
+    target: containerRef,
+    offset: ["start end", "end center"]
+  });
+
+  const mainFade = useTransform(mainScroll.scrollYProgress, [0,0.1,0.9,1], [0.5,1,1,0])
+
 
   const scroll = useScroll({
     target: containerRef,
@@ -13,7 +21,7 @@ export default function Product() {
   const step1Opacity = useTransform(scroll.scrollYProgress, [0,1/7,2/7,3/7,4/7,5/7,6/7,1], [1,1,0,0,0,0,0,0])
   const step2Opacity = useTransform(scroll.scrollYProgress, [0,1/7,2/7,3/7,4/7,5/7,6/7,1], [0,0,0,1,1,0,0,0])
   const step3Opacity = useTransform(scroll.scrollYProgress, [0,1/7,2/7,3/7,4/7,5/7,6/7,1], [0,0,0,0,0,0,1,1])
-
+  const waveOpacity = useTransform(scroll.scrollYProgress, [0, 1/4, 3/4, 1], [0.3, 1, 1, 0.3])
   return <motion.section
   initial={{
     opacity: 0,
@@ -25,8 +33,11 @@ export default function Product() {
     duration:1,
     delay: 0.3
   }}
+  style={{
+    opacity: mainFade
+  }}
   ref={containerRef} 
-  className="bg-black min-h-[1500px] mt-28 md:mt-72 py-20 px-5 w-full flex flex-col md:pt-7 items-center justify-start overflow-x-clip">
+  className="bg-black min-h-[1500px] mt-28 md:mt-72 px-5 w-full select-none flex flex-col md:pt-7 items-center relative justify-start overflow-x-clip">
     <motion.div
     style={{
       opacity: step1Opacity
@@ -95,5 +106,27 @@ export default function Product() {
         {/* <Image className="md:max-h-[50vh] w-auto pointer-events-none" src={tracksImage} alt="editor demo image"></Image> */}
       </div>
     </motion.div>
+
+
+    {/* Waves on the left and right sides */}
+    <motion.img 
+    style={{
+      opacity: waveOpacity
+    }}
+    className="hidden md:block absolute rotate-[90deg] scale-x-[-1] -top-72
+    min-h-[1800px] overflow-clip
+    -left-[500px] lg:-left-[600px] xl:-left-[800px]
+    waveform-mask pointer-events-none"
+    src="/waveform.svg" alt="Waveform" width={1800} height={1800} />
+    <motion.img 
+    className="hidden md:block absolute rotate-[90deg] -top-80
+    min-h-[1800px] overflow-clip
+    -right-[400px] lg:-right-[500px] xl:-right-[700px]
+    waveform-mask pointer-events-none"
+    style={{
+      opacity: waveOpacity
+    }}
+    src="/waveform.svg" alt="Waveform" width={1800} height={1800} />
+
   </motion.section>;
 }

@@ -52,20 +52,19 @@ export default function Play({
   const MAX_WINDOW_SIZE = 20;
 
   const [playAlong, setPlayAlong] = useState(false);
-  
   const [micOrMidi, setMicOrMidi] = useState("mic");
-  const { audioBuffer, fftData, midiUtils } = useMicrophone();
-  const { input, inputs, selectInput, selectedInputId } = useMIDIInputs()
 
-  useEffect(() => {
-    console.log(inputs.length)
-  }, [inputs]);
+  const micEnabled = playAlong && micOrMidi === "mic";
+  const midiEnabled = playAlong && micOrMidi === "midi";
 
+  const { fftData, midiUtils } = useMicrophone();
+    
+  const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
   const activeNotes = useMIDINotes({ channel: 1 })
-  useEffect(()=> {
-    console.log(activeNotes)
-  }, [activeNotes])
-
+  
+  useEffect(()=>{
+    console.log(inputs.length)
+  },[inputs])
   // Calculate what notes are visible in the time window
   const notes = noteWindow(midiData, currentTime, WINDOW_SIZE);
 
@@ -227,8 +226,9 @@ export default function Play({
   // Here is where we check if the user is playing along
   useEffect(() => {
     if (playAlong == true && micOrMidi == "mic") {
+      
       const newPlayAlongBuffer = new Map<string, boolean>();
-
+      console.log(fftData)
       // Check if the two ranges overlap:
       // [currentTime - tolerance, currentTime + tolerance]
       // [note.time, note.time + note.duration]
@@ -249,8 +249,9 @@ export default function Play({
 
   useEffect(() => {
     if (playAlong == true && micOrMidi == "midi") {
+      
       const newPlayAlongBuffer = new Map<string, boolean>();
-
+      console.log(activeNotes)
       // Check if the two ranges overlap:
       // [currentTime - tolerance, currentTime + tolerance]
       // [note.time, note.time + note.duration]
@@ -270,8 +271,23 @@ export default function Play({
             newPlayAlongBuffer.set(id, false);
           }
         })
+
+        if(!newPlayAlongBuffer.get(id))
+          newPlayAlongBuffer.set(id, false);
       });
-      setPlayAlongBuffer(newPlayAlongBuffer);
+
+      activeNotes.forEach((obj) => {
+        // Check if there's already an entry for this MIDI note in the buffer.
+        const exists = Array.from(newPlayAlongBuffer.keys()).some((key) =>
+          key.endsWith(`-${obj.note}`)
+        );
+        if (!exists) { 
+          // Add with the correct state.
+          newPlayAlongBuffer.set(`unknown-0-0-${obj.note}`, false);
+        }
+      });
+
+      setPlayAlongBuffer(newPlayAlongBuffer); 
     }
   }, [currentTime, playAlong, micOrMidi, activeNotes]);
 
@@ -324,7 +340,6 @@ export default function Play({
   return (
     <section>
       <EditorNav projectId="id" projectName="Untitled Project" pauseCallback={pause} />
-
       <div className="flex flex-col w-full min-h-screen h-screen bg-black text-white p-6">
         <div
           className="w-full h-full overflow-y-auto"
@@ -377,7 +392,7 @@ export default function Play({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 w-full items-center mt-2">
 
               <div className="flex justify-center sm:justify-start flex-row gap-3">
-                <div className="flex flex-col gap-1 w-[150px] items-center border border-white rounded-md p-2">
+                <div className="flex flex-col gap-1 w-[150px] items-center border border-neutral-500 rounded-md p-2">
                   <span 
                   onClick={()=>setWindowSize(3)}
                   className="font-mono text-xs truncate hover:cursor-pointer">
@@ -395,7 +410,8 @@ export default function Play({
                     variant="ghost" 
                     className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
                       -
-                    </Button>      
+                    </Button>
+                       
                     <Slider
                     className="w-full"
                     min={MAX_WINDOW_SIZE}
@@ -404,6 +420,7 @@ export default function Play({
                     value={[WINDOW_SIZE]}
                     onValueChange={(e) => setWindowSize(e[0])}
                     ></Slider>
+
                     <Button
                     onClick={()=>setWindowSize((prev)=> {
                       if(prev-2 < 0.5) {
@@ -415,11 +432,12 @@ export default function Play({
                     variant="ghost" 
                     className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
                       +
-                    </Button>                
+                    </Button>
+                                  
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-1 border border-white rounded-md p-2 w-[150px] items-center">
+                <div className="flex flex-col gap-1 border border-neutral-500 rounded-md p-2 w-[150px] items-center">
                   <span
                   onClick={()=>playbackSpeedRef.current = 1} 
                   className="font-mono text-xs truncate hover:cursor-pointer">
@@ -432,7 +450,8 @@ export default function Play({
                     variant="ghost" 
                     className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
                       -
-                    </Button>      
+                    </Button>   
+                        
                     <Slider
                       className="w-full"
                       min={0.1}
@@ -441,13 +460,14 @@ export default function Play({
                       value={[playbackSpeedRef.current]}
                       onValueChange={(e) => playbackSpeedRef.current = e[0]}
                     ></Slider>
+
                     <Button
                     onClick={()=>playbackSpeedRef.current = playbackSpeedRef.current + 0.2}
                     size="icon" 
                     variant="ghost" 
                     className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
                       +
-                    </Button>                
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -571,7 +591,17 @@ export default function Play({
                     <HeadphoneSVG className="group-hover:invert"/>
                   </Button>
                 )}
-                <Knob size={40} value={volume} onChange={setVolume}></Knob>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Knob size={40} value={volume} onChange={setVolume}></Knob>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Volume Knob</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                
               </div>
             </div>
           </div>

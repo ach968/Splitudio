@@ -1,14 +1,27 @@
 import { Button } from "../ui/button";
 import heroImage from "@/assets/hero-image.png"
 import Link from "next/link";
-import {easeOut, motion} from "motion/react"
+import { easeOut, motion, useScroll, useTransform} from "motion/react"
+import { useRef } from "react";
 
 export default function Hero() {
-  return <section className="w-full flex justify-center mt-24 md:mt-5 md:pb-10 overflow-x-clip">
+  const containerRef = useRef(null);
+
+  const scroll = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  });
+  const opacity = useTransform(scroll.scrollYProgress, [0,1], [1,-1])
+  
+  return <motion.section
+    ref={containerRef}
+    style={{
+      opacity: opacity
+    }}
+    className="w-full select-none flex justify-center mt-24 md:mt-5 md:pb-10 overflow-x-clip">
     <div className="container">
       <div className="md:flex items-center justify-center px-5">
         <div className="md:w-[578px]">
-          {/* <div className="tag">Powered by AI</div> */}
           <motion.h1
           initial={{
             opacity:0,
@@ -78,17 +91,26 @@ export default function Hero() {
           </div>
         </div>
         <div className="mt-10 overflow-clip relative items-center flex">
-          <div className="xl:w-[700px] lg:w-[600px] md:w-[450px] select-none">
+          <motion.div 
+          initial={{
+            opacity:0,
+          }}
+          animate={{
+            opacity:1,
+          }}
+          transition={{
+            duration: 2,
+            ease: easeOut,
+          }}
+          className="xl:w-[700px] lg:w-[600px] md:w-[450px] select-none">
             <motion.img 
             className="pointer-events-none" 
             src={heroImage.src} 
             alt="image of tracks" 
             initial={{
-              opacity:0,
-              filter: "brightness(0.3) saturate(1)"
+              filter: "brightness(0.6) saturate(1)"
             }}
             animate={{
-              opacity:1,
               filter: "brightness(1.2) saturate(1.2)",
             }}
             transition={{
@@ -96,10 +118,10 @@ export default function Hero() {
               ease: easeOut,
             }}
             width={800} height={800} />
-          </div>
+          </motion.div>
           
         </div>
       </div>
     </div>
-  </section>
+  </motion.section>
 }
