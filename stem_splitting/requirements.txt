@@ -1,0 +1,6 @@
+Flask
+google-cloud-storage
+python-dotenv
+demucs
+torch
+torchaudio
