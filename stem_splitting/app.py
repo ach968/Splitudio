@@ -5,6 +5,10 @@ from google.cloud import storage as gcs
 import tempfile
 import os
 from dotenv import load_dotenv
+import shutil
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 load_dotenv()
 
@@ -30,23 +34,48 @@ def predict():
         # Save the uploaded audio file to a temporary path
         _, temp_path = tempfile.mkstemp()
         audio_file.save(temp_path)
+        
+        logging.info("Temporary file upload created at: %s", temp_path)
 
         # Perform audio separation using Demucs
-        output_dir = tempfile.mkdtemp()  # Temporary directory for separated files
-        main(["--two-stems=vocals", "--out", output_dir, temp_path])
+        output_dir = tempfile.mkdtemp() # creates unique temporary directory for this thread
+        main(["--two-stems=vocals", "--mp3","--out", output_dir, temp_path])
 
         # Collect separated files and upload them to Google Cloud Storage
         uploaded_files = []
         bucket_name = os.getenv("STORAGE_BUCKET")
-        for filename in os.listdir(output_dir):
-            if _upload_to_storage(filename, bucket_name, output_dir, project_id):
-                uploaded_files.append(filename)
+        
+        all_uploads_successful = True
+
+        # Get the directory that contains the separated stems
+        htdemucs_dir = os.path.join(output_dir, "htdemucs") # /tmp/tmp_****/htdemucs
+        inner_dir_name = os.listdir(htdemucs_dir)[0]  # tmp_****
+        inner_pathname = os.path.join(htdemucs_dir, inner_dir_name)
+        logging.info(f"Separated files located at: {inner_pathname}")
+        for filename in os.listdir(inner_pathname):
+            if filename.endswith(".mp3"):
+                logging.info(f"Processing file: {filename}")
+                success = _upload_to_storage(filename, bucket_name, inner_pathname, project_id)
+                if success:
+                    uploaded_files.append(filename)
+                else:
+                    all_uploads_successful = False
+                    logging.error(f"Failed to upload {filename}")
+            else:
+                logging.warning(f"Skipping non-mp3 file: {filename}")
+            
 
         # Clean up temporary files
-        os.remove(temp_path)
-        for filename in uploaded_files:
-            os.remove(os.path.join(output_dir, filename))
-
+        try:
+            os.remove(temp_path)
+            shutil.rmtree(output_dir)
+            logging.info("Temporary files cleaned up successfully.")
+        except Exception as cleanup_error:
+            logging.error(f"Error cleaning up temporary files: {cleanup_error}")
+        
+        if not all_uploads_successful:
+            return jsonify({"error": "Some files failed to upload"}), 500
+        
         return (
             jsonify(
                 {
@@ -57,8 +86,10 @@ def predict():
             ),
             200,
         )
+        
 
     except Exception as e:
+        logging.error(f"Error in predict endpoint: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -76,16 +107,17 @@ def _upload_to_storage(filename, bucket_name, tmp_dir, pid):
         bool: True if the upload was successful, False otherwise.
     """
     try:
-        print(f"Uploading {filename} to bucket {bucket_name}...")
-        bucket = gcs.Client().bucket(bucket_name)
+        logging.info(f"Uploading {filename} to bucket {bucket_name}...")
+        storage_client = gcs.Client()
+        bucket = storage_client.bucket(bucket_name)
         blob = bucket.blob(f"projects/{pid}/{filename}")
         blob.upload_from_filename(
             os.path.join(tmp_dir, filename)
         )  # Upload from tmp directory
-        print(f"Uploaded {filename} to {bucket_name}/{pid}/!")
+        logging.info(f"Uploaded {filename} to {bucket_name}/{pid}/!")
         return True
     except Exception as e:
-        print(f"Error uploading to storage: {e}")
+        logging.error(f"Error uploading to storage: {e}")
         return False
 
 
