@@ -18,6 +18,8 @@ export default function Product() {
     target: containerRef,
     offset: ["start center", "end end"]
   });
+
+
   const step1Opacity = useTransform(scroll.scrollYProgress, [0,1/7,2/7,3/7,4/7,5/7,6/7,1], [1,1,0,0,0,0,0,0])
   const step2Opacity = useTransform(scroll.scrollYProgress, [0,1/7,2/7,3/7,4/7,5/7,6/7,1], [0,0,0,1,1,0,0,0])
   const step3Opacity = useTransform(scroll.scrollYProgress, [0,1/7,2/7,3/7,4/7,5/7,6/7,1], [0,0,0,0,0,0,1,1])
@@ -113,14 +115,15 @@ export default function Product() {
     style={{
       opacity: waveOpacity
     }}
-    className="hidden md:block absolute rotate-[90deg] scale-x-[-1] -top-72
-    min-h-[1800px] overflow-clip
+    className="hidden lg:block absolute rotate-[90deg] scale-x-[-1] -top-72
+    min-h-[1500px] overflow-clip
     -left-[500px] lg:-left-[600px] xl:-left-[800px]
     waveform-mask pointer-events-none"
     src="/waveform.svg" alt="Waveform" width={1800} height={1800} />
+    
     <motion.img 
-    className="hidden md:block absolute rotate-[90deg] -top-80
-    min-h-[1800px] overflow-clip
+    className="hidden lg:block absolute rotate-[90deg] -top-72
+    min-h-[1500px] overflow-clip
     -right-[400px] lg:-right-[500px] xl:-right-[700px]
     waveform-mask pointer-events-none"
     style={{
