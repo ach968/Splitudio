@@ -26,6 +26,7 @@ const db = getFirestore(app);
 export async function storeProject(project: Project) {
   const projectDocRef = doc(db, "projects", project.pid);
   const projectDoc = await getDoc(projectDocRef);
+
   if (!projectDoc.exists()) {
     await setDoc(projectDocRef, {
       pid: project.pid,
@@ -34,7 +35,6 @@ export async function storeProject(project: Project) {
       updatedAt: serverTimestamp(),
       uid: project.uid,
       collaboratorIds: project.collaboratorIds,
-      coverImage: project.coverImage,
       isPublic: project.isPublic,
     });
   } else {
@@ -48,14 +48,6 @@ export async function storeProject(project: Project) {
       }
     );
   }
-}
-
-export async function getUser(): Promise<User | null> {
-  const user = auth.currentUser;
-  if (user) {
-    return user;
-  }
-  return null;
 }
 
 export async function fetchProjects(user: User): Promise<Project[]> {

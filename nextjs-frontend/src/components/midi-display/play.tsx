@@ -1,7 +1,7 @@
 "use client";
 
 import PianoRoll from "@/components/midi-display/piano-roll";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Midi } from "@tonejs/midi";
 import { Slider } from "../ui/slider";
 import Footer from "../footer";
@@ -24,6 +24,7 @@ import PauseSVG from "@/assets/pause";
 import PlaySVG from "@/assets/play";
 import ForwardSVG from "@/assets/forward";
 import SettingsSVG from "@/assets/settings";
+import { MidiNote } from "tone/build/esm/core/type/NoteUnits";
 
 interface Note {
   midi: number; // e.g., 60 for middle C
@@ -60,11 +61,39 @@ export default function Play({
   const { fftData, midiUtils } = useMicrophone();
     
   const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
-  const activeNotes = useMIDINotes({ channel: 1 })
-  
+  const rawMidiNotes = useMIDINotes({ channel: 1 })
+  const [activeNotes, setActiveNotes] = useState<Map<number, any>>(new Map());
+
   useEffect(()=>{
     console.log(inputs.length)
   },[inputs])
+
+  useEffect(()=>{
+    console.log(activeNotes)
+  }, [activeNotes])
+
+  useEffect(()=>{
+    console.log(rawMidiNotes)
+
+    setActiveNotes((prev) => {
+      const r = new Map(prev);
+
+      rawMidiNotes.forEach((n) => {
+        if(n.velocity > 0)
+          r.set(n.note, n)
+        else 
+          r.delete(n.note)
+      })
+
+      return r;
+    })
+
+  }, [rawMidiNotes])
+
+  // useEffect(()=> {
+  //   console.log(activeNotes)
+  // }, [activeNotes])
+
   // Calculate what notes are visible in the time window
   const notes = noteWindow(midiData, currentTime, WINDOW_SIZE);
 
@@ -228,7 +257,7 @@ export default function Play({
     if (playAlong == true && micOrMidi == "mic") {
       
       const newPlayAlongBuffer = new Map<string, boolean>();
-      console.log(fftData)
+
       // Check if the two ranges overlap:
       // [currentTime - tolerance, currentTime + tolerance]
       // [note.time, note.time + note.duration]
@@ -243,6 +272,7 @@ export default function Play({
           newPlayAlongBuffer.set(id, false);
         }
       });
+
       setPlayAlongBuffer(newPlayAlongBuffer);
     }
   }, [currentTime, playAlong, micOrMidi]);
@@ -251,12 +281,20 @@ export default function Play({
     if (playAlong == true && micOrMidi == "midi") {
       
       const newPlayAlongBuffer = new Map<string, boolean>();
-      console.log(activeNotes)
+
       // Check if the two ranges overlap:
       // [currentTime - tolerance, currentTime + tolerance]
       // [note.time, note.time + note.duration]
       const window = noteWindow(midiData, currentTime, PLAY_TOLERANCE);
 
+      // First set everything to false
+      window.forEach((note)=>{
+        const id = `${note.name}-${note.time}-${note.duration}-${note.midi}`;
+
+        newPlayAlongBuffer.set(id, false);
+      })
+
+      // Then add the active notes
       window.forEach((note) => {
         const id = `${note.name}-${note.time}-${note.duration}-${note.midi}`;
         
@@ -264,16 +302,7 @@ export default function Play({
           if(obj.note == note.midi && obj.velocity > 0) {
             newPlayAlongBuffer.set(id, true);
           }
-          else if(obj.note == note.midi && obj.velocity == 0){
-            newPlayAlongBuffer.set(id, false);
-          }
-          else {
-            newPlayAlongBuffer.set(id, false);
-          }
         })
-
-        if(!newPlayAlongBuffer.get(id))
-          newPlayAlongBuffer.set(id, false);
       });
 
       activeNotes.forEach((obj) => {
@@ -281,12 +310,13 @@ export default function Play({
         const exists = Array.from(newPlayAlongBuffer.keys()).some((key) =>
           key.endsWith(`-${obj.note}`)
         );
+
         if (!exists) { 
           // Add with the correct state.
           newPlayAlongBuffer.set(`unknown-0-0-${obj.note}`, false);
         }
       });
-
+      console.log(newPlayAlongBuffer)
       setPlayAlongBuffer(newPlayAlongBuffer); 
     }
   }, [currentTime, playAlong, micOrMidi, activeNotes]);

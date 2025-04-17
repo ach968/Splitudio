@@ -122,7 +122,8 @@ export default function Upload() {
         pName: file.name,
         collaboratorIds: [],
         isPublic: false,
-        coverImage: "",
+        originalMp3: "",
+        tracks: [""]
       };
       createProject(newProject);
 
