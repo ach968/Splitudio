@@ -33,7 +33,7 @@ export default function Profile() {
             <div className="border gap-7 flex flex-col p-6 rounded-lg border-neutral-500 bg-black">
               {subscriptionStatus == 0 ? (
                 <>
-                  <div>
+                  <div className="flex flex-col gap-1">
                     <p className="text-white text-2xl font-semibold">
                       Subscription
                     </p>
