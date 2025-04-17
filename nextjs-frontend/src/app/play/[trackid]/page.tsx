@@ -15,14 +15,22 @@ export default async function Page() {
   if(trackid == undefined || trackid == "") {
     redirect('/projects');
   }
+
   async function getMidi(trackid: string) {
-    // Simulate a delay (e.g. network request)
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    var ret = await fetch("https://us-central1-splitudio-19e91.cloudfunctions.net/mp3_to_midi", {
+      method: "POST",
+      body: JSON.stringify({
+        project_id: trackid,
+        mp3_file_link: trackid
+      })
+    }).then((res)=>res.json)
+
+    return ret
   }
 
-  // simulate waiting for backend
-  // const wait = await getMidi(trackid);
-  var data = await Midi.fromUrl("https://bitmidi.com/uploads/112561.mid");
+  var midiUrl = await getMidi(trackid);
+
+  var data = await Midi.fromUrl(midiUrl);
 
   // bring out the complex stuff we need
   const duration = data.tracks[0].duration;

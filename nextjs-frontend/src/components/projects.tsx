@@ -54,11 +54,11 @@ export default function Projects({
     setHasMounted(true);
   }, []);
 
-  const filteredProjects = projects.filter((project) => {
+  const filteredProjects = projects.filter((project: Project) => {
     const lowerQuery = searchQuery.toLowerCase();
     return (
-      project.pName.toLowerCase().includes(lowerQuery) ||
-      project.file.toLowerCase().includes(lowerQuery)
+      project.pName.toLowerCase().includes(lowerQuery)
+      // project.toLowerCase().includes(lowerQuery)
     );
   });
 
@@ -106,7 +106,7 @@ export default function Projects({
       // update dummy list
       setProjects((prevProjects) =>
         prevProjects!.map((project) =>
-          project.id === projectId ? { ...project, pName: newName } : project
+          project.pid === projectId ? { ...project, pName: newName } : project
         )
       );
     } catch (error) {
