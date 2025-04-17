@@ -1,4 +1,5 @@
 from firebase_functions import https_fn
+from flask import jsonify
 from utils.midi_extraction import mp3_midi_save, mp3_midi_cleanup
 import logging
 from utils.bucket_upload import upload_to_storage
@@ -55,7 +56,14 @@ def mp3_to_midi(req: https_fn.Request) -> https_fn.Response:
                 pid=project_id,
             )
 
-        return https_fn.Response("MP3 to MIDI conversion successful", status=200)
+        file_name = file_name.replace(".mp3", ".mid")
+
+        return jsonify(
+            {
+                "status": "success",
+                "gcs_path": f"https://storage.cloud.google.com/{bucket_name}/projects/{project_id}/{file_name}",
+            }
+        )
 
     except Exception as e:
         logging.error(f"Error processing MP3 file: {str(e)}")

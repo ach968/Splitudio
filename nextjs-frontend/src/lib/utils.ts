@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { app } from "@/lib/firebase/firebase";
+import { app, auth } from "@/lib/firebase/firebase";
 import {
   doc,
   getDoc,
@@ -50,6 +50,14 @@ export async function storeProject(project: Project) {
   }
 }
 
+export async function getUser(): Promise<User | null> {
+  const user = auth.currentUser;
+  if (user) {
+    return user;
+  }
+  return null;
+}
+
 export async function fetchProjects(user: User): Promise<Project[]> {
   const projectsRef = collection(db, "projects");
   const q = query(projectsRef, where("uid", "==", user.uid));
@@ -66,7 +74,6 @@ export async function storeCloudFile(
   pid: string,
   cloudFile: Omit<CloudFile, "fid" | "uploadDate" | "storagePath">
 ) {
-  
   const projectDocRef = doc(db, "projects", pid);
   const filesCollectionRef = collection(projectDocRef, "files");
 
