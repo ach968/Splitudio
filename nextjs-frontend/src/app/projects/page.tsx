@@ -3,23 +3,23 @@ import Projects from "@/components/projects";
 import { fetchProjects } from "@/lib/utils";
 import { useAuth } from "@/components/authContext";
 import { Project } from "@/types/firestore";
+import { useEffect, useState } from "react";
+import Loading from "./loading";
+export default function Page() {
 
-async function getProjects(): Promise<Project[]> {
-  const { user, uid } = useAuth();
-  const projects = await fetchProjects(user!);
-  return projects.map((project) => ({
-    pid: project.pid,
-    uid: uid || null,
-    pName: project.pName,
-    createdAt: project.createdAt,
-    updatedAt: project.updatedAt,
-    collaboratorIds: project.collaboratorIds,
-    coverImage: project.coverImage,
-    isPublic: project.isPublic,
-  }));
-}
+  const { user } = useAuth();
 
-export default async function Page() {
-  const projects = await getProjects();
+  const [projects, setProjects] = useState<Project[] | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+
+    fetchProjects(user).then((res)=>{
+      setProjects(res);
+    })
+  }, [user]);
+
+  if(projects == null) return <Loading></Loading>
+
   return <Projects initialProjects={projects} />;
 }

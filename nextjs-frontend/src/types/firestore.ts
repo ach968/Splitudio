@@ -1,12 +1,12 @@
 import { User } from "firebase/auth";
-import { serverTimestamp } from "firebase/firestore";
+import { FieldValue, serverTimestamp, Timestamp } from "firebase/firestore";
 
 export interface CloudFile { 
   fid: string; 
   url: string; 
   size: number; 
   contentType: string; 
-  uploadDate: typeof serverTimestamp;
+  uploadDate: FieldValue | Timestamp;
   storagePath: string; 
 }
 
@@ -14,18 +14,24 @@ export interface Project {
   pid: string;
   uid: string | null; 
   pName: string;
-  createdAt?: typeof serverTimestamp;
-  updatedAt?: typeof serverTimestamp;
-  collaboratorIds?: string[];
-  coverImage?: string;
+  createdAt?: FieldValue | Timestamp;
+  updatedAt?: FieldValue | Timestamp;
+  fileName: string; // filename of original mp3
+  originalMp3?: string // PATH TO ORIGINAL MP3  
   isPublic: boolean;
+  tracks?: string[] // List of trackIds that belong to this project
+}
+
+export interface Track {
+  trackId: string;
+  midi: string // PATH TO MIDI
+  stem: string // PATH TO STEM
 }
 
 export interface Customer {
-  user: User; // firebase useAuth wrapper
-  subscription: string;
-  stripeSubscriptionId: null;
-  projects: Project[];
+  uid: string; // firebase UID
+  stripeCustomerId: string;
+  subscriptionStatus: "active" | "none";
   apiUsage: number;
 }
 

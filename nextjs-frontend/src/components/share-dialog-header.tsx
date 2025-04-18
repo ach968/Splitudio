@@ -3,7 +3,10 @@ import { Label } from "@/components/ui/label";
 import { Button } from "./ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getProject, storeProject } from "@/lib/utils";
+import { Project } from "@/types/firestore";
+import { toast } from "@/hooks/use-toast";
 
 export default function Share({
   projectId,
@@ -12,21 +15,38 @@ export default function Share({
   projectId: string;
   projectName: string;
 }) {
-  const [shared, setShared] = useState(true);
-  const [disabled, setDisabled] = useState(false);
+  const [project, setProject] = useState<Project | null>(null);
+  const [shared, setShared] = useState(false);
+  const [disabled, setDisabled] = useState(true);
+
+  useEffect(()=>{
+    getProject(projectId).then((project)=>{
+      if(project == undefined) return;
+      setProject(project)
+      setShared(project.isPublic);
+    }).finally(()=>setDisabled(false))
+  }, [])
 
   const enableShare = (status: boolean) => {
+    var prev = shared;
     setShared(status);
     setDisabled(true);
 
-    // Fetch logic
+    if(project == undefined) return;
 
-    // simulate finally after fetch
-    setTimeout(() => {
-      setDisabled(false);
-    }, 1500);
+    storeProject({
+      ...project,
+      isPublic: status
+    }).catch((err)=>{
+      setShared(prev);
+      toast({title: "ERROR", description: "Couldn't update project name"})
+    }).finally(()=>setDisabled(false))
   };
-  const copyLink = () => {};
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(`http://localhost:3000/editor/${project?.pid}`);
+    toast({title: "Copied to clipboard!"})
+  };
 
   return (
     <DialogHeader>

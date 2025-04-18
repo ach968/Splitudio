@@ -13,8 +13,8 @@ import { Progress } from "./ui/progress";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import EditorNav from "./editor-nav";
-import { storeProject, storeCloudFile } from "@/lib/utils";
-import { Project } from "@/types/firestore";
+import { storeProject, storeCloudFile, getCustomer } from "@/lib/utils";
+import { Customer, Project } from "@/types/firestore";
 import { useAuth } from "./authContext";
 import { v4 as uuidv4 } from "uuid";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
@@ -46,7 +46,15 @@ export default function Upload() {
 
   // User instance
   const { user } = useAuth();
-  const isPremiumUser = true;
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
+
+  useEffect(()=>{
+    if(user?.uid)
+      getCustomer((user.uid)).then((customer: Customer | undefined)=>{
+        if(!customer) return;
+          if(customer.subscriptionStatus == "active") setIsPremiumUser(true); 
+      })
+  },[user])
 
   // For youtube link
   const inputRef = useRef<HTMLInputElement>(null);
@@ -119,11 +127,11 @@ export default function Upload() {
       const newProject: Project = {
         pid: uuidv4(),
         uid: user?.uid || null,
-        pName: file.name,
-        collaboratorIds: [],
+        pName: "Untitiled Project",
+        fileName: file.name,
         isPublic: false,
-        coverImage: "",
       };
+
       createProject(newProject);
 
       // Upload file to Firebase Storage
@@ -150,10 +158,10 @@ export default function Upload() {
           });
           setUploadProgress(null);
           setFileName(null);
+          return;
         },
         async () => {
           setUploadProgress(100);
-          console.log("File uploaded successfully!");
 
           // Get the download URL
           const downloadURL = await getDownloadURL(storageRef);
@@ -168,22 +176,39 @@ export default function Upload() {
 
           try {
             await storeCloudFile(newProject.pid, cloudFile);
-            toast({
-              title: "File uploaded",
-              description: "File uploaded successfully!",
-            });
-            
-            setTimeout(() => {
-              setUploadProgress(null);
-              redirect(`/editor/${newProject.pid}`);
-            }, 300);
 
+            await fetch(
+              "http://127.0.0.1:5001/splitudio-19e91/us-central1/register_project",
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  pid: newProject.pid
+                })
+              }
+            )
+            .then((res) => {
+              if(res.ok) return res.json
+              else throw new Error("Could not validate on the server side");
+            })
+            .then(()=> {
+              toast({
+                title: "File uploaded",
+                description: "File uploaded successfully!",
+              });
+              
+              setTimeout(() => {
+                setUploadProgress(null);
+                redirect(`/editor/${newProject.pid}`);
+              }, 300);
+            })
           } catch (error: any) {
             console.error("Failed to store file info to cloud file", error);
             toast({
               title: "ERROR",
-              description: "Failed to store file info: " + error.message,
+              description: "Failed to store file: " + error.message,
             });
+            setUploadProgress(null);
+            setFileName(null);
           }
         }
       );
@@ -203,7 +228,6 @@ export default function Upload() {
 
     // Replace with real logic later
     setTimeout(() => {
-      console.log("SERVER RESPONSE");
       setServerReturn(true);
       setTimeout(() => {
         redirect("/editor/project-id-returned");
