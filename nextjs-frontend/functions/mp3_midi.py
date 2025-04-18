@@ -1,3 +1,4 @@
+import datetime
 from firebase_functions import https_fn
 from flask import jsonify
 from utils.midi_extraction import mp3_midi_save, mp3_midi_cleanup
@@ -43,6 +44,12 @@ def mp3_to_midi(req: https_fn.Request) -> https_fn.Response:
     temp_file = f"tmp/{file_name}"
     blob.download_to_filename(temp_file)
 
+    download_url = blob.generate_signed_url(
+        expiration=datetime.timedelta(hours=5),
+        method="GET",
+        version="v4"
+    )
+    
     mp3_file_link = temp_file
 
     try:
@@ -61,7 +68,7 @@ def mp3_to_midi(req: https_fn.Request) -> https_fn.Response:
         return jsonify(
             {
                 "status": "success",
-                "gcs_path": f"https://storage.cloud.google.com/{bucket_name}/projects/{project_id}/{file_name}",
+                "gcs_path": download_url,
             }
         )
 
