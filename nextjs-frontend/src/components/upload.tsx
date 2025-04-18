@@ -149,6 +149,7 @@ export default function Upload() {
           });
           setUploadProgress(null);
           setFileName(null);
+          return;
         },
         async () => {
           setUploadProgress(100);
