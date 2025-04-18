@@ -122,8 +122,6 @@ export default function Upload() {
         pName: file.name,
         collaboratorIds: [],
         isPublic: false,
-        originalMp3: "",
-        tracks: [""]
       };
       createProject(newProject);
 
@@ -169,22 +167,45 @@ export default function Upload() {
 
           try {
             await storeCloudFile(newProject.pid, cloudFile);
-            toast({
-              title: "File uploaded",
-              description: "File uploaded successfully!",
-            });
-            
-            setTimeout(() => {
-              setUploadProgress(null);
-              redirect(`/editor/${newProject.pid}`);
-            }, 300);
 
+            await fetch(
+              "http://127.0.0.1:5001/splitudio-19e91/us-central1/register_project",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  pid: newProject.pid,
+                  uid: user?.uid ?? null,
+                  pName: file.name,
+                  storagePath: `projects/${newProject.pid}/${file.name}`,
+                  isPublic: false,
+                  collaboratorIds: [],
+                }),
+              }
+            )
+            .then((res) => {
+              if(res.ok) return res.json
+              else throw new Error("Could not validate on the server side");
+            })
+            .finally(()=> {
+              toast({
+                title: "File uploaded",
+                description: "File uploaded successfully!",
+              });
+              
+              setTimeout(() => {
+                setUploadProgress(null);
+                redirect(`/editor/${newProject.pid}`);
+              }, 300);
+            })
           } catch (error: any) {
             console.error("Failed to store file info to cloud file", error);
             toast({
               title: "ERROR",
               description: "Failed to store file info: " + error.message,
             });
+            setUploadProgress(null);
+            setFileName(null);
           }
         }
       );
@@ -204,7 +225,6 @@ export default function Upload() {
 
     // Replace with real logic later
     setTimeout(() => {
-      console.log("SERVER RESPONSE");
       setServerReturn(true);
       setTimeout(() => {
         redirect("/editor/project-id-returned");

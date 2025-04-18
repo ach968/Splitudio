@@ -1,35 +1,21 @@
-"""
-Cloud Function: register_project
---------------------------------
-Frontend flow:
-1.  User uploads file ➜  gs://<default‑bucket>/projects/{pid}/{filename}
-2.  Frontend calls POST https://<region>-<proj>.cloudfunctions.net/register_project
-    with JSON:
-    {
-        "pid":            "...",          # required
-        "uid":            "...",          # may be null/undefined
-        "pName":          "...",
-        "storagePath":    "projects/{pid}/{filename}",
-        "isPublic":       false,
-        "collaboratorIds": []
-    }
-
-The function looks up the Storage object, builds the Project + CloudFile
-documents, and writes them to Firestore.
-"""
 import json
 import os
 import datetime as _dt
 from typing import Any, Dict, List, Optional
 
 from firebase_functions import https_fn
-from google.cloud import firestore
+from google.cloud import storage
 import firebase_admin
-from firebase_admin import storage as fb_storage
+from firebase_admin import firestore
+
+BUCKET_NAME: str = "STORAGE_BUCKET"
 
 db = firestore.Client()
-bucket = fb_storage.bucket()                      # default bucket for project
+storage_client = storage.Client()
+bucket = storage_client.bucket(BUCKET_NAME)
 
+# Where we stage files inside the Cloud Function
+TMP_DIR = "/tmp"
 
 # --- helpers -----------------------------------------------------------------
 VALID_EXTS = (".mp3", ".wav", ".flac", ".aac")
@@ -44,8 +30,9 @@ def _json_resp(obj: Dict[str, Any], status: int = 200) -> https_fn.Response:
 
 
 # --- HTTPS Function ----------------------------------------------------------
-@https_fn.on_request(memory=512, timeout_sec=60)
+@https_fn.on_request(memory=512, timeout_sec=60, cpu=1)
 def register_project(req: https_fn.Request) -> https_fn.Response:
+
     if req.method != "POST":
         return _err("POST only", 405)
 
@@ -78,7 +65,6 @@ def register_project(req: https_fn.Request) -> https_fn.Response:
 
     # Signed URL (change expiry as needed)
     download_url = blob.generate_signed_url(
-        expiration=_dt.timedelta(days=7),
         method="GET",
         version="v4",
     )
@@ -100,7 +86,7 @@ def register_project(req: https_fn.Request) -> https_fn.Response:
         "isPublic": is_public,
         "tracks": [],                           # empty until you add stems
     }
-    # merge=True ensures idempotency if the doc already exists
+
     project_ref.set(project_doc, merge=True)
 
     # ------------------------------------------------------------------ #

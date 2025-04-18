@@ -19,6 +19,7 @@ import Link from "next/link";
 
 interface TrackProps {
   id: string;
+  projectId: string;
   focused: string | null; // id of the track that is focused
   fileUrl: string;
   waveColor: string;
@@ -36,6 +37,7 @@ interface TrackProps {
 
 export default function Track({
   id,
+  projectId,
   fileUrl,
   waveColor,
   trackName,
@@ -202,7 +204,7 @@ export default function Track({
                   className="w-20 h-9 rounded-full group"
                   variant="outline"
                 >
-                  <Link href={`/play/${id}`}>
+                  <Link href={`/play/${projectId}/${fileUrl}`}>
                     <p>play midi</p>
                   </Link>
                 </Button>

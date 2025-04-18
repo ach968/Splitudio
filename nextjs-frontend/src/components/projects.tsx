@@ -31,6 +31,9 @@ import { Button } from "./ui/button";
 import Topbar from "./topbar";
 import EditorNav from "./editor-nav";
 import { Project } from "@/types/firestore";
+import { FieldValue, Timestamp } from "firebase/firestore";
+import { deleteProject } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 export default function Projects({
   initialProjects,
@@ -40,9 +43,7 @@ export default function Projects({
   const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [alphabeticalDown, setAlphabeticalDown] = useState<boolean | null>(
-    null
-  );
+  const [alphabeticalDown, setAlphabeticalDown] = useState<boolean | null>(null);
   const [dateDown, setDateDown] = useState<boolean | null>(true);
 
   const [renaming, setRenaming] = useState<string | null>(null); // set to project-id while renaming
@@ -56,9 +57,11 @@ export default function Projects({
 
   const filteredProjects = projects.filter((project: Project) => {
     const lowerQuery = searchQuery.toLowerCase();
+    
+    if(project.pName == undefined) return true;
+
     return (
       project.pName.toLowerCase().includes(lowerQuery)
-      // project.toLowerCase().includes(lowerQuery)
     );
   });
 
@@ -73,14 +76,20 @@ export default function Projects({
     }
   }, [renaming]);
 
+  const toMillis = (d?: Timestamp | Date | FieldValue) => {
+    if (!d || d instanceof FieldValue) return 0;                       // handle null / undefined
+    return d instanceof Date ? d.getTime()  // plain Date
+                             : d.toMillis(); // Firestore Timestamp
+  };
+  
   // Create a sorted copy based on the active sort:
   // If dateDown is not null, sort by updatedAt.
   // Else if alphabeticalDown is not null, sort by pName.
   let sortedProjects = [...filteredProjects];
   if (dateDown !== null) {
     sortedProjects.sort((a, b) => {
-      const dateA = new Date(a.updatedAt);
-      const dateB = new Date(b.updatedAt);
+      const dateA = new Date(toMillis(a.updatedAt));
+      const dateB = new Date(toMillis(a.updatedAt));
       // If dateDown is true, sort descending (newest first), yes it's counter intuitive but that's how UI works.
       return dateDown
         ? dateB.getTime() - dateA.getTime()
@@ -94,7 +103,7 @@ export default function Projects({
     });
   }
 
-  const handleRenameSubmit = async (projectId: string) => {
+  const handleRenameSubmit = (projectId: string) => {
     try {
       // fetch logic
       // new name stored in newName
@@ -118,6 +127,16 @@ export default function Projects({
     }
   };
 
+  function handleDeleteProject(p: Project) {
+    deleteProject(p).catch((err)=> {
+      toast({
+        title: "ERROR: Could not delete project.",
+        description: err
+      });
+    }).finally(()=>{
+      setProjects((prev)=>prev.filter((proj) => proj.pid !== p.pid))
+    })
+  }
   return (
     <section>
       <EditorNav />
@@ -232,17 +251,17 @@ export default function Projects({
                           setNewName("");
                         }
                       }}
-                      key={project.id}
-                      className="hover:bg-white/15"
+                      key={project.pid}
+                      className="hover:bg-white/15 select-none"
                     >
-                      <ContextMenu>
+                      <ContextMenu >
                         <ContextMenuTrigger>
-                          {renaming !== project.id ? (
+                          {renaming !== project.pid ? (
                             <Link
                               className="flex justify-between pt-3 pb-3"
                               href={
                                 renaming == null
-                                  ? `/editor/${project.id}`
+                                  ? `/editor/${project.pid}`
                                   : "/projects"
                               } // clicking only redirects if not editing name
                               onClick={() => {
@@ -264,7 +283,7 @@ export default function Projects({
                                     {project.pName}
                                   </p>
                                   <p className="text-neutral-400 text-sm line-clamp-1">
-                                    / {project.file}
+                                    / {project.pid}
                                   </p>
                                 </motion.span>
                               </TableCell>
@@ -279,7 +298,7 @@ export default function Projects({
                                   className="text-neutral-400 text-sm line-clamp-1"
                                 >
                                   {new Date(
-                                    project.updatedAt
+                                    toMillis(project.updatedAt)
                                   ).toDateString()}
                                 </motion.p>
                               </TableCell>
@@ -299,7 +318,7 @@ export default function Projects({
                                       }
                                       onKeyDown={(e) => {
                                         if (e.key === "Enter") {
-                                          handleRenameSubmit(project.id);
+                                          handleRenameSubmit(project.pid);
                                         }
                                       }}
                                     />
@@ -308,7 +327,7 @@ export default function Projects({
                                       variant="ghost"
                                       size="icon"
                                       onClick={(e) =>
-                                        handleRenameSubmit(project.id)
+                                        handleRenameSubmit(project.pid)
                                       }
                                     >
                                       <EnterSVG className="group-hover:invert"></EnterSVG>
@@ -316,7 +335,7 @@ export default function Projects({
                                   </div>
 
                                   <p className="text-neutral-400 text-sm line-clamp-1">
-                                    / {project.file}
+                                    / {project.pid}
                                   </p>
                                 </span>
                               </TableCell>
@@ -324,7 +343,7 @@ export default function Projects({
                                 <div className="flex items-center h-full">
                                   <p className="text-neutral-400 text-sm line-clamp-1">
                                     {new Date(
-                                      project.updatedAt
+                                      toMillis(project.updatedAt)
                                     ).toDateString()}
                                   </p>
                                 </div>
@@ -335,7 +354,7 @@ export default function Projects({
                         <ContextMenuContent>
                           <ContextMenuItem
                             onClick={() => {
-                              setRenaming(project.id);
+                              setRenaming(project.pid);
                               setNewName(project.pName);
                             }}
                           >
@@ -357,14 +376,16 @@ export default function Projects({
                             </ContextMenuItem>
                             <DialogContent>
                               <Share
-                                projectId={project.id}
+                                projectId={project.pid}
                                 projectName={project.pName}
                               />
                             </DialogContent>
                           </Dialog>
 
                           <ContextMenuItem>
-                            <p className="flex w-full h-full hover:cursor-pointer">
+                            <p 
+                            onClick={()=>handleDeleteProject(project)}
+                            className="flex w-full h-full hover:cursor-pointer">
                               Delete
                             </p>
                           </ContextMenuItem>

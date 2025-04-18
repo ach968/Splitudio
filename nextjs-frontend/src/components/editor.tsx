@@ -11,6 +11,7 @@ import BracketLeftSVG from "@/assets/bracket-left";
 import BracketRightSVG from "@/assets/bracket-right";
 import SettingsSVG from "@/assets/settings";
 import LoopSVG from "@/assets/loop";
+
 import { WaveformHighlight } from "@/components/waveformHighlight";
 import {
   Tooltip,
@@ -20,6 +21,8 @@ import {
 } from "@/components/ui/tooltip";
 import EditorNav from "@/components/editor-nav";
 import { useParams } from "next/navigation";
+import { getProject } from "@/lib/utils";
+import { Project } from "@/types/firestore";
 
 interface TrackState {
   ws: any;
@@ -71,11 +74,9 @@ const trackList = [
   },
 ];
 
-export default function Editor() {
+export default function Editor({project} : {project: Project}) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [trackStates, setTrackStates] = useState<Record<string, TrackState>>(
-    {}
-  );
+  const [trackStates, setTrackStates] = useState<Record<string, TrackState>>({});
   const [currentTime, setCurrentTime] = useState(0);
   const [selected, setSelected] = useState(false);
 
@@ -101,9 +102,13 @@ export default function Editor() {
   // Enable looping of highlighted section
   const [looping, setLooping] = useState(false);
 
-  const { projectId } = useParams<{ projectId: string }>(); // THIS IS PASSED INTO PATH BY PARENT EDITOR PAGE OR PROJECTS PAGE
-  const PROJECTNAME = "Untitled Project"; // TODO HOOK UP TO BACKEND
-  const FILENAME = "untilited_name.mp3"; // TODO HOOK UP TO BACKEND
+  const projectId = project.pid;
+  const PROJECTNAME = project.pName;
+  const FILENAME = project.pid;
+  
+  useEffect(()=>{
+    console.log(project)
+  },[])
 
   useEffect(() => {
     if (containerRef.current && wrapperRef.current) {
@@ -412,6 +417,7 @@ export default function Editor() {
 
                 {trackList.map((track) => (
                   <Track
+                    projectId={projectId}
                     key={track.id}
                     id={track.id}
                     className={track.className}
