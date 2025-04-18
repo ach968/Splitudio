@@ -16,15 +16,15 @@ export default function Share({
   projectName: string;
 }) {
   const [project, setProject] = useState<Project | null>(null);
-  const [shared, setShared] = useState(true);
-  const [disabled, setDisabled] = useState(false);
+  const [shared, setShared] = useState(false);
+  const [disabled, setDisabled] = useState(true);
 
   useEffect(()=>{
     getProject(projectId).then((project)=>{
       if(project == undefined) return;
       setProject(project)
       setShared(project.isPublic);
-    })
+    }).finally(()=>setDisabled(false))
   }, [])
 
   const enableShare = (status: boolean) => {

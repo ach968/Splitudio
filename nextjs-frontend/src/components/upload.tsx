@@ -13,8 +13,8 @@ import { Progress } from "./ui/progress";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import EditorNav from "./editor-nav";
-import { storeProject, storeCloudFile } from "@/lib/utils";
-import { Project } from "@/types/firestore";
+import { storeProject, storeCloudFile, getCustomer } from "@/lib/utils";
+import { Customer, Project } from "@/types/firestore";
 import { useAuth } from "./authContext";
 import { v4 as uuidv4 } from "uuid";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
@@ -46,7 +46,15 @@ export default function Upload() {
 
   // User instance
   const { user } = useAuth();
-  const isPremiumUser = true;
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
+
+  useEffect(()=>{
+    if(user?.uid)
+      getCustomer((user.uid)).then((customer: Customer | undefined)=>{
+        if(!customer) return;
+          if(customer.subscriptionStatus == "active") setIsPremiumUser(true); 
+      })
+  },[user])
 
   // For youtube link
   const inputRef = useRef<HTMLInputElement>(null);
@@ -121,9 +129,9 @@ export default function Upload() {
         uid: user?.uid || null,
         pName: "Untitiled Project",
         fileName: file.name,
-        collaboratorIds: [],
         isPublic: false,
       };
+
       createProject(newProject);
 
       // Upload file to Firebase Storage
@@ -182,7 +190,7 @@ export default function Upload() {
               if(res.ok) return res.json
               else throw new Error("Could not validate on the server side");
             })
-            .finally(()=> {
+            .then(()=> {
               toast({
                 title: "File uploaded",
                 description: "File uploaded successfully!",

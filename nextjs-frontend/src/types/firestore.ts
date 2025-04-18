@@ -16,7 +16,6 @@ export interface Project {
   pName: string;
   createdAt?: FieldValue | Timestamp;
   updatedAt?: FieldValue | Timestamp;
-  collaboratorIds?: string[];
   fileName: string; // filename of original mp3
   originalMp3?: string // PATH TO ORIGINAL MP3  
   isPublic: boolean;
@@ -32,8 +31,7 @@ export interface Track {
 export interface Customer {
   uid: string; // firebase UID
   stripeCustomerId: string;
-  subscriptionStatus: "active" | "cancelled";
-  projects: string[]; // List of projectIds that belong to the user 
+  subscriptionStatus: "active" | "none";
   apiUsage: number;
 }
 

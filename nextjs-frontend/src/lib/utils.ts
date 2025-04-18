@@ -15,9 +15,10 @@ import {
   addDoc,
   writeBatch,
   QuerySnapshot,
+  updateDoc,
 } from "firebase/firestore";
 
-import { Project, CloudFile } from "@/types/firestore";
+import { Project, CloudFile, Customer } from "@/types/firestore";
 import { User } from "firebase/auth";
 import { deleteObject, getStorage, listAll, ref, StorageReference } from "firebase/storage";
 import { adminDb } from "./firebase/admin";
@@ -41,7 +42,6 @@ export async function storeProject(project: Project) {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       uid: project.uid,
-      collaboratorIds: project.collaboratorIds,
       isPublic: project.isPublic,
     });
   } else {
@@ -130,14 +130,36 @@ export async function fetchCloudFiles(pid: string): Promise<CloudFile[]> {
   }) as CloudFile[];
 }
 
+export async function getCustomer(uid: string) {
+  const customerDocRef = doc(db, "customers", uid);
+  const customerDoc = await getDoc(customerDocRef);
 
+  if(!customerDoc) return;
+  
+  return {
+    ...customerDoc.data()
+  } as Customer
+  
+}
 
+export async function storeCustomer(cust: Customer) {
+  const customerDocRef = doc(db, "customers", cust.uid);
+  const customerDoc = await getDoc(customerDocRef);
 
+  console.log(cust)
 
-
-
-
-
+  if(customerDoc) {
+    await updateDoc(
+      customerDocRef,
+      {
+        ...cust,
+      }
+    );
+  }
+  else { // this should never happen but meh
+    await setDoc(customerDocRef, { ...cust });
+  }
+}
 
 
 async function removeFolderRecursively(folderRef: StorageReference) {

@@ -6,7 +6,7 @@ import { Project } from "@/types/firestore";
 
 export default async function Page({ params } : any) {
 
-  const {projectId} = await params;
+  const { projectId } = await params;
 
   const snap = await adminDb.doc(`projects/${projectId}`).get();
   if (!snap.exists) redirect('/projects');
@@ -19,7 +19,6 @@ export default async function Page({ params } : any) {
     pName: d.pName,
     fileName: d.fileName,
     isPublic: d.isPublic,
-    collaboratorIds: d.collaboratorIds ?? [],
     originalMp3: d.originalMp3,
     tracks: d.tracks ?? [],
 
