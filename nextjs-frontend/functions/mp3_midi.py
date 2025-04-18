@@ -7,7 +7,6 @@ from utils.bucket_upload import upload_to_storage
 from google.cloud import storage
 import os
 from dotenv import load_dotenv
-import requests
 
 load_dotenv()
 
