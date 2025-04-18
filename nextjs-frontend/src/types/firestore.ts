@@ -17,6 +17,7 @@ export interface Project {
   createdAt?: FieldValue | Timestamp;
   updatedAt?: FieldValue | Timestamp;
   collaboratorIds?: string[];
+  fileName: string; // filename of original mp3
   originalMp3?: string // PATH TO ORIGINAL MP3  
   isPublic: boolean;
   tracks?: string[] // List of trackIds that belong to this project

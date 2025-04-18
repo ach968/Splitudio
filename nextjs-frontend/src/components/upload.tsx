@@ -119,7 +119,8 @@ export default function Upload() {
       const newProject: Project = {
         pid: uuidv4(),
         uid: user?.uid || null,
-        pName: file.name,
+        pName: "Untitiled Project",
+        fileName: file.name,
         collaboratorIds: [],
         isPublic: false,
       };
@@ -153,7 +154,6 @@ export default function Upload() {
         },
         async () => {
           setUploadProgress(100);
-          console.log("File uploaded successfully!");
 
           // Get the download URL
           const downloadURL = await getDownloadURL(storageRef);
@@ -173,15 +173,9 @@ export default function Upload() {
               "http://127.0.0.1:5001/splitudio-19e91/us-central1/register_project",
               {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                  pid: newProject.pid,
-                  uid: user?.uid ?? null,
-                  pName: file.name,
-                  storagePath: `projects/${newProject.pid}/${file.name}`,
-                  isPublic: false,
-                  collaboratorIds: [],
-                }),
+                  pid: newProject.pid
+                })
               }
             )
             .then((res) => {
@@ -203,7 +197,7 @@ export default function Upload() {
             console.error("Failed to store file info to cloud file", error);
             toast({
               title: "ERROR",
-              description: "Failed to store file info: " + error.message,
+              description: "Failed to store file: " + error.message,
             });
             setUploadProgress(null);
             setFileName(null);

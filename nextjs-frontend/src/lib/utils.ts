@@ -28,6 +28,7 @@ export function cn(...inputs: ClassValue[]) {
 
 const db = getFirestore(app);
 
+// Also used to update projects
 export async function storeProject(project: Project) {
   const projectDocRef = doc(db, "projects", project.pid);
   const projectDoc = await getDoc(projectDocRef);
@@ -35,6 +36,7 @@ export async function storeProject(project: Project) {
   if (!projectDoc.exists()) {
     await setDoc(projectDocRef, {
       pid: project.pid,
+      fileName: project.fileName,
       pName: project.pName,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
@@ -46,6 +48,7 @@ export async function storeProject(project: Project) {
     await setDoc(
       projectDocRef,
       {
+        ...project,
         updatedAt: serverTimestamp(),
       },
       {

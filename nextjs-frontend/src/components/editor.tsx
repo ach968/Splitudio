@@ -104,7 +104,7 @@ export default function Editor({project} : {project: Project}) {
 
   const projectId = project.pid;
   const PROJECTNAME = project.pName;
-  const FILENAME = project.pid;
+  const FILENAME = project.fileName;
   
   useEffect(()=>{
     console.log(project)

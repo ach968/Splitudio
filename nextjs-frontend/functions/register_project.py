@@ -1,6 +1,6 @@
 import json
 import os
-import datetime as _dt
+import datetime
 from typing import Any, Dict, List, Optional
 
 from firebase_functions import https_fn
@@ -63,8 +63,8 @@ def register_project(req: https_fn.Request) -> https_fn.Response:
     size = blob.size or 0
     content_type = blob.content_type or "application/octet-stream"
 
-    # Signed URL (change expiry as needed)
     download_url = blob.generate_signed_url(
+        expiration=datetime.timedelta(hours=5),
         method="GET",
         version="v4",
     )

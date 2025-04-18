@@ -32,7 +32,7 @@ import Topbar from "./topbar";
 import EditorNav from "./editor-nav";
 import { Project } from "@/types/firestore";
 import { FieldValue, Timestamp } from "firebase/firestore";
-import { deleteProject } from "@/lib/utils";
+import { deleteProject, storeProject } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 
 export default function Projects({
@@ -61,7 +61,8 @@ export default function Projects({
     if(project.pName == undefined) return true;
 
     return (
-      project.pName.toLowerCase().includes(lowerQuery)
+      project.pName.toLowerCase().includes(lowerQuery) ||
+      project.fileName.toLowerCase().includes(lowerQuery)
     );
   });
 
@@ -105,8 +106,6 @@ export default function Projects({
 
   const handleRenameSubmit = (projectId: string) => {
     try {
-      // fetch logic
-      // new name stored in newName
 
       if (newName.trim() == "") {
         throw new Error();
@@ -118,25 +117,40 @@ export default function Projects({
           project.pid === projectId ? { ...project, pName: newName } : project
         )
       );
+
+      projects.forEach((p)=>{
+        if(p.pid === projectId) {
+          var toUpdate: Project = {...p};
+          toUpdate.pName = newName
+          storeProject(toUpdate)
+        }
+          
+      })
+
     } catch (error) {
       // error logic
+      toast({title: "Error", description: "Could not rename project"})
     } finally {
-      // Clear renaming state whether successful or not.
+      
+
       setRenaming(null);
       setNewName("");
     }
   };
 
   function handleDeleteProject(p: Project) {
+    setProjects((prev)=>prev.filter((proj) => proj.pid !== p.pid))
+
     deleteProject(p).catch((err)=> {
       toast({
         title: "ERROR: Could not delete project.",
         description: err
       });
-    }).finally(()=>{
-      setProjects((prev)=>prev.filter((proj) => proj.pid !== p.pid))
+
+      setProjects((prev)=>[...prev, p]);
     })
   }
+
   return (
     <section>
       <EditorNav />
@@ -283,7 +297,7 @@ export default function Projects({
                                     {project.pName}
                                   </p>
                                   <p className="text-neutral-400 text-sm line-clamp-1">
-                                    / {project.pid}
+                                    / {project.fileName}
                                   </p>
                                 </motion.span>
                               </TableCell>
@@ -335,7 +349,7 @@ export default function Projects({
                                   </div>
 
                                   <p className="text-neutral-400 text-sm line-clamp-1">
-                                    / {project.pid}
+                                    / {project.fileName}
                                   </p>
                                 </span>
                               </TableCell>

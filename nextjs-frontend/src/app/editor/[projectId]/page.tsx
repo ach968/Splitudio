@@ -1,22 +1,23 @@
 import Editor from "@/components/editor";
-import { getProject } from "@/lib/utils";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { adminDb } from '@/lib/firebase/admin';
 import { Project } from "@/types/firestore";
 
 
-export default async function Page({params}:{params:{projectId:string}}) {
+export default async function Page({ params } : any) {
 
-  const snap = await adminDb.doc(`projects/${params.projectId}`).get();
+  const {projectId} = await params;
+
+  const snap = await adminDb.doc(`projects/${projectId}`).get();
   if (!snap.exists) redirect('/projects');
 
-  const d = snap.data() as any;                     // raw Firestore data
+  const d = snap.data() as any;
 
   const project: Project = {
-    pid: params.projectId,
+    pid: projectId,
     uid: d.uid ?? null,
     pName: d.pName,
+    fileName: d.fileName,
     isPublic: d.isPublic,
     collaboratorIds: d.collaboratorIds ?? [],
     originalMp3: d.originalMp3,
