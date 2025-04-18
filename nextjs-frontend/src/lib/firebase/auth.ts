@@ -73,6 +73,13 @@ async function storeUser(userCredential: UserCredential) {
   
     await setDoc(customerDocRef, newCust);
   }
+
+  const idToken = await userCredential.user.getIdToken();
+  await fetch("/api/session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idToken }),
+  });
 }
 
 export async function signOut() {

@@ -21,7 +21,6 @@ import {
 import { Project, CloudFile, Customer } from "@/types/firestore";
 import { User } from "firebase/auth";
 import { deleteObject, getStorage, listAll, ref, StorageReference } from "firebase/storage";
-import { adminDb } from "./firebase/admin";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -139,7 +138,6 @@ export async function getCustomer(uid: string) {
   return {
     ...customerDoc.data()
   } as Customer
-  
 }
 
 export async function storeCustomer(cust: Customer) {
