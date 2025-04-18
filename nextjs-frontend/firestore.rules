@@ -9,11 +9,11 @@ service cloud.firestore {
       allow create: if request.auth != null && request.auth.uid == userId;
     }
     match /projects/{projectID}{
-      allow read, write, update, delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow read, write, update, delete: if request.auth != null;
       allow create: if request.auth != null;
 
       match /files/{fileId}{
-        allow write, read, update, delete: if request.auth != null && resource.parent.data.uid == request.auth.uid; 
+        allow write, read, update, delete: if request.auth != null; 
         allow create: if request!= null;
       }
 

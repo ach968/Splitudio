@@ -25,7 +25,7 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import Share from "./share-dialog-header";
-import { Dialog, DialogClose, DialogContent, DialogTrigger } from "./ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import EnterSVG from "@/assets/enter";
 import { Button } from "./ui/button";
 import Topbar from "./topbar";
@@ -48,6 +48,8 @@ export default function Projects({
 
   const [renaming, setRenaming] = useState<string | null>(null); // set to project-id while renaming
   const [newName, setNewName] = useState<string>(""); // holds new name for project
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Only plays framer animations once
   const [hasMounted, setHasMounted] = useState(false);
@@ -128,11 +130,9 @@ export default function Projects({
       })
 
     } catch (error) {
-      // error logic
       toast({title: "Error", description: "Could not rename project"})
     } finally {
       
-
       setRenaming(null);
       setNewName("");
     }
@@ -154,7 +154,7 @@ export default function Projects({
   return (
     <section>
       <EditorNav />
-
+      
       <div className="flex flex-col w-full min-h-screen bg-black">
         <div className="flex flex-col h-full">
           <div className="flex justify-center w-full mt-20">
@@ -186,6 +186,7 @@ export default function Projects({
                   />
                 </motion.div>
               </div>
+
 
               <Table className="text-base">
                 <TableCaption>
@@ -396,13 +397,39 @@ export default function Projects({
                             </DialogContent>
                           </Dialog>
 
-                          <ContextMenuItem>
-                            <p 
-                            onClick={()=>handleDeleteProject(project)}
-                            className="flex w-full h-full hover:cursor-pointer">
-                              Delete
-                            </p>
+                          <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                            <ContextMenuItem>
+                              <DialogTrigger
+                              className="w-full h-full text-start"
+                              onClick={(e) => e.stopPropagation()}>
+                                <p className="flex w-full h-full hover:cursor-pointer">
+                                  Delete
+                                </p>
+                              </DialogTrigger>
+                                
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Delete "{project.pName}"</DialogTitle>
+                                  <DialogDescription>
+                                    <div className="flex flex-col gap-5">
+                                      This action cannot be undone. This will permanently delete your account
+                                      and remove your data from our servers.
+                                      <Button
+                                      className="w-[100px]"
+                                      variant="destructive"
+                                      onClick={()=>{
+                                        handleDeleteProject(project)
+                                        setDeleteDialogOpen(false);
+                                      }}>
+                                        DELETE
+                                      </Button>
+                                    </div>
+                                    
+                                  </DialogDescription>
+                                </DialogHeader>
+                              </DialogContent>                           
                           </ContextMenuItem>
+                          </Dialog>
                         </ContextMenuContent>
                       </ContextMenu>
                     </TableRow>

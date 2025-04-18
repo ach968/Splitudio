@@ -83,5 +83,10 @@ async function storeUser(userCredential: UserCredential) {
 }
 
 export async function signOut() {
+  await fetch("/api/session", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" }
+  });
+
   return _signOut(auth);
 }
