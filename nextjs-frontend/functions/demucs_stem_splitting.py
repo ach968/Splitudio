@@ -17,7 +17,7 @@ logging.basicConfig(
 )
 
 
-@https_fn.on_request(memory=32000, cpu=8)
+@https_fn.on_request(memory=32768, cpu=8)
 def demucs_stem_splitting(req: https_fn.Request) -> https_fn.Response:
     try:
         if req.content_type == "application/json":

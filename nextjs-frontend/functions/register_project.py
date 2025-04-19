@@ -2,17 +2,10 @@ import json
 import os
 import datetime
 from typing import Any, Dict, List, Optional
-
 from firebase_functions import https_fn
 from google.cloud import storage
-import firebase_admin
 from firebase_admin import firestore
 
-BUCKET_NAME: str = "STORAGE_BUCKET"
-
-db = firestore.Client()
-storage_client = storage.Client()
-bucket = storage_client.bucket(BUCKET_NAME)
 
 # Where we stage files inside the Cloud Function
 TMP_DIR = "/tmp"
@@ -26,12 +19,20 @@ def _err(message: str, status: int = 400) -> https_fn.Response:
 
 
 def _json_resp(obj: Dict[str, Any], status: int = 200) -> https_fn.Response:
-    return https_fn.Response(json.dumps(obj), status, {"Content-Type": "application/json"})
+    return https_fn.Response(
+        json.dumps(obj), status, {"Content-Type": "application/json"}
+    )
 
 
 # --- HTTPS Function ----------------------------------------------------------
 @https_fn.on_request(memory=512, timeout_sec=60, cpu=1)
 def register_project(req: https_fn.Request) -> https_fn.Response:
+
+    BUCKET_NAME: str = "STORAGE_BUCKET"
+
+    db = firestore.Client()
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(BUCKET_NAME)
 
     if req.method != "POST":
         return _err("POST only", 405)
@@ -84,7 +85,7 @@ def register_project(req: https_fn.Request) -> https_fn.Response:
         "collaboratorIds": collab_ids,
         "originalMp3": storage_path,
         "isPublic": is_public,
-        "tracks": [],                           # empty until you add stems
+        "tracks": [],  # empty until you add stems
     }
 
     project_ref.set(project_doc, merge=True)
