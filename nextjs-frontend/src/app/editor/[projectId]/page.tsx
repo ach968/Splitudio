@@ -21,7 +21,7 @@ export default async function Page({ params } : any) {
     fileName: d.fileName,
     isPublic: d.isPublic,
     originalMp3: d.originalMp3,
-    tracks: d.tracks ?? [],
+    trackIds: d.tracks ?? [],
     createdAt: d.createdAt?.toDate?.() ?? null,
     updatedAt: d.updatedAt?.toDate?.() ?? null,
   };
@@ -46,6 +46,7 @@ export default async function Page({ params } : any) {
 
   console.log(decoded.uid)
   console.log(projectOwnerUid)
+  
   // Compare the UIDs
   if (project.isPublic == false && decoded.uid !== projectOwnerUid) {
     return redirect("/projects");

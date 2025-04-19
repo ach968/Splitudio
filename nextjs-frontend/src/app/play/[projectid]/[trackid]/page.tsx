@@ -22,21 +22,21 @@ export default async function Page({params} : any) {
     redirect('/projects');
   }
   
-  const snap = await adminDb.doc(`projects/${projectid}`).get();
-  if (!snap.exists) redirect('/projects');
+  const projectSnap = await adminDb.doc(`projects/${projectid}`).get();
+  if (!projectSnap.exists) redirect('/projects');
 
-  const d = snap.data() as any;
+  const p = projectSnap.data() as any;
 
   const project: Project = {
     pid: projectid,
-    uid: d.uid,
-    pName: d.pName,
-    fileName: d.fileName,
-    isPublic: d.isPublic,
-    originalMp3: d.originalMp3,
-    tracks: d.tracks ?? [],
-    createdAt: d.createdAt?.toDate?.() ?? null,
-    updatedAt: d.updatedAt?.toDate?.() ?? null,
+    uid: p.uid,
+    pName: p.pName,
+    fileName: p.fileName,
+    isPublic: p.isPublic,
+    originalMp3: p.originalMp3,
+    trackIds: p.tracks ?? [],
+    createdAt: p.createdAt?.toDate?.() ?? null,
+    updatedAt: p.updatedAt?.toDate?.() ?? null,
   };
 
   if(!project.uid) redirect("/projects")
@@ -63,38 +63,54 @@ export default async function Page({params} : any) {
     return redirect("/projects");
   }
 
-  // ID check passed, We are good to download
+  
+
+  // ID check passed, we are good to download / start conversion
+
+  // Get related track based on trackid
+  const trackRef = adminDb.doc(`tracks/${trackid}`);
+  const trackSnap = await trackRef.get();
+  if (!trackSnap.exists) redirect("/projects");
+
+  const track = trackSnap.data();
+  if(track == undefined) redirect("/projects")
+  
+  // Check if the midipath is set. If it isn't, we need to call firebase function
+  // to convert the stem to midi.
+  let midiPath = track.midiPath;
+
+  if (!midiPath) {
+    const cloudFunctionResponse = await fetch(
+      "https://us-central1-splitudio-19e91.cloudfunctions.net/mp3_to_midi",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          project_id: projectid,
+          mp3_file_path: track.stemPath, // use the track's stemPath
+        }),
+      }
+    );
+
+    if (!cloudFunctionResponse.ok) redirect("/projects");
+
+    const result = await cloudFunctionResponse.json();
+    midiPath = result.gcs_path;
+
+    await trackRef.update({ midiPath: midiPath });
+  }
+
   const storage = new Storage({
     projectId: 'splitudio-19e91',
     credentials: JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}')
   });
   const bucketName = process.env.STORAGE_BUCKET!;
 
-  async function getMidiData(filePath: string): Promise<Midi> {
-    const [buffer] = await storage.bucket(bucketName).file(filePath).download();
-    const midi = new Midi(buffer);
-    return midi;
-  }
+  const [buffer] = await storage.bucket(bucketName).file(midiPath).download();
 
-  // async function getPath(project_id: string, mp3_file_link: string) {
-  //   return fetch("https://us-central1-splitudio-19e91.cloudfunctions.net/mp3_to_midi", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json"
-  //     },
-  //     body: JSON.stringify({
-  //       project_id: project_id,
-  //       mp3_file_link: mp3_file_link
-  //     })
-  //   }).catch((err)=>{
-  //     redirect("/projects")
-  //   }).then((res)=>res.json()).then((response)=> {
-  //     return response.gcs_path
-  //   })
-  // }
-
+  const midi = new Midi(buffer);
   // const path = getPath("bababooey", "https://storage.cloud.google.com/splitudio-19e91.firebasestorage.app/projects/bababooey/no_vocals.mp3");
-  const midi = await getMidiData("projects/bababooey/no_vocals_basic_pitch.mid");
+  // const midi = await getMidiData("projects/bababooey/no_vocals_basic_pitch.mid");
 
   // bring out the complex stuff we need
   const duration = midi.tracks[0].duration;

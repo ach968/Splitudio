@@ -1,7 +1,7 @@
 import { adminAuth, adminDb } from "@/lib/firebase/admin";
 import { type NextRequest, NextResponse } from "next/server";
-import { doc, getDoc, setDoc } from "firebase/firestore";
 
+// Setting up Customer record when a user is created
 export async function POST(req: NextRequest) {
   const { idToken } = await req.json();
 
