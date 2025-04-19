@@ -1,5 +1,6 @@
 from utils.find_key import find_key
-from utils.find_tempo import find_tempo
+from utils.find_tempo import find_tempo, find_tempo_autocorrelate, find_time_signature
+from utils.midi_extraction import mp3_midi
 
 # from utils.midi_extraction import mp3_midi
 from firebase_functions import https_fn
@@ -9,15 +10,7 @@ import pandas as pd
 # @https_fn.on_request(memory=512)
 def midi_to_sheets():
     audio_path = "file1.mp3"
-    # df: pd.DataFrame = mp3_midi(audio_path=audio_path)
-    with open("tmp/file1_basic_pitch.csv", "r") as f:
-        df = pd.read_csv(
-            f,
-            delimiter=",",
-            header=0,
-            usecols=range(4),
-            names=["start_time_s", "end_time_s", "pitch_midi", "velocity"],
-        )
+    df: pd.DataFrame = mp3_midi(audio_path=audio_path)
 
     pop_mean = df["velocity"].mean()
     pop_std = df["velocity"].std()
@@ -25,13 +18,19 @@ def midi_to_sheets():
         lambda x: velocity_threshold(x, pop_mean, pop_std)
     )
     df.drop(df[~rows_to_keep].index, inplace=True)
-    print(df.head())
-    start_times = df["start_time_s"].drop_duplicates().dropna().tolist()
-    print(len(start_times))
+    start_times = (
+        df["start_time_s"]
+        .sort_values(ascending=True)
+        .drop_duplicates()
+        .dropna()
+        .tolist()
+    )
 
-    tempo = find_tempo(start_times=start_times)
+    tempo = find_tempo_autocorrelate(start_times=start_times)
+    time_signature = find_time_signature(start_times=start_times, bpm=tempo, tolerance=0.2)
 
     print(tempo)
+    print(time_signature)
 
 def velocity_threshold(velocity: float, pop_mean: float, pop_std: float) -> bool:
     """Detects if a velocity is significantly louder than the average using a Z-score threshold.
@@ -51,7 +50,6 @@ def velocity_threshold(velocity: float, pop_mean: float, pop_std: float) -> bool
 
     return False
 
+
 if __name__ == "__main__":
     midi_to_sheets()
-
-
