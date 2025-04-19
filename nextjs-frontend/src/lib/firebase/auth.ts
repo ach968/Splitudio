@@ -37,7 +37,6 @@ export async function signInWithGoogle(): Promise<UserCredential> {
 async function storeUser(userCredential: UserCredential) {
   const { user } = userCredential;
   const userDocRef = doc(db, "users", user.uid);
-  const customerDocRef = doc(db, "customers", user.uid);
 
   // 1) Auth users doc
   const userDoc = await getDoc(userDocRef);
@@ -61,20 +60,16 @@ async function storeUser(userCredential: UserCredential) {
     );
   }
 
-  // 2) ensure empty custoemr record
-  const customerDoc = await getDoc(customerDocRef);
-  if(!customerDoc.exists()){
-    const newCust: Customer = {
-      uid: user.uid,
-      stripeCustomerId: '',
-      subscriptionStatus: 'none',
-      apiUsage: 0
-    }
-  
-    await setDoc(customerDocRef, newCust);
-  }
+  // 2) Hit backend API to ensure customer document exists
+  const idToken = await user.getIdToken();
 
-  const idToken = await userCredential.user.getIdToken();
+  await fetch("/api/customer", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idToken }),
+  });
+
+  // 3) Set session cookie
   await fetch("/api/session", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

@@ -140,6 +140,8 @@ export async function getCustomer(uid: string) {
   } as Customer
 }
 
+// REMOVE THIS FOR PROD
+// THIS IS ONLY USED TO GIVE YOURSELF PREMIUM IN THE DEMO
 export async function storeCustomer(cust: Customer) {
   const customerDocRef = doc(db, "customers", cust.uid);
   const customerDoc = await getDoc(customerDocRef);

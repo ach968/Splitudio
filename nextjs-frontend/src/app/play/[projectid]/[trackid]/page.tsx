@@ -5,7 +5,10 @@ import { Midi } from "@tonejs/midi";
 import { redirect } from 'next/navigation';
 import PlayWrapper from '@/components/midi-display/playwrapper';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
-import { Project } from '@/types/firestore';
+import { CloudFile, Project } from '@/types/firestore';
+import { fetchCloudFiles } from '@/lib/utils';
+import { collection, doc, getDocs } from 'firebase/firestore';
+
 
 export default async function Page({params} : any) {
 
@@ -36,7 +39,8 @@ export default async function Page({params} : any) {
     updatedAt: d.updatedAt?.toDate?.() ?? null,
   };
 
-  const projectOwnerUid: string = projectid;
+  if(!project.uid) redirect("/projects")
+  const projectOwnerUid: string = project.uid;
 
 
   // Get the logged in user's cookies
@@ -54,36 +58,49 @@ export default async function Page({params} : any) {
 
   // Compare the UIDs
   if (project.isPublic == false && decoded.uid !== projectOwnerUid) {
+    console.log(decoded.uid)
+    console.log(projectOwnerUid)
     return redirect("/projects");
   }
 
-  async function getMidi() {
-    return fetch("https://us-central1-splitudio-19e91.cloudfunctions.net/mp3_to_midi", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        project_id: "bababooey",
-        mp3_file_link: "https://storage.cloud.google.com/splitudio-19e91.firebasestorage.app/projects/bababooey/no_vocals.mp3"
-      })
-    }).catch((err)=>{
-      throw new Error(err);
-    }).then((res)=>res.json()).then((response)=> {
-      return response.gcs_path
-    })
+  // ID check passed, We are good to download
+  const storage = new Storage({
+    projectId: 'splitudio-19e91',
+    credentials: JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}')
+  });
+  const bucketName = process.env.STORAGE_BUCKET!;
+
+  async function getMidiData(filePath: string): Promise<Midi> {
+    const [buffer] = await storage.bucket(bucketName).file(filePath).download();
+    const midi = new Midi(buffer);
+    return midi;
   }
 
-  var midiUrl = await getMidi();
-  console.log(midiUrl)
+  // async function getPath(project_id: string, mp3_file_link: string) {
+  //   return fetch("https://us-central1-splitudio-19e91.cloudfunctions.net/mp3_to_midi", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json"
+  //     },
+  //     body: JSON.stringify({
+  //       project_id: project_id,
+  //       mp3_file_link: mp3_file_link
+  //     })
+  //   }).catch((err)=>{
+  //     redirect("/projects")
+  //   }).then((res)=>res.json()).then((response)=> {
+  //     return response.gcs_path
+  //   })
+  // }
 
-  var data = await Midi.fromUrl(midiUrl);
+  // const path = getPath("bababooey", "https://storage.cloud.google.com/splitudio-19e91.firebasestorage.app/projects/bababooey/no_vocals.mp3");
+  const midi = await getMidiData("projects/bababooey/no_vocals_basic_pitch.mid");
 
   // bring out the complex stuff we need
-  const duration = data.tracks[0].duration;
+  const duration = midi.tracks[0].duration;
 
   // get rid of complex objects so next can pass ts
-  data = JSON.parse(JSON.stringify(data));
+  const data = JSON.parse(JSON.stringify(midi));
 
   return <PlayWrapper midiData={data} duration={duration} />
 }

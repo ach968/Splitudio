@@ -90,10 +90,6 @@ export default function Play({
 
   }, [rawMidiNotes])
 
-  // useEffect(()=> {
-  //   console.log(activeNotes)
-  // }, [activeNotes])
-
   // Calculate what notes are visible in the time window
   const notes = noteWindow(midiData, currentTime, WINDOW_SIZE);
 
@@ -444,11 +440,14 @@ export default function Play({
                        
                     <Slider
                     className="w-full"
-                    min={MAX_WINDOW_SIZE}
-                    max={0.5}
+                    min={0.5}
+                    max={MAX_WINDOW_SIZE}
                     step={0.01}
-                    value={[WINDOW_SIZE]}
-                    onValueChange={(e) => setWindowSize(e[0])}
+                    value={[MAX_WINDOW_SIZE + 0.5 - WINDOW_SIZE]}
+                    onValueChange={([e]) => {
+                      const inverted = MAX_WINDOW_SIZE + 0.5 - e;
+                      setWindowSize(inverted)
+                    }}
                     ></Slider>
 
                     <Button

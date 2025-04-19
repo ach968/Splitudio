@@ -44,6 +44,8 @@ export default async function Page({ params } : any) {
     return redirect("/login");
   }
 
+  console.log(decoded.uid)
+  console.log(projectOwnerUid)
   // Compare the UIDs
   if (project.isPublic == false && decoded.uid !== projectOwnerUid) {
     return redirect("/projects");
