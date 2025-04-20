@@ -16,16 +16,17 @@ export interface Project {
   pName: string;
   createdAt?: FieldValue | Timestamp;
   updatedAt?: FieldValue | Timestamp;
-  fileName: string; // filename of original mp3
-  originalMp3?: string // PATH TO ORIGINAL MP3  
+  fileName: string; // filename of original mp3 (displayed in frontend)
+  originalMp3?: string // PATH TO ORIGINAL MP3
   isPublic: boolean;
-  tracks?: string[] // List of trackIds that belong to this project
+  trackIds?: string[] // List of trackIds
 }
 
 export interface Track {
   trackId: string;
-  midi: string // PATH TO MIDI
-  stem: string // PATH TO STEM
+  stemPath?: string // PATH TO SPLIT MP3 STEM
+  midiPath?: string // PATH TO MIDI
+  sheetMusicPath: string // PATH TO SHEET MUSIC
 }
 
 export interface Customer {

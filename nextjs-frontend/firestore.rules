@@ -18,6 +18,10 @@ service cloud.firestore {
       }
 
     }
+    match /tracks/{trackId}{
+      allow read, write, update, delete: if request.auth != null;
+      allow create: if request.auth != null;
+    }
 
     // Default rule - deny everything else
     match /{document=**} {

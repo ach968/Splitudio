@@ -175,33 +175,13 @@ export default function Upload() {
           };
 
           try {
-            await storeCloudFile(newProject.pid, cloudFile);
-
-            // await fetch(
-            //   "http://127.0.0.1:5001/splitudio-19e91/us-central1/register_project",
-            //   {
-            //     method: "POST",
-            //     body: JSON.stringify({
-            //       pid: newProject.pid
-            //     })
-            //   }
-            // )
-            // .then((res) => {
-            //   if(res.ok) return res.json
-            //   else throw new Error("Could not validate on the server side");
-            // })
-            // .then(()=> {
             toast({
-              title: "File uploaded",
-              description: "File uploaded successfully!",
+              title: "Uploading",
+              description: "Uploading ...",
             });
+            await storeCloudFile(newProject.pid, cloudFile);
             
-            setTimeout(() => {
-              setUploadProgress(null);
-              redirect(`/editor/${newProject.pid}`);
-            }, 300);
-            // })
-          } catch (error: any) {
+          } catch(error: any) {
             console.error("Failed to store file info to cloud file", error);
             toast({
               title: "ERROR",
@@ -210,10 +190,38 @@ export default function Upload() {
             setUploadProgress(null);
             setFileName(null);
           }
+          try{
+            toast({
+              title: "Splitting your song ...",
+            });
+            await fetch(
+              "/api/register_project",
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  pid: newProject.pid
+                })
+              }
+            )
+            .then((res) => {
+              if(!res.ok) throw new Error("Internal server error");
+            })
+            .then(()=> {
+              setUploadProgress(null);
+              redirect(`/editor/${newProject.pid}`);
+            })
+          } catch (error: any) {
+            console.error("Failed to split song", error);
+            toast({
+              title: "ERROR",
+              description: "Failed to split your song: " + error.message,
+            });
+            setUploadProgress(null);
+            setFileName(null);
+          }
         }
       );
     } catch (err: any) {
-      console.error(err);
       toast({
         title: "ERROR",
         description: "Something went wrong",

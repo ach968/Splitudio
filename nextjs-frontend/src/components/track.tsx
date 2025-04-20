@@ -149,7 +149,7 @@ export default function Track({
               height={70}
               progressColor={waveColor}
               waveColor="White"
-              url={fileUrl}
+              url={`/api/audio?projectId=${encodeURIComponent(projectId)}&trackId=${encodeURIComponent(id)}`}
               onFinish={() => setIsPlaying(false)}
               onReady={onReady}
               onSeeking={(e: any) => {
@@ -204,7 +204,7 @@ export default function Track({
                   className="w-20 h-9 rounded-full group"
                   variant="outline"
                 >
-                  <Link href={`/play/${projectId}/${fileUrl}`}>
+                  <Link href={`/play/${projectId}/${id}`}>
                     <p>play midi</p>
                   </Link>
                 </Button>

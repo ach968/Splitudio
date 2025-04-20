@@ -20,32 +20,31 @@ def demucs_stem_splitting(req: https_fn.Request) -> https_fn.Response:
         if req.content_type == "application/json":
             request_json = req.get_json()
             project_id = request_json.get("project_id")
+            gcs_path = request_json.get("gcs_path")
         else:
-            project_id = req.form.get("project_id")
+            return jsonify({"error": "Invalid content type"}), 400
 
-        audio_file = req.files["audio"]
+        if not project_id or not gcs_path:
+            return jsonify({"error": "Missing project_id or gcs_path"}), 400
 
-        if not audio_file:
-            return jsonify({"error": "No audio file provided"}), 400
-        if not project_id:
-            return jsonify({"error": "No project_id provided"}), 400
+        bucket_name = os.getenv("STORAGE_BUCKET")
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(gcs_path)
 
         # Save the uploaded audio file to a temporary path
         _, temp_path = tempfile.mkstemp()
-        audio_file.save(temp_path)
+        blob.download_to_filename(temp_path)
 
-        logging.info("Temporary file upload created at: %s", temp_path)
+        logging.info(f"Downloaded file from GCS: {gcs_path} to {temp_path}")
 
         # Perform audio separation using Demucs
-        output_dir = (
-            tempfile.mkdtemp()
-        )  # creates unique temporary directory for this thread
+        output_dir = tempfile.mkdtemp() 
+        # creates unique temporary directory for this thread
         main(["--two-stems=vocals", "--mp3", "--out", output_dir, temp_path])
 
         # Collect separated files and upload them to Google Cloud Storage
         uploaded_files = []
-        bucket_name = os.getenv("STORAGE_BUCKET")
-
         all_uploads_successful = True
 
         # Get the directory that contains the separated stems
@@ -53,6 +52,7 @@ def demucs_stem_splitting(req: https_fn.Request) -> https_fn.Response:
         inner_dir_name = os.listdir(htdemucs_dir)[0]  # tmp_****
         inner_pathname = os.path.join(htdemucs_dir, inner_dir_name)
         logging.info(f"Separated files located at: {inner_pathname}")
+
         for filename in os.listdir(inner_pathname):
             if filename.endswith(".mp3"):
                 logging.info(f"Processing file: {filename}")
@@ -60,7 +60,7 @@ def demucs_stem_splitting(req: https_fn.Request) -> https_fn.Response:
                     filename, bucket_name, inner_pathname, project_id
                 )
                 if success:
-                    uploaded_files.append(filename)
+                    uploaded_files.append(f"projects/{project_id}/{filename}")
                 else:
                     all_uploads_successful = False
                     logging.error(f"Failed to upload {filename}")
@@ -78,16 +78,10 @@ def demucs_stem_splitting(req: https_fn.Request) -> https_fn.Response:
         if not all_uploads_successful:
             return jsonify({"error": "Some files failed to upload"}), 500
 
-        return (
-            jsonify(
-                {
-                    "status": "success",
-                    "files": uploaded_files,
-                    "gcs_path": f"gs://{bucket_name}/{project_id}/",
-                }
-            ),
-            200,
-        )
+        return jsonify({
+            "status": "success",
+            "files": uploaded_files  # List of GCS-relative paths
+        }), 200
 
     except Exception as e:
         logging.error(f"Error in predict endpoint: {e}")
