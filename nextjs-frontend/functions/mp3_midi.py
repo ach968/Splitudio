@@ -15,7 +15,7 @@ logging.basicConfig(
 )
 
 
-@https_fn.on_request(memory=4096, cpu=8)
+@https_fn.on_request(memory=4096, cpu=8, timeout_sec=540)
 def mp3_to_midi(req: https_fn.Request) -> https_fn.Response:
 
     # Cleaning up request object

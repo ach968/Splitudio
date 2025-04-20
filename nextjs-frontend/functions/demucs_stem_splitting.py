@@ -7,6 +7,7 @@ from utils.bucket_upload import upload_to_storage
 import os
 from dotenv import load_dotenv
 from demucs.separate import main
+from google.cloud import storage
 
 load_dotenv()
 logging.basicConfig(
@@ -14,7 +15,7 @@ logging.basicConfig(
 )
 
 
-@https_fn.on_request(memory=32768, cpu=8)
+@https_fn.on_request(memory=32768, cpu=8, timeout_sec=540)
 def demucs_stem_splitting(req: https_fn.Request) -> https_fn.Response:
     try:
         if req.content_type == "application/json":
@@ -39,16 +40,16 @@ def demucs_stem_splitting(req: https_fn.Request) -> https_fn.Response:
         logging.info(f"Downloaded file from GCS: {gcs_path} to {temp_path}")
 
         # Perform audio separation using Demucs
-        output_dir = tempfile.mkdtemp() 
+        output_dir = tempfile.mkdtemp()
         # creates unique temporary directory for this thread
-        main(["--two-stems=vocals", "--mp3", "--out", output_dir, temp_path])
+        main(["-n", "htdemucs_6s", "--mp3", "--out", output_dir, temp_path])
 
         # Collect separated files and upload them to Google Cloud Storage
         uploaded_files = []
         all_uploads_successful = True
 
         # Get the directory that contains the separated stems
-        htdemucs_dir = os.path.join(output_dir, "htdemucs")  # /tmp/tmp_****/htdemucs
+        htdemucs_dir = os.path.join(output_dir, "htdemucs_6s")  # /tmp/tmp_****/htdemucs
         inner_dir_name = os.listdir(htdemucs_dir)[0]  # tmp_****
         inner_pathname = os.path.join(htdemucs_dir, inner_dir_name)
         logging.info(f"Separated files located at: {inner_pathname}")
@@ -78,10 +79,15 @@ def demucs_stem_splitting(req: https_fn.Request) -> https_fn.Response:
         if not all_uploads_successful:
             return jsonify({"error": "Some files failed to upload"}), 500
 
-        return jsonify({
-            "status": "success",
-            "files": uploaded_files  # List of GCS-relative paths
-        }), 200
+        return (
+            jsonify(
+                {
+                    "status": "success",
+                    "files": uploaded_files,  # List of GCS-relative paths
+                }
+            ),
+            200,
+        )
 
     except Exception as e:
         logging.error(f"Error in predict endpoint: {e}")
