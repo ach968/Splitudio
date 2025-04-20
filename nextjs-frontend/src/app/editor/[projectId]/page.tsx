@@ -2,7 +2,7 @@ import Editor from "@/components/editor";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { adminDb, adminAuth } from '@/lib/firebase/admin';
-import { Project } from "@/types/firestore";
+import { Project, Track } from "@/types/firestore";
 
 
 export default async function Page({ params } : any) {
@@ -49,6 +49,7 @@ export default async function Page({ params } : any) {
     return redirect("/projects");
   }
 
+
   // Check if we need to split stems
   if(!project.trackIds) {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -74,11 +75,26 @@ export default async function Page({ params } : any) {
 
     updatedProject.updatedAt = undefined;
     updatedProject.createdAt = undefined;
-    return <Editor project={updatedProject} />
+
+    const trackDocs = await Promise.all(
+      updatedProject.trackIds!.map(async (trackId: string) => {
+        const trackSnap = await adminDb.doc(`tracks/${trackId}`).get();
+        return {...(trackSnap.data() as Track) };
+      })
+    );
+
+    return <Editor project={updatedProject} tracks={trackDocs} />
   }
+
+  const trackDocs = await Promise.all(
+    project.trackIds.map(async (trackId: string) => {
+      const trackSnap = await adminDb.doc(`tracks/${trackId}`).get();
+      return { ...(trackSnap.data() as Track) };
+    })
+  );
 
   project.updatedAt = undefined;
   project.createdAt = undefined;
-  return <Editor project={project} />;
+  return <Editor project={project} tracks={trackDocs} />;
 }
 

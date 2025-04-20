@@ -58,12 +58,8 @@ export default async function Page({params} : any) {
 
   // Compare the UIDs
   if (project.isPublic == false && decoded.uid !== projectOwnerUid) {
-    console.log(decoded.uid)
-    console.log(projectOwnerUid)
     return redirect("/projects");
   }
-
-  
 
   // ID check passed, we are good to download / start conversion
 
@@ -109,8 +105,6 @@ export default async function Page({params} : any) {
   const [buffer] = await storage.bucket(bucketName).file(midiPath).download();
 
   const midi = new Midi(buffer);
-  // const path = getPath("bababooey", "https://storage.cloud.google.com/splitudio-19e91.firebasestorage.app/projects/bababooey/no_vocals.mp3");
-  // const midi = await getMidiData("projects/bababooey/no_vocals_basic_pitch.mid");
 
   // bring out the complex stuff we need
   const duration = midi.tracks[0].duration;

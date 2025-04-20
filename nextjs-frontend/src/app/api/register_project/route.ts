@@ -22,7 +22,7 @@ async function runStemSplitter(projectId: string, gcsPath: string): Promise<stri
 export async function POST(req: NextRequest) {
 
   console.log("REGISTERING PROJECT")
-  
+
   const { pid } = await req.json();
 
   if (!pid) {
@@ -53,7 +53,13 @@ export async function POST(req: NextRequest) {
       const trackId = uuidv4();
       const trackRef = adminDb.doc(`tracks/${trackId}`);
 
+      // Extract instrument name
+      const parts = stemPath.split("/");
+      const fileName = parts[parts.length - 1];
+      const instrument = fileName.replace(/\.[^/.]+$/, "");
+
       const trackRecord: Track = {
+        instrument: instrument,
         trackId: trackId,
         stemPath: stemPath,
       };

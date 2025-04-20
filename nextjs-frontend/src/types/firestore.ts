@@ -24,6 +24,7 @@ export interface Project {
 
 export interface Track {
   trackId: string;
+  instrument: string
   stemPath?: string // PATH TO SPLIT MP3 STEM
   midiPath?: string // PATH TO MIDI
   sheetMusicPath?: string // PATH TO SHEET MUSIC

@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/tooltip";
 import EditorNav from "@/components/editor-nav";
 import { useParams } from "next/navigation";
-import { Project } from "@/types/firestore";
+import { Project, Track as TrackInterface } from "@/types/firestore";
 
 interface TrackState {
   ws: any;
@@ -30,27 +30,27 @@ interface TrackState {
 
 const trackList = [
   {
-    trackName: "Vocal",
+    trackName: "Vocals",
     waveColor: "#fb2c36",
     className: "border-red-400 shadow-[0px_0px_50px_#fb2c3633]",
   },
   {
-    trackName: "Drums",
+    trackName: "Piano",
     waveColor: "#f97316",
     className: "border-orange-500 shadow-[0px_0px_50px_#f9731633]",
   },
   {
-    trackName: "Bass",
+    trackName: "Guitar",
     waveColor: "#facc15",
     className: "border-yellow-400 shadow-[0px_0px_50px_#facc1533]",
   },
   {
-    trackName: "Guitar",
+    trackName: "Bass",
     waveColor: "#4ade80",
     className: "border-green-400 shadow-[0px_0px_50px_#4ade8033]",
   },
   {
-    trackName: "Piano",
+    trackName: "Drums",
     waveColor: "#60a5fa",
     className: "border-blue-400 shadow-[0px_0px_50px_#60a5fa33]",
   },
@@ -61,7 +61,7 @@ const trackList = [
   },
 ];
 
-export default function Editor({project} : {project: Project}) {
+export default function Editor({project, tracks} : {project: Project, tracks: TrackInterface[]}) {
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [trackStates, setTrackStates] = useState<Record<string, TrackState>>({});
@@ -95,7 +95,7 @@ export default function Editor({project} : {project: Project}) {
   const FILENAME = project.fileName;
   
   console.log("KLAJSDJKLASJKLDA")
-  console.log(project.trackIds)
+  console.log(tracks)
 
   useEffect(() => {
     if (containerRef.current && wrapperRef.current) {
@@ -401,28 +401,33 @@ export default function Editor({project} : {project: Project}) {
                   waveformOffset={waveformOffset}
                   minWidth={MINWIDTH}
                 />
+                {trackList.map(({ trackName, waveColor, className }) => {
+                  const matchedTrack = tracks.find((t) =>
+                    t.instrument.toLowerCase() === trackName.toLowerCase()
+                  );
 
-                {project.trackIds!.map((id, idx) => (
-                  <Track
-                    projectId={projectId}
-                    key={id}
-                    id={id}
-                    className={trackList[idx].className}
-                    trackName={trackList[idx].trackName}
-                    waveColor={trackList[idx].waveColor}
-                    registerWaveSurfer={registerWaveSurfer}
-                    onUniversalSeek={onUniversalSeek}
-                    setIsPlaying={setIsPlaying}
-                    volume={
-                      trackStates[id] ? trackStates[id].volume : 1
-                    }
-                    updateVolume={updateTrackVolume}
-                    focused={focused}
-                    setFocused={setFocusedLayer}
-                    waveformContainerRef={containerRef} // Sets container ref on the waveform
-                    onTimeUpdate={onTimeUpdate}
-                  />
-                ))}
+                  if (!matchedTrack) return null;
+
+                  return (
+                    <Track
+                      key={matchedTrack.trackId}
+                      projectId={projectId}
+                      id={matchedTrack.trackId}
+                      className={className}
+                      trackName={trackName}
+                      waveColor={waveColor}
+                      registerWaveSurfer={registerWaveSurfer}
+                      onUniversalSeek={onUniversalSeek}
+                      setIsPlaying={setIsPlaying}
+                      volume={trackStates[matchedTrack.trackId]?.volume ?? 1}
+                      updateVolume={updateTrackVolume}
+                      focused={focused}
+                      setFocused={setFocusedLayer}
+                      waveformContainerRef={containerRef}
+                      onTimeUpdate={onTimeUpdate}
+                    />
+                  );
+                })}
               </div>
             </div>
           </div>
