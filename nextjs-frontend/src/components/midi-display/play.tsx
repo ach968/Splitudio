@@ -365,7 +365,8 @@ export default function Play({
 
   return (
     <section>
-      <EditorNav projectId="id" projectName="Untitled Project" pauseCallback={pause} />
+      <EditorNav/>
+      
       <div className="flex flex-col w-full min-h-screen h-screen bg-black text-white p-6">
         <div
           className="w-full h-full overflow-y-auto"
@@ -434,7 +435,7 @@ export default function Play({
                     })}
                     size="icon" 
                     variant="ghost" 
-                    className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
+                    className="flex items-center pt-5 justify-center text-lg p-3 w-[12px] h-[12px]">
                       -
                     </Button>
                        

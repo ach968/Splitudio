@@ -11,7 +11,7 @@ import Share from "@/components/share-dialog-header";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
-import { redirect, usePathname } from "next/navigation";
+import { redirect, usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "./authContext";
 import Logo from "./logo";
@@ -19,17 +19,15 @@ import Logo from "./logo";
 export default function EditorNav({
   projectId,
   projectName,
-  pauseCallback,
 }: {
   projectId?: string;
   projectName?: string;
-  pauseCallback?: () => void;
 }) {
   const pathname = usePathname();
   const [isSharing, setIsSharing] = useState(false);
 
   const { user, loading } = useAuth();
-
+  
   // REDIRECT TO HOME PAGE IF NOT LOGGED IN
   useEffect(() => {
     if (!user) {
@@ -44,13 +42,26 @@ export default function EditorNav({
           <Link 
           href="/"
           className="relative flex w-[40px] h-[40px] items-center justify-center">
-            <div className="scale-[0.2] ">
+            <div 
+            onClick={()=>{
+              setTimeout(()=>{
+                window.location.href = "/projects";
+              }, 50)
+            }}
+            className="scale-[0.2]">
               <Logo />
             </div>
           </Link>
 
-          <Link onClick={pauseCallback} href="/projects">
+          <Link
+          scroll={false} 
+          href="/projects">
             <p
+              onClick={()=>{
+                setTimeout(()=>{
+                  window.location.href = "/projects";
+                }, 50)
+              }}
               className={twMerge(
                 pathname === "/projects" && "text-white",
                 "hover:cursor-pointer hover:text-white hover:underline"
@@ -59,8 +70,15 @@ export default function EditorNav({
               Projects
             </p>
           </Link>
-          <Link onClick={pauseCallback} href="/editor">
+
+          <Link  
+          href="/editor">
             <p
+              onClick={()=>{
+                setTimeout(()=>{
+                  window.location.href = "/projects";
+                }, 50)
+              }}
               className={twMerge(
                 pathname.startsWith("/editor") && "text-white",
                 "hover:cursor-pointer hover:text-white hover:underline"
@@ -69,6 +87,7 @@ export default function EditorNav({
               Editor
             </p>
           </Link>
+
           {projectId && projectId != "" && projectName && (
             <Link href="#">
               <Dialog onOpenChange={(open) => setIsSharing(open)}>
@@ -94,7 +113,6 @@ export default function EditorNav({
             <NavigationMenuItem>
               <Link href="/profile" legacyBehavior passHref>
                 <NavigationMenuLink
-                  onClick={pauseCallback}
                   className={twMerge(
                     navigationMenuTriggerStyle(),
                     pathname.startsWith("/profile") &&
@@ -108,7 +126,6 @@ export default function EditorNav({
             <NavigationMenuItem>
               <Link href="/logout" legacyBehavior passHref>
                 <NavigationMenuLink
-                  onClick={pauseCallback}
                   className={navigationMenuTriggerStyle()}
                 >
                   <p className="text-sm">Logout</p>

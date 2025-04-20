@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Trigger Firebase Function to get stem paths
     const stemPaths = await runStemSplitter(pid, `projects/${pid}/${projectData.fileName}`) 
+    console.log("INNER FIERBASE FUNCTION RETURNS")
     
     // 3. For each stem, create a Track document
     const trackIds: string[] = [];

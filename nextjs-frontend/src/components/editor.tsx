@@ -94,8 +94,6 @@ export default function Editor({project, tracks} : {project: Project, tracks: Tr
   const PROJECTNAME = project.pName;
   const FILENAME = project.fileName;
   
-  console.log("KLAJSDJKLASJKLDA")
-  console.log(tracks)
 
   useEffect(() => {
     if (containerRef.current && wrapperRef.current) {
@@ -361,7 +359,6 @@ export default function Editor({project, tracks} : {project: Project, tracks: Tr
       <div className="w-screen flex h-screen bg-black">
         <div className="flex flex-col justify-start w-full h-full">
           <EditorNav
-            pauseCallback={onUniversalPause}
             projectName={PROJECTNAME}
             projectId={projectId}
           ></EditorNav>

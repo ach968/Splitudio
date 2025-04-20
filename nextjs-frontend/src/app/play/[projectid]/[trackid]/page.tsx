@@ -106,6 +106,8 @@ export default async function Page({params} : any) {
 
   const midi = new Midi(buffer);
 
+  // const midi = await Midi.fromUrl("http://localhost:3000/mid.mid")
+
   // bring out the complex stuff we need
   const duration = midi.tracks[0].duration;
 

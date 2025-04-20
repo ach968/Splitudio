@@ -203,7 +203,13 @@ export default function Track({
                   variant="outline"
                 >
                   <Link href={`/play/${projectId}/${id}`}>
-                    <p>play midi</p>
+                    <p
+                    onClick={()=>{
+                      setTimeout(()=>{
+                        window.location.href=`/play/${projectId}/${id}`
+                      },50)
+                    }}
+                    >play midi</p>
                   </Link>
                 </Button>
               </TooltipTrigger>

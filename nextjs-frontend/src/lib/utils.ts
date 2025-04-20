@@ -146,8 +146,6 @@ export async function storeCustomer(cust: Customer) {
   const customerDocRef = doc(db, "customers", cust.uid);
   const customerDoc = await getDoc(customerDocRef);
 
-  console.log(cust)
-
   if(customerDoc) {
     await updateDoc(
       customerDocRef,
@@ -162,14 +160,3 @@ export async function storeCustomer(cust: Customer) {
 }
 
 
-async function removeFolderRecursively(folderRef: StorageReference) {
-  const page = await listAll(folderRef);
-
-  // delete all files in this "directory"
-  await Promise.all(page.items.map((item) => deleteObject(item)));
-
-  // recurse into sub‑dirs
-  await Promise.all(
-    page.prefixes.map((subFolder) => removeFolderRecursively(subFolder))
-  );
-}
