@@ -26,7 +26,7 @@ export interface Track {
   trackId: string;
   stemPath?: string // PATH TO SPLIT MP3 STEM
   midiPath?: string // PATH TO MIDI
-  sheetMusicPath: string // PATH TO SHEET MUSIC
+  sheetMusicPath?: string // PATH TO SHEET MUSIC
 }
 
 export interface Customer {

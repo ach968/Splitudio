@@ -21,7 +21,7 @@ export default async function Page({ params } : any) {
     fileName: d.fileName,
     isPublic: d.isPublic,
     originalMp3: d.originalMp3,
-    trackIds: d.tracks ?? null,
+    trackIds: d.trackIds,
     createdAt: d.createdAt?.toDate?.() ?? null,
     updatedAt: d.updatedAt?.toDate?.() ?? null,
   };
@@ -43,9 +43,6 @@ export default async function Page({ params } : any) {
   } catch (e) {
     return redirect("/login");
   }
-
-  console.log(decoded.uid)
-  console.log(projectOwnerUid)
 
   // Compare the UIDs
   if (project.isPublic == false && decoded.uid !== projectOwnerUid) {
@@ -75,9 +72,13 @@ export default async function Page({ params } : any) {
     const updatedProject = newSnap.data() as Project;
     updatedProject.pid = projectId;
 
+    updatedProject.updatedAt = undefined;
+    updatedProject.createdAt = undefined;
     return <Editor project={updatedProject} />
   }
 
+  project.updatedAt = undefined;
+  project.createdAt = undefined;
   return <Editor project={project} />;
 }
 

@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/tooltip";
 import EditorNav from "@/components/editor-nav";
 import { useParams } from "next/navigation";
-import { getProject } from "@/lib/utils";
 import { Project } from "@/types/firestore";
 
 interface TrackState {
@@ -31,43 +30,31 @@ interface TrackState {
 
 const trackList = [
   {
-    id: "track-id-1",
-    fileUrl: "/vocals.wav",
     trackName: "Vocal",
     waveColor: "#fb2c36",
     className: "border-red-400 shadow-[0px_0px_50px_#fb2c3633]",
   },
   {
-    id: "track-id-2",
-    fileUrl: "/drums.wav",
     trackName: "Drums",
     waveColor: "#f97316",
     className: "border-orange-500 shadow-[0px_0px_50px_#f9731633]",
   },
   {
-    id: "track-id-3",
-    fileUrl: "/bass.wav",
     trackName: "Bass",
     waveColor: "#facc15",
     className: "border-yellow-400 shadow-[0px_0px_50px_#facc1533]",
   },
   {
-    id: "track-id-4",
-    fileUrl: "/other.wav",
     trackName: "Guitar",
     waveColor: "#4ade80",
     className: "border-green-400 shadow-[0px_0px_50px_#4ade8033]",
   },
   {
-    id: "track-id-5",
-    fileUrl: "/vocals.wav",
     trackName: "Piano",
     waveColor: "#60a5fa",
     className: "border-blue-400 shadow-[0px_0px_50px_#60a5fa33]",
   },
   {
-    id: "track-id-6",
-    fileUrl: "/drums.wav",
     trackName: "Other",
     waveColor: "#a78bfa",
     className: "border-violet-400 shadow-[0px_0px_50px_#a78bfa33]",
@@ -75,6 +62,7 @@ const trackList = [
 ];
 
 export default function Editor({project} : {project: Project}) {
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [trackStates, setTrackStates] = useState<Record<string, TrackState>>({});
   const [currentTime, setCurrentTime] = useState(0);
@@ -86,7 +74,7 @@ export default function Editor({project} : {project: Project}) {
   const [focused, setFocused] = useState<string | null>(null);
 
   // This is all for highlighting a section
-  const MINWIDTH = 2;
+  const MINWIDTH = 1;
   const [isSelecting, setIsSelecting] = useState(false);
   const [start, setStart] = useState<number | null>(null);
   const [end, setEnd] = useState<number | null>(null);
@@ -106,9 +94,8 @@ export default function Editor({project} : {project: Project}) {
   const PROJECTNAME = project.pName;
   const FILENAME = project.fileName;
   
-  useEffect(()=>{
-    console.log(project)
-  },[])
+  console.log("KLAJSDJKLASJKLDA")
+  console.log(project.trackIds)
 
   useEffect(() => {
     if (containerRef.current && wrapperRef.current) {
@@ -415,20 +402,19 @@ export default function Editor({project} : {project: Project}) {
                   minWidth={MINWIDTH}
                 />
 
-                {trackList.map((track) => (
+                {project.trackIds!.map((id, idx) => (
                   <Track
                     projectId={projectId}
-                    key={track.id}
-                    id={track.id}
-                    className={track.className}
-                    fileUrl={track.fileUrl}
-                    trackName={track.trackName}
-                    waveColor={track.waveColor}
+                    key={id}
+                    id={id}
+                    className={trackList[idx].className}
+                    trackName={trackList[idx].trackName}
+                    waveColor={trackList[idx].waveColor}
                     registerWaveSurfer={registerWaveSurfer}
                     onUniversalSeek={onUniversalSeek}
                     setIsPlaying={setIsPlaying}
                     volume={
-                      trackStates[track.id] ? trackStates[track.id].volume : 1
+                      trackStates[id] ? trackStates[id].volume : 1
                     }
                     updateVolume={updateTrackVolume}
                     focused={focused}

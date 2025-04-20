@@ -21,7 +21,6 @@ interface TrackProps {
   id: string;
   projectId: string;
   focused: string | null; // id of the track that is focused
-  fileUrl: string;
   waveColor: string;
   trackName: string;
   className: string;
@@ -38,7 +37,6 @@ interface TrackProps {
 export default function Track({
   id,
   projectId,
-  fileUrl,
   waveColor,
   trackName,
   className,

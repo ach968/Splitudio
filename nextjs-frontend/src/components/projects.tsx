@@ -32,7 +32,7 @@ import Topbar from "./topbar";
 import EditorNav from "./editor-nav";
 import { Project } from "@/types/firestore";
 import { FieldValue, Timestamp } from "firebase/firestore";
-import { deleteProject, storeProject } from "@/lib/utils";
+import { storeProject } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 
 export default function Projects({
@@ -141,13 +141,16 @@ export default function Projects({
   function handleDeleteProject(p: Project) {
     setProjects((prev)=>prev.filter((proj) => proj.pid !== p.pid))
 
-    deleteProject(p).catch((err)=> {
+    fetch("/api/delete_project", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pid: p.pid }),
+    }).catch((err)=>{
+      setProjects((prev)=>[...prev, p])
       toast({
         title: "ERROR: Could not delete project.",
         description: err
       });
-
-      setProjects((prev)=>[...prev, p]);
     })
   }
 

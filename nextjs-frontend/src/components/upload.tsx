@@ -175,10 +175,6 @@ export default function Upload() {
           };
 
           try {
-            toast({
-              title: "Uploading",
-              description: "Uploading ...",
-            });
             await storeCloudFile(newProject.pid, cloudFile);
             
           } catch(error: any) {
@@ -190,35 +186,10 @@ export default function Upload() {
             setUploadProgress(null);
             setFileName(null);
           }
-          try{
-            toast({
-              title: "Splitting your song ...",
-            });
-            await fetch(
-              "/api/register_project",
-              {
-                method: "POST",
-                body: JSON.stringify({
-                  pid: newProject.pid
-                })
-              }
-            )
-            .then((res) => {
-              if(!res.ok) throw new Error("Internal server error");
-            })
-            .then(()=> {
-              setUploadProgress(null);
-              redirect(`/editor/${newProject.pid}`);
-            })
-          } catch (error: any) {
-            console.error("Failed to split song", error);
-            toast({
-              title: "ERROR",
-              description: "Failed to split your song: " + error.message,
-            });
-            setUploadProgress(null);
-            setFileName(null);
-          }
+
+          setTimeout(()=>{
+            redirect(`/editor/${newProject.pid}`);
+          }, 300)
         }
       );
     } catch (err: any) {

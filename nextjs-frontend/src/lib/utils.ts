@@ -69,25 +69,25 @@ export async function getProject(pid: string): Promise<Project | undefined> {
   } as Project;
 }
 
-export async function deleteProject(project: Project) {
-  const projectDocRef = doc(db, "projects", project.pid);
-  const projectDoc = await getDoc(projectDocRef);
+// export async function deleteProject(project: Project) {
+//   const projectDocRef = doc(db, "projects", project.pid);
+//   const projectDoc = await getDoc(projectDocRef);
 
-  if(!projectDoc.exists) return;
+//   if(!projectDoc.exists) return;
 
-  // 1. Delete every Storage object under projects/{pid}/
-  const storage = getStorage(app);
-  const folderRef = ref(storage, `projects/${project.pid}`);
-  await removeFolderRecursively(folderRef);
+//   // 1. Delete every Storage object under projects/{pid}/
+//   const storage = getStorage(app);
+//   const folderRef = ref(storage, `projects/${project.pid}`);
+//   await removeFolderRecursively(folderRef);
 
-  // 2. Remove docs in the "files" sub‑collection (optional but tidy)
-  const batch = writeBatch(db);
-  const filesSnap = await getDocs(collection(projectDocRef, 'files'));
-  filesSnap.forEach((d) => batch.delete(d.ref));
-  await batch.commit();
+//   // 2. Remove docs in the "files" sub‑collection (optional but tidy)
+//   const batch = writeBatch(db);
+//   const filesSnap = await getDocs(collection(projectDocRef, 'files'));
+//   filesSnap.forEach((d) => batch.delete(d.ref));
+//   await batch.commit();
   
-  deleteDoc(projectDocRef)
-}
+//   deleteDoc(projectDocRef)
+// }
 
 export async function fetchProjects(user: User): Promise<Project[]> {
   const projectsRef = collection(db, "projects");
