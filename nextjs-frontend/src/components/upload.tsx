@@ -108,10 +108,8 @@ export default function Upload() {
       setUploadProgress(25);
 
       // client side duration check
-      const isValidDuration = await validateFileDuration(
-        file,
-        isPremiumUser
-      ).catch(() => false);
+      const isValidDuration = await validateFileDuration(file, isPremiumUser);
+      
       if (!isValidDuration) {
         const maxAllowed = isPremiumUser ? "20 minutes" : "2 minutes";
         toast({

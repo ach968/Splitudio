@@ -4,6 +4,7 @@ import pandas as pd
 from utils.lookup_tables import FREQUENCY_TO_NOTE
 import logging
 import os
+import shutil
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -12,10 +13,14 @@ logging.basicConfig(
 
 def mp3_midi_cleanup(output="tmp"):
     try:
-        for file in os.listdir(output):
-            file_path = os.path.join(output, file)
-            if os.path.isfile(file_path):
-                os.remove(file_path)
+        if not os.path.exists(output):
+            logging.warning(
+                f"Output directory {output} does not exist. Nothing to clean up."
+            )
+            return
+        # Remove the output directory and its contents
+        shutil.rmtree(output)
+
         logging.info(f"Cleanup completed for directory: {output}")
     except Exception as e:
         logging.error(f"Error during cleanup of directory {output}: {str(e)}")

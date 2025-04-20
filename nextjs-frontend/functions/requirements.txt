@@ -8,3 +8,4 @@ demucs
 stripe
 basic-pitch 
 pandas
+numpy==1.26.4
