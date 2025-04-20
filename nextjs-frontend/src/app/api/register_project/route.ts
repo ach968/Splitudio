@@ -1,21 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
 import { v4 as uuidv4 } from "uuid";
+import { Project } from "@/types/firestore";
 
 // Assume this function triggers the Cloud Function and returns an array of paths
 async function runStemSplitter(projectId: string): Promise<string[]> {
-  const response = await fetch("https://us-central1-splitudio-19e91.cloudfunctions.net/split_stems", {
+  const response = await fetch("https://us-central1-splitudio-19e91.cloudfunctions.net/demucs_stem_splitting", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ project_id: projectId })
   });
 
   if (!response.ok) {
+    console.log(response.statusText)
+    console.log(await response.json())
     throw new Error("Failed to split stems");
   }
 
   const data = await response.json();
-  return data.relative_paths as string[];
+  return data.files as string[];
 }
 
 export async function POST(req: NextRequest) {
@@ -35,10 +38,12 @@ export async function POST(req: NextRequest) {
     }
 
     const projectData = projectSnap.data();
+    if(projectData == undefined){
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
 
     // 2. Trigger Firebase Function to get stem paths
     const stemPaths = await runStemSplitter(pid); 
-    // e.g. ["projects/abc/drums.mp3", "projects/abc/vocals.mp3"]
 
     // 3. For each stem, create a Track document
     const trackIds: string[] = [];

@@ -149,7 +149,7 @@ export default function Track({
               height={70}
               progressColor={waveColor}
               waveColor="White"
-              url={fileUrl}
+              url={`/api/audio?projectId=${encodeURIComponent(projectId)}&trackId=${encodeURIComponent(id)}`}
               onFinish={() => setIsPlaying(false)}
               onReady={onReady}
               onSeeking={(e: any) => {

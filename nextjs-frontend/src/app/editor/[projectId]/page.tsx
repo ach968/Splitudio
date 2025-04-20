@@ -21,7 +21,7 @@ export default async function Page({ params } : any) {
     fileName: d.fileName,
     isPublic: d.isPublic,
     originalMp3: d.originalMp3,
-    trackIds: d.tracks ?? [],
+    trackIds: d.tracks ?? null,
     createdAt: d.createdAt?.toDate?.() ?? null,
     updatedAt: d.updatedAt?.toDate?.() ?? null,
   };
@@ -46,10 +46,36 @@ export default async function Page({ params } : any) {
 
   console.log(decoded.uid)
   console.log(projectOwnerUid)
-  
+
   // Compare the UIDs
   if (project.isPublic == false && decoded.uid !== projectOwnerUid) {
     return redirect("/projects");
+  }
+
+  // Check if we need to split stems
+  if(!project.trackIds) {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
+    await fetch(
+      `${baseUrl}/api/register_project`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          pid: project.pid
+        })
+      }
+    )
+    .then((res) => {
+      if(!res.ok) redirect("/projects");
+    })
+
+    const newSnap = await adminDb.doc(`projects/${projectId}`).get();
+    if (!newSnap.exists) redirect('/projects');
+
+    const updatedProject = newSnap.data() as Project;
+    updatedProject.pid = projectId;
+
+    return <Editor project={updatedProject} />
   }
 
   return <Editor project={project} />;

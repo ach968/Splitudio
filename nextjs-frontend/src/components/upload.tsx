@@ -175,8 +175,25 @@ export default function Upload() {
           };
 
           try {
+            toast({
+              title: "Uploading",
+              description: "Uploading ...",
+            });
             await storeCloudFile(newProject.pid, cloudFile);
-
+            
+          } catch(error: any) {
+            console.error("Failed to store file info to cloud file", error);
+            toast({
+              title: "ERROR",
+              description: "Failed to store file: " + error.message,
+            });
+            setUploadProgress(null);
+            setFileName(null);
+          }
+          try{
+            toast({
+              title: "Splitting your song ...",
+            });
             await fetch(
               "/api/register_project",
               {
@@ -187,24 +204,17 @@ export default function Upload() {
               }
             )
             .then((res) => {
-              if(!res.ok) throw new Error("Could not validate on the server side");
+              if(!res.ok) throw new Error("Internal server error");
             })
             .then(()=> {
-            toast({
-              title: "File uploaded",
-              description: "File uploaded successfully!",
-            });
-            
-            setTimeout(() => {
               setUploadProgress(null);
               redirect(`/editor/${newProject.pid}`);
-            }, 300);
             })
           } catch (error: any) {
-            console.error("Failed to store file info to cloud file", error);
+            console.error("Failed to split song", error);
             toast({
               title: "ERROR",
-              description: "Failed to store file: " + error.message,
+              description: "Failed to split your song: " + error.message,
             });
             setUploadProgress(null);
             setFileName(null);
@@ -212,7 +222,6 @@ export default function Upload() {
         }
       );
     } catch (err: any) {
-      console.error(err);
       toast({
         title: "ERROR",
         description: "Something went wrong",
