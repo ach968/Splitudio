@@ -74,7 +74,7 @@ export default function PianoRoll({
           return (
             <div
               key={index}
-              className="absolute bg-neutral-200 rounded-sm"
+              className="absolute bg-neutral-200 rounded-sm border-4 border-violet-400"
               style={{
                 bottom: bottom,
                 left,
@@ -89,7 +89,7 @@ export default function PianoRoll({
           return (
             <div
               key={index}
-              className="absolute bg-green-500 rounded-sm"
+              className="absolute bg-orange-500 rounded-sm border-4 border-red-500"
               style={{
                 bottom: bottom,
                 left,
@@ -105,7 +105,7 @@ export default function PianoRoll({
       return (
         <div
           key={index}
-          className="absolute bg-neutral-500 rounded-sm"
+          className="absolute bg-neutral-500 rounded-sm border-4 border-violet-400"
           style={{
             bottom: bottom, // Clip if note starts above window
             left,
@@ -121,7 +121,7 @@ export default function PianoRoll({
     return (
       <div
         key={index}
-        className="absolute bg-neutral-200 rounded-sm"
+        className="absolute bg-neutral-200 rounded-sm border-4 border-violet-400"
         style={{
           bottom: bottom, // Clip if note starts above window
           left,

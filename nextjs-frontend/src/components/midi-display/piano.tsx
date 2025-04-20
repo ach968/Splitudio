@@ -119,15 +119,18 @@ export default function Piano({
   return (
     <div
       ref={containerRef}
-      className="relative bg-black"
-      style={{ width: "100%", height: "100%" }}
+      className="relative bg-white"
+      style={{ 
+        width: "100%", 
+        height: "100%" 
+      }}
     >
       {Array.from({ length: KEY_COUNT }, (_, idx) => {
         const midi = MIN_MIDI + idx;
         return (
           <div
             key={midi}
-            className="absolute h-full border-black border rounded-sm hover:cursor-pointer select-none"
+            className="absolute border-black border rounded-sm hover:cursor-pointer select-none"
             onPointerDown={() => {
               sampler?.triggerAttack(midi, undefined, 5);
             }}
@@ -135,6 +138,7 @@ export default function Piano({
               sampler?.triggerRelease(midi);
             }}
             style={{
+              height: isBlackKey(midi) ? "70%" : "100%",
               left: idx * KEY_WIDTH,
               width: KEY_WIDTH,
               background: getKeyColor(midi),

@@ -65,15 +65,10 @@ export default function Play({
   const [activeNotes, setActiveNotes] = useState<Map<number, any>>(new Map());
 
   useEffect(()=>{
-    console.log(inputs.length)
-  },[inputs])
-
-  useEffect(()=>{
-    console.log(activeNotes)
-  }, [activeNotes])
-
-  useEffect(()=>{
     console.log(rawMidiNotes)
+  },[rawMidiNotes])
+
+  useEffect(()=>{
 
     setActiveNotes((prev) => {
       const r = new Map(prev);
@@ -210,7 +205,7 @@ export default function Play({
         ) &&
         Math.abs(note.time - currentTime) < TOLERANCE
       ) {
-        if (playAlong == false)
+        if (playAlong == false || playAlong == true)
           sampler.current?.triggerAttackRelease(
             note.name,
             (note.duration * 1/playbackSpeedRef.current),
@@ -382,7 +377,7 @@ export default function Play({
           />
         </div>
 
-        <div className="w-full h-20">
+        <div className="w-full h-40">
           <Piano
             notes={buffer}
             playAlongBuffer={playAlongBuffer}
@@ -637,24 +632,6 @@ export default function Play({
           </div>
         </div>
       </div>
-      {/* {
-            fftData && fftData.length &&
-            <LineChart
-            // xAxis={[{ data: [fftData.map((_, i) => i)].splice(0, 100)}]}
-            yAxis={[{ min: 0, max: 255 }]}
-            series={[
-                {
-                    data: [...fftData!].splice(0, 500),
-                    area:false,
-                    showMark: false,
-                    stack: "total"
-                },
-            ]}
-            width={900}
-            height={300}
-            skipAnimation
-            />
-        } */}
 
       <Footer />
     </section>

@@ -104,9 +104,9 @@ export default async function Page({params} : any) {
 
   const [buffer] = await storage.bucket(bucketName).file(midiPath).download();
 
-  const midi = new Midi(buffer);
+  // const midi = new Midi(buffer);
 
-  // const midi = await Midi.fromUrl("http://localhost:3000/mid.mid")
+  const midi = await Midi.fromUrl("http://localhost:3000/twinkle.midi")
 
   // bring out the complex stuff we need
   const duration = midi.tracks[0].duration;
