@@ -2,13 +2,10 @@ import shutil
 import tempfile
 from firebase_functions import https_fn
 from flask import jsonify
-from utils.midi_extraction import mp3_midi_save, mp3_midi_cleanup
 import logging
 from utils.bucket_upload import upload_to_storage
-from google.cloud import storage
 import os
 from dotenv import load_dotenv
-import requests
 from demucs.separate import main
 
 load_dotenv()
