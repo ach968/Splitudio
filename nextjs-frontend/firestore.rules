@@ -8,7 +8,7 @@ service cloud.firestore {
       allow read, update, delete: if request.auth != null && request.auth.uid == userId;
       allow create: if request.auth != null && request.auth.uid == userId;
     }
-    match /projects/{projectID}{
+    match /projects/{projectID} {
       allow read, write, update, delete: if request.auth != null;
       allow create: if request.auth != null;
 
@@ -19,8 +19,7 @@ service cloud.firestore {
 
     }
     match /tracks/{trackId}{
-      allow read, write, update, delete: if request.auth != null;
-      allow create: if request.auth != null;
+      allow create, write, update, delete: if false;
     }
 
     // Default rule - deny everything else

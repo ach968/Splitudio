@@ -5,7 +5,6 @@ import { Midi } from "@tonejs/midi";
 import { redirect } from 'next/navigation';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { CloudFile, Project } from '@/types/firestore';
-import { fetchCloudFiles } from '@/lib/utils';
 import { collection, doc, getDocs } from 'firebase/firestore';
 import Play from '@/components/midi-display/play';
 

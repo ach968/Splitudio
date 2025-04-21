@@ -19,8 +19,7 @@ import {
 } from "firebase/firestore";
 
 import { Project, CloudFile, Customer } from "@/types/firestore";
-import { User } from "firebase/auth";
-import { deleteObject, getStorage, listAll, ref, StorageReference } from "firebase/storage";
+import { getAuth } from "firebase/auth";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -30,6 +29,9 @@ const db = getFirestore(app);
 
 // Also used to update projects
 export async function storeProject(project: Project) {
+
+  console.log("STORING: ", project)
+  console.log("Current user UID:", getAuth().currentUser?.uid);
   const projectDocRef = doc(db, "projects", project.pid);
   const projectDoc = await getDoc(projectDocRef);
 
@@ -57,17 +59,17 @@ export async function storeProject(project: Project) {
   }
 }
 
-export async function getProject(pid: string): Promise<Project | undefined> {
-  const projectDocRef = doc(db, "projects", pid);
-  const projectDoc = await getDoc(projectDocRef);
+// export async function getProject(pid: string): Promise<Project | undefined> {
+//   const projectDocRef = doc(db, "projects", pid);
+//   const projectDoc = await getDoc(projectDocRef);
 
-  if(!projectDoc.exists) return undefined;
+//   if(!projectDoc.exists) return undefined;
 
-  return {
-    pid: pid,
-    ...projectDoc.data()
-  } as Project;
-}
+//   return {
+//     pid: pid,
+//     ...projectDoc.data()
+//   } as Project;
+// }
 
 // export async function deleteProject(project: Project) {
 //   const projectDocRef = doc(db, "projects", project.pid);
@@ -89,17 +91,17 @@ export async function getProject(pid: string): Promise<Project | undefined> {
 //   deleteDoc(projectDocRef)
 // }
 
-export async function fetchProjects(user: User): Promise<Project[]> {
-  const projectsRef = collection(db, "projects");
-  const q = query(projectsRef, where("uid", "==", user.uid));
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map((doc) => {
-    return {
-      ...doc.data(),
-      pid: doc.id,
-    } as Project;
-  }) as Project[];
-}
+// export async function fetchProjects(user: User): Promise<Project[]> {
+//   const projectsRef = collection(db, "projects");
+//   const q = query(projectsRef, where("uid", "==", user.uid));
+//   const querySnapshot = await getDocs(q);
+//   return querySnapshot.docs.map((doc) => {
+//     return {
+//       ...doc.data(),
+//       pid: doc.id,
+//     } as Project;
+//   }) as Project[];
+// }
 
 export async function storeCloudFile(
   pid: string,
@@ -116,18 +118,19 @@ export async function storeCloudFile(
   return docRef.id;
 }
 
-export async function fetchCloudFiles(pid: string): Promise<CloudFile[]> {
-  const projectDocRef = doc(db, "projects", pid);
-  const filesCollectionRef = collection(projectDocRef, "files");
-  const querySnapshot = await getDocs(filesCollectionRef);
+// REMOVE THIS IN PROD WTFFFFF
+// export async function fetchCloudFiles(pid: string): Promise<CloudFile[]> {
+//   const projectDocRef = doc(db, "projects", pid);
+//   const filesCollectionRef = collection(projectDocRef, "files");
+//   const querySnapshot = await getDocs(filesCollectionRef);
 
-  return querySnapshot.docs.map((doc) => {
-    return {
-      fid: doc.id,
-      ...doc.data(),
-    } as CloudFile;
-  }) as CloudFile[];
-}
+//   return querySnapshot.docs.map((doc) => {
+//     return {
+//       fid: doc.id,
+//       ...doc.data(),
+//     } as CloudFile;
+//   }) as CloudFile[];
+// }
 
 export async function getCustomer(uid: string) {
   const customerDocRef = doc(db, "customers", uid);
