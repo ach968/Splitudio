@@ -42,7 +42,7 @@ export default function EditorNav({
       <div className="flex flex-row w-full container items-center justify-between px-6 text-sm">
         <div className="flex gap-5 text-neutral-400 items-center underline-offset-4">
           <Link 
-          href="#"
+          href="/"
           className="relative flex w-[40px] h-[40px] items-center justify-center">
             <div 
             onClick={()=>{
@@ -55,7 +55,7 @@ export default function EditorNav({
 
           <Link
           scroll={false} 
-          href="#">
+          href="/projects">
             <p
               onClick={()=>{
                 window.location.href = "/projects";
@@ -70,7 +70,7 @@ export default function EditorNav({
           </Link>
 
           <Link  
-          href="#">
+          href="/editor">
             <p
               onClick={()=>{
                 window.location.href = "/editor";
