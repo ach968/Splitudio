@@ -69,7 +69,7 @@ export default function Piano({
       var ret;
 
       if (upcomingMidis.has(midi)) {
-        ret = `linear-gradient(to bottom, #fde047, transparent), ${baseColor}`;
+        ret = `linear-gradient(to bottom, #fb923c, transparent), ${baseColor}`;
       }
       if (upcomingMidis.has(midi) && playingMidis.has(midi)) {
         ret = `linear-gradient(to bottom, #22c55e, transparent), ${baseColor}`;
@@ -88,8 +88,6 @@ export default function Piano({
     if (playAlong == false) {
       if (activeMidis.has(midi)) {
         return "0 -5px 10px #F87BFF33, 0 -10px 15px #FB92CF44, 0 -15px 20px #FFDD9B55, 0 -20px 25px #C2F0B166, 0 -25px 30px #2FD8FE77";
-      } else {
-        return "";
       }
     } else {
       // playAlong == true
