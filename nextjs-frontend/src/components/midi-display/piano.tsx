@@ -130,7 +130,7 @@ export default function Piano({
         return (
           <div
             key={midi}
-            className="absolute border-black border rounded-sm hover:cursor-pointer select-none"
+            className="absolute rounded-b-md hover:cursor-pointer select-none"
             onPointerDown={() => {
               sampler?.triggerAttack(midi, undefined, 5);
             }}

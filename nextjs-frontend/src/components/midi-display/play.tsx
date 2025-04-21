@@ -1,7 +1,7 @@
 "use client";
 
 import PianoRoll from "@/components/midi-display/piano-roll";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useContext, useRef, useState } from "react";
 import { Midi } from "@tonejs/midi";
 import { Slider } from "../ui/slider";
 import Footer from "../footer";
@@ -15,8 +15,6 @@ import Knob from "./knob";
 import { useMicrophone } from "./use-microphone";
 import MicrophoneSVG from "@/assets/microphone";
 import HeadphoneSVG from "@/assets/headphone";
-import { useMIDIInputs, useMIDINotes } from "@react-midi/hooks";
-import { MIDINote } from "@react-midi/hooks/dist/types";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import LoopSVG from "@/assets/loop";
 import BackwardSVG from "@/assets/backward";
@@ -24,7 +22,7 @@ import PauseSVG from "@/assets/pause";
 import PlaySVG from "@/assets/play";
 import ForwardSVG from "@/assets/forward";
 import SettingsSVG from "@/assets/settings";
-import { MidiNote } from "tone/build/esm/core/type/NoteUnits";
+import {WebMidi} from 'webmidi';
 
 interface Note {
   midi: number; // e.g., 60 for middle C
@@ -60,30 +58,57 @@ export default function Play({
 
   const { fftData, midiUtils } = useMicrophone();
     
-  const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
-  const rawMidiNotes = useMIDINotes({ channel: 1 })
+  // const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
+  // const rawMidiNotes = useMIDINotes({ channel: 1 })
+
+  const handleNoteOn = (e: any) => {
+    setActiveNotes((prev) => {
+      const updated = new Map(prev);
+      updated.set(e.note.number, e.note);
+      return updated;
+    });
+  };
+  
+  const handleNoteOff = (e: any) => {
+    setActiveNotes((prev) => {
+      const updated = new Map(prev);
+      updated.delete(e.note.number);
+      return updated;
+    });
+  };
+
+  useEffect(() => {
+    let input: any;
+
+    WebMidi.enable()
+      .then(() => {
+        console.log(WebMidi.inputs);
+        input = WebMidi.inputs[0];
+
+        if (!input) return;
+
+        input.addListener("noteon", "all", handleNoteOn);
+
+        input.addListener("noteoff", "all", handleNoteOff);
+      })
+      .catch((err: any) =>
+        console.error("WebMidi could not be enabled.", err)
+      );
+    
+    return () => {
+      if (input) {
+        input.removeListener("noteon", "all", handleNoteOn);
+        input.removeListener("noteoff", "all", handleNoteOff);
+      }
+    };
+  }, []);
+
   const [activeNotes, setActiveNotes] = useState<Map<number, any>>(new Map());
 
   useEffect(()=>{
-    console.log(rawMidiNotes)
-  },[rawMidiNotes])
+    console.log(activeNotes)
+  },[activeNotes])
 
-  useEffect(()=>{
-
-    setActiveNotes((prev) => {
-      const r = new Map(prev);
-
-      rawMidiNotes.forEach((n) => {
-        if(n.velocity > 0)
-          r.set(n.note, n)
-        else 
-          r.delete(n.note)
-      })
-
-      return r;
-    })
-
-  }, [rawMidiNotes])
 
   // Calculate what notes are visible in the time window
   const notes = noteWindow(midiData, currentTime, WINDOW_SIZE);
@@ -290,7 +315,7 @@ export default function Play({
         const id = `${note.name}-${note.time}-${note.duration}-${note.midi}`;
         
         activeNotes.forEach((obj)=>{
-          if(obj.note == note.midi && obj.velocity > 0) {
+          if(obj.number == note.midi) {
             newPlayAlongBuffer.set(id, true);
           }
         })
@@ -299,12 +324,12 @@ export default function Play({
       activeNotes.forEach((obj) => {
         // Check if there's already an entry for this MIDI note in the buffer.
         const exists = Array.from(newPlayAlongBuffer.keys()).some((key) =>
-          key.endsWith(`-${obj.note}`)
+          key.endsWith(`-${obj.number}`)
         );
 
         if (!exists) { 
           // Add with the correct state.
-          newPlayAlongBuffer.set(`unknown-0-0-${obj.note}`, false);
+          newPlayAlongBuffer.set(`unknown-0-0-${obj.number}`, false);
         }
       });
       console.log(newPlayAlongBuffer)
@@ -377,7 +402,7 @@ export default function Play({
           />
         </div>
 
-        <div className="w-full h-40">
+        <div className="w-full h-32">
           <Piano
             notes={buffer}
             playAlongBuffer={playAlongBuffer}

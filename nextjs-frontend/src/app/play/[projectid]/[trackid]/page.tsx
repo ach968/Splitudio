@@ -3,11 +3,11 @@ import { cookies, headers } from 'next/headers';
 import { Storage } from "@google-cloud/storage";
 import { Midi } from "@tonejs/midi";
 import { redirect } from 'next/navigation';
-import PlayWrapper from '@/components/midi-display/playwrapper';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { CloudFile, Project } from '@/types/firestore';
 import { fetchCloudFiles } from '@/lib/utils';
 import { collection, doc, getDocs } from 'firebase/firestore';
+import Play from '@/components/midi-display/play';
 
 
 export default async function Page({params} : any) {
@@ -114,5 +114,5 @@ export default async function Page({params} : any) {
   // get rid of complex objects so next can pass ts
   const data = JSON.parse(JSON.stringify(midi));
 
-  return <PlayWrapper midiData={data} duration={duration} />
+  return <Play midiData={data} duration={duration} />
 }
