@@ -28,6 +28,8 @@ export default function EditorNav({
 
   const { user, loading } = useAuth();
   
+  const path = usePathname();
+
   // REDIRECT TO HOME PAGE IF NOT LOGGED IN
   useEffect(() => {
     if (!user) {
@@ -40,13 +42,11 @@ export default function EditorNav({
       <div className="flex flex-row w-full container items-center justify-between px-6 text-sm">
         <div className="flex gap-5 text-neutral-400 items-center underline-offset-4">
           <Link 
-          href="/"
+          href="#"
           className="relative flex w-[40px] h-[40px] items-center justify-center">
             <div 
             onClick={()=>{
-              setTimeout(()=>{
-                window.location.href = "/projects";
-              }, 50)
+              window.location.href = "/";
             }}
             className="scale-[0.2]">
               <Logo />
@@ -55,12 +55,10 @@ export default function EditorNav({
 
           <Link
           scroll={false} 
-          href="/projects">
+          href="#">
             <p
               onClick={()=>{
-                setTimeout(()=>{
-                  window.location.href = "/projects";
-                }, 50)
+                window.location.href = "/projects";
               }}
               className={twMerge(
                 pathname === "/projects" && "text-white",
@@ -72,12 +70,10 @@ export default function EditorNav({
           </Link>
 
           <Link  
-          href="/editor">
+          href="#">
             <p
               onClick={()=>{
-                setTimeout(()=>{
-                  window.location.href = "/projects";
-                }, 50)
+                window.location.href = "/editor";
               }}
               className={twMerge(
                 pathname.startsWith("/editor") && "text-white",

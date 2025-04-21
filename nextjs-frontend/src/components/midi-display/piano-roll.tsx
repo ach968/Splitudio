@@ -121,7 +121,7 @@ export default function PianoRoll({
     return (
       <div
         key={index}
-        className="absolute bg-neutral-200 rounded-sm border-4 border-violet-500"
+        className="absolute bg-neutral-200 rounded-sm"
         style={{
           bottom: bottom, // Clip if note starts above window
           left,
