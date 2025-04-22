@@ -82,8 +82,8 @@ def demucs_stem_splitting(req: https_fn.Request) -> https_fn.Response:
             )  # /tmp/tmp_****/htdemucs_ft
         elif model == "2-stem":
             htdemucs_dir = os.path.join(
-                output_dir, "htdemucs"
-            )  # /tmp/tmp_****/htdemucs
+                output_dir, "htdemucs_ft"
+            )  # /tmp/tmp_****/htdemucs_ft 
         else:
             htdemucs_dir = os.path.join(
                 output_dir, "htdemucs_6s"
