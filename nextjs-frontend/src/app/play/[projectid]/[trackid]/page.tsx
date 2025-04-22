@@ -96,7 +96,7 @@ export default async function Page({params} : any) {
 
   const storage = new Storage({
     projectId: 'splitudio-19e91',
-    credentials: JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}')
+    credentials: JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY!)
   });
   const bucketName = process.env.STORAGE_BUCKET!;
 
