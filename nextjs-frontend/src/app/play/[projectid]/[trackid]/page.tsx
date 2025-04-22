@@ -1,27 +1,24 @@
-
-import { cookies } from 'next/headers';
+import { cookies } from "next/headers";
 import { Storage } from "@google-cloud/storage";
 import { Midi } from "@tonejs/midi";
-import { redirect } from 'next/navigation';
-import { adminAuth, adminDb } from '@/lib/firebase/admin';
-import { Project } from '@/types/firestore';
-import Play from '@/components/midi-display/play';
+import { redirect } from "next/navigation";
+import { adminAuth, adminDb } from "@/lib/firebase/admin";
+import { Project } from "@/types/firestore";
+import Play from "@/components/midi-display/play";
 
-
-export default async function Page({params} : any) {
-
+export default async function Page({ params }: any) {
   const { projectid, trackid } = await params;
 
-  if(projectid == undefined || projectid == "" || projectid == null) {
-    redirect('/projects');
+  if (projectid == undefined || projectid == "" || projectid == null) {
+    redirect("/projects");
   }
 
-  if(trackid == undefined || trackid == ""  || projectid == null) {
-    redirect('/projects');
+  if (trackid == undefined || trackid == "" || projectid == null) {
+    redirect("/projects");
   }
-  
+
   const projectSnap = await adminDb.doc(`projects/${projectid}`).get();
-  if (!projectSnap.exists) redirect('/projects');
+  if (!projectSnap.exists) redirect("/projects");
 
   const p = projectSnap.data() as any;
 
@@ -37,12 +34,11 @@ export default async function Page({params} : any) {
     updatedAt: p.updatedAt?.toDate?.() ?? null,
   };
 
-  if(!project.uid) redirect("/projects")
+  if (!project.uid) redirect("/projects");
   const projectOwnerUid: string = project.uid;
 
-
   // Get the logged in user's cookies
-  const token = ((await cookies()).get("session")?.value);
+  const token = (await cookies()).get("session")?.value;
   if (!token) {
     return redirect("/login");
   }
@@ -67,8 +63,8 @@ export default async function Page({params} : any) {
   if (!trackSnap.exists) redirect("/projects");
 
   const track = trackSnap.data();
-  if(track == undefined) redirect("/projects")
-  
+  if (track == undefined) redirect("/projects");
+
   // Check if the midipath is set. If it isn't, we need to call firebase function
   // to convert the stem to midi.
   let midiPath = track.midiPath;
@@ -86,7 +82,10 @@ export default async function Page({params} : any) {
       }
     );
 
-    if (!cloudFunctionResponse.ok) redirect("/projects");
+    if (!cloudFunctionResponse.ok) {
+      console.log("Error calling cloud function", cloudFunctionResponse);
+      redirect("/projects");
+    }
 
     const result = await cloudFunctionResponse.json();
     midiPath = result.gcs_path;
@@ -95,8 +94,8 @@ export default async function Page({params} : any) {
   }
 
   const storage = new Storage({
-    projectId: 'splitudio-19e91',
-    credentials: JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY!)
+    projectId: "splitudio-19e91",
+    credentials: JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY!),
   });
   const bucketName = process.env.STORAGE_BUCKET!;
 
@@ -104,7 +103,7 @@ export default async function Page({params} : any) {
 
   // const midi = new Midi(buffer);
 
-  const midi = await Midi.fromUrl("http://localhost:3000/twinkle.midi")
+  const midi = await Midi.fromUrl("http://localhost:3000/twinkle.midi");
 
   // bring out the complex stuff we need
   const duration = midi.tracks[0].duration;
@@ -112,5 +111,5 @@ export default async function Page({params} : any) {
   // get rid of complex objects so next can pass ts
   const data = JSON.parse(JSON.stringify(midi));
 
-  return <Play midiData={data} duration={duration} />
+  return <Play midiData={data} duration={duration} />;
 }
