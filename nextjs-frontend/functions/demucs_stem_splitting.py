@@ -22,6 +22,9 @@ def demucs_stem_splitting(req: https_fn.Request) -> https_fn.Response:
             request_json = req.get_json()
             project_id = request_json.get("project_id")
             gcs_path = request_json.get("gcs_path")
+            model = request_json.get(
+                "model", "6-stem"
+            )  # Default to 6-stem if not provided
         else:
             return jsonify({"error": "Invalid content type"}), 400
 
@@ -41,28 +44,51 @@ def demucs_stem_splitting(req: https_fn.Request) -> https_fn.Response:
         print(torch.cuda.is_available())
         # Perform audio separation using Demucs
         output_dir = tempfile.mkdtemp()
+
+        # Determine the model name based on the 'model' parameter
+        demucs_args = [
+            "--device",
+            "cuda",
+            "--mp3",
+            "--mp3-bitrate",
+            "128",
+            "--mp3-preset",
+            "7",
+            "--out",
+            output_dir,
+            temp_path,
+        ]
+        if model == "4-stem":
+            demucs_model = "htdemucs_ft"
+            demucs_args = ["-n", demucs_model] + demucs_args
+        elif model == "2-stem":
+            demucs_model = "htdemucs_ft"
+            demucs_args = ["-n", demucs_model, "--two-stems=vocals"] + demucs_args
+        else:
+            demucs_model = "htdemucs_6s"  # Default to 6-stem
+            demucs_args = ["-n", demucs_model] + demucs_args
+
         # creates unique temporary directory for this thread
-        main(
-            [
-                "-n",
-                "htdemucs_6s",
-                "--device",
-                "cuda",
-                "--mp3",
-                "--mp3-preset",
-                "7",
-                "--out",
-                output_dir,
-                temp_path,
-            ]
-        )
+        main(demucs_args)
 
         # Collect separated files and upload them to Google Cloud Storage
         uploaded_files = []
         all_uploads_successful = True
 
         # Get the directory that contains the separated stems
-        htdemucs_dir = os.path.join(output_dir, "htdemucs_6s")  # /tmp/tmp_****/htdemucs
+        if model == "4-stem":
+            htdemucs_dir = os.path.join(
+                output_dir, "htdemucs_ft"
+            )  # /tmp/tmp_****/htdemucs_ft
+        elif model == "2-stem":
+            htdemucs_dir = os.path.join(
+                output_dir, "htdemucs"
+            )  # /tmp/tmp_****/htdemucs
+        else:
+            htdemucs_dir = os.path.join(
+                output_dir, "htdemucs_6s"
+            )  # /tmp/tmp_****/htdemucs_6s
+
         inner_dir_name = os.listdir(htdemucs_dir)[0]  # tmp_****
         inner_pathname = os.path.join(htdemucs_dir, inner_dir_name)
         print(f"Separated files located at: {inner_pathname}")
