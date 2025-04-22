@@ -15,19 +15,19 @@ const eslintConfig = [
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
     plugins: {
-      "unused-imports": unusedImports
+      "unused-imports": unusedImports,
     },
     rules: {
-      'react/no-unescaped-entities': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-expressions': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@next/next/no-page-custom-font': 'off',
-      'react-hooks/exhaustive-deps': 'off',
-      'no-var': 'off'
-    }
-  }
-  
+      "react/no-unescaped-entities": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-unused-expressions": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@next/next/no-page-custom-font": "off",
+      "react-hooks/exhaustive-deps": "off",
+      "no-var": "off",
+      "prefer-const": "off",
+    },
+  },
 ];
 
 export default eslintConfig;
