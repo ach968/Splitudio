@@ -3,12 +3,16 @@ import { adminDb } from "@/lib/firebase/admin";
 import { v4 as uuidv4 } from "uuid";
 import { Track } from "@/types/firestore";
 
-// Assume this function triggers the Cloud Function and returns an array of paths
-async function runStemSplitter(projectId: string, gcsPath: string): Promise<string[]> {
+// This function triggers the Cloud Function and returns an array of paths
+async function runStemSplitter(projectId: string, gcsPath: string, model: string): Promise<string[]> {
   const response = await fetch("https://us-central1-splitudio-19e91.cloudfunctions.net/demucs_stem_splitting", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ project_id: projectId, gcs_path: gcsPath })
+    body: JSON.stringify({ 
+      project_id: projectId, 
+      gcs_path: gcsPath,
+      model: model
+     })
   });
 
   if (!response.ok) {
@@ -44,7 +48,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Trigger Firebase Function to get stem paths
-    const stemPaths = await runStemSplitter(pid, `projects/${pid}/${projectData.fileName}`) 
+    const stemPaths = await runStemSplitter(pid, `projects/${pid}/${projectData.fileName}`, projectData.model) 
     console.log("INNER FIERBASE FUNCTION RETURNS")
     
     // 3. For each stem, create a Track document

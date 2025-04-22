@@ -16,6 +16,7 @@ export default async function Page({ params }: any) {
     pid: projectId,
     uid: d.uid,
     pName: d.pName,
+    model: d.model,
     fileName: d.fileName,
     isPublic: d.isPublic,
     originalMp3: d.originalMp3,

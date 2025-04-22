@@ -19,6 +19,7 @@ import { useAuth } from "./authContext";
 import { v4 as uuidv4 } from "uuid";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebase/firebase";
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 
 const validateFileDuration = (
   file: File,
@@ -29,7 +30,7 @@ const validateFileDuration = (
     audio.src = URL.createObjectURL(file);
     audio.addEventListener("loadedmetadata", () => {
       const duration = audio.duration;
-      const maxDuration = isPremium ? 20 * 60 : 2 * 60; // 20 minutes for premium, 2 minutes for free
+      const maxDuration = isPremium ? 20 * 60 : 5 * 60; // 20 minutes for premium, 5 minutes for free
       URL.revokeObjectURL(audio.src);
       resolve(duration <= maxDuration);
     });
@@ -40,6 +41,9 @@ const validateFileDuration = (
 };
 
 export default function Upload() {
+
+  const [selectedModel, setSelectedModel] = useState<"6-Stem" | "4-Stem" | "2-Stem">("6-Stem")
+
   // For drag and drop
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -112,7 +116,7 @@ export default function Upload() {
       const isValidDuration = await validateFileDuration(file, isPremiumUser);
       
       if (!isValidDuration) {
-        const maxAllowed = isPremiumUser ? "20 minutes" : "2 minutes";
+        const maxAllowed = isPremiumUser ? "20 minutes" : "5 minutes";
         toast({
           title: "ERROR",
           description: `Please upload a file shorter than ${maxAllowed}`,
@@ -127,6 +131,7 @@ export default function Upload() {
         pid: uuidv4(),
         uid: user?.uid || null,
         pName: "Untitiled Project",
+        model: selectedModel,
         fileName: file.name,
         isPublic: false,
       };
@@ -350,7 +355,7 @@ export default function Upload() {
                         </p>
                       ) : (
                         <p className="text-sm text-neutral-400">
-                          Max song length 2 mins. Upgrade to{" "}
+                          Max song length 5 mins. Upgrade to{" "}
                           <Link href="/profile">
                             <PremiumText />
                           </Link>
@@ -399,6 +404,71 @@ export default function Upload() {
                     )}
                   </TabsContent>
                 </Tabs>
+
+                <p
+                className="mt-5 text-white font-mono text-lg"
+                >Model:</p>
+                <div className="flex mt-2 gap-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        {
+                          selectedModel == "6-Stem" ?
+                          <div className="border border-white bg-neutral-200 rounded-md p-2">
+                            <p className="text-black text-sm">6 Stem</p>
+                          </div>
+                          :
+                          <div 
+                          onClick={()=>setSelectedModel("6-Stem")}
+                          className="border border-neutral-600 rounded-md p-2">
+                            <p className="text-neutral-400 text-sm">6 Stem</p>
+                          </div>
+                        }
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Vocal, drums, bass, guitar, piano, and other</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger>
+                          {
+                            selectedModel == "4-Stem" ?
+                            <div className="border border-white bg-neutral-200 rounded-md p-2">
+                              <p className="text-black text-sm">4 Stem (refined)</p>
+                            </div>
+                            :
+                            <div 
+                            onClick={()=>setSelectedModel("4-Stem")}
+                            className="border border-neutral-600 rounded-md p-2">
+                              <p className="text-neutral-400 text-sm">4 Stem (refined)</p>
+                            </div>
+                          }
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Vocal, drums, bass, and other. This model has the best split quality!</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        {
+                          selectedModel == "2-Stem" ?
+                          <div className="border border-white bg-neutral-200 rounded-md p-2">
+                            <p className="text-black text-sm">2 Stem</p>
+                          </div>
+                          :
+                          <div 
+                          onClick={()=>setSelectedModel("2-Stem")}
+                          className="border border-neutral-600 rounded-md p-2">
+                            <p className="text-neutral-400 text-sm">2 Stem</p>
+                          </div>
+                        }
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Vocal & instrumental</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </motion.div>
             </div>
           </div>

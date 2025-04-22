@@ -25,13 +25,15 @@ export async function storeProject(project: Project) {
   const res = await fetch("/api/set_project", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ project }),
+    body: JSON.stringify({project: project}),
   });
 
   if (!res.ok) {
     const { error } = await res.json();
     throw new Error(`set_project failed: ${error ?? res.statusText}`);
   }
+
+  return res;
 }
 
 // export async function storeProject(project: Project) {

@@ -3,6 +3,7 @@ import { adminAuth, adminDb } from "@/lib/firebase/admin";
 import { Project } from "@/types/firestore";
 
 export async function POST(req: NextRequest) {
+  
   const { pid } = await req.json();
 
   const token = req.cookies.get("session")?.value;
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
       if(decoded.uid != project.uid)
         return NextResponse.json({error: "Unauthorized"}, { status: 401 })
 
-      return NextResponse.json({ project })     
+      return NextResponse.json({ project: project })     
     }
     catch(err: any) {
       console.error("Error fetching project:", err);

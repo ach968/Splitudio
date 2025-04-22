@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Malformed request body" }, { status: 400 });
   }
 
-  // 1️ Verify user
+  // 1 Verify user
   const token = req.cookies.get("session")?.value;
   if (!token) {
     return NextResponse.json({ error: "Missing session" }, { status: 400 });
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
       });
     } else {
       // update / merge
-      await ref.set(
+      const res = await ref.set(
         { ...project, updatedAt: FieldValue.serverTimestamp() },
         { merge: true }
       );

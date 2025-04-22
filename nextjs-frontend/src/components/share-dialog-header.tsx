@@ -24,7 +24,9 @@ export default function Share({
   const user = useAuth();
   
   useEffect(()=>{
-    fetch("get_project", {
+    if(user.loading) return;
+
+    fetch("/api/get_project", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -34,15 +36,16 @@ export default function Share({
       })
     }).catch((err)=>{
       redirect("/");
-    }).then(res=>res.json()).then((p)=>{
+    }).then(res=>res.json())
+    .then((p)=>{
       if(p == undefined) return;
-      setProject(p);
-      setShared(p.isPublic);
+      setProject(p.project);
+      setShared(p.project.isPublic);
     }).finally(()=>setDisabled(false));
-  }, [])
+  }, [user])
 
   const enableShare = (status: boolean) => {
-    const prev = shared;
+    const prev = !status;
     setShared(status);
     setDisabled(true);
 
@@ -53,13 +56,12 @@ export default function Share({
       isPublic: status
     }).catch((err)=>{
       setShared(prev);
-      console.log(err)
       toast({title: "ERROR", description: "Couldn't update shared status"})
     }).finally(()=>setDisabled(false))
   };
 
   const copyLink = () => {
-    navigator.clipboard.writeText(`http://localhost:3000/editor/${project?.pid}`);
+    navigator.clipboard.writeText(`${process.env.NEXT_PUBLIC_BASE_URL}/editor/${project?.pid}`);
     toast({title: "Copied to clipboard!"})
   };
 
@@ -67,7 +69,7 @@ export default function Share({
     <DialogHeader>
       <DialogTitle>Share "{projectName}"</DialogTitle>
       {
-        user.uid === project?.uid ?
+        user?.uid === project?.uid ?
         <>
           <DialogDescription className="pb-7">
           If sharing is enabled, anyone with the link can view your project.
@@ -77,7 +79,7 @@ export default function Share({
           <Switch
             disabled={disabled}
             checked={shared}
-            onCheckedChange={enableShare}
+            onCheckedChange={(checked)=>enableShare(checked)}
             id="enable-sharing"
           />
           <Label htmlFor="enable-sharing">Enable Sharing</Label>

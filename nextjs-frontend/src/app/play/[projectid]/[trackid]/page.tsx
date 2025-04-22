@@ -26,6 +26,7 @@ export default async function Page({ params }: any) {
     pid: projectid,
     uid: p.uid,
     pName: p.pName,
+    model: p.model,
     fileName: p.fileName,
     isPublic: p.isPublic,
     originalMp3: p.originalMp3,
@@ -105,7 +106,8 @@ export default async function Page({ params }: any) {
   let midi
   // Local testing for KK
   if(process.env.NEXT_PUBLIC_BASE_URL == "http://localhost:3000")
-    midi = await Midi.fromUrl("http://localhost:3000/twinkle.midi")
+    midi = new Midi(buffer);
+    // midi = await Midi.fromUrl("http://localhost:3000/twinkle.midi")
   else
   // For prod
     midi = new Midi(buffer);

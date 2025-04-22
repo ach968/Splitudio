@@ -30,6 +30,7 @@ export default function Loading() {
             windowStart={0}
             windowDuration={3}
             isFullPiano={false}
+            playTolerance={0}
           />
         </div>
 
@@ -40,6 +41,7 @@ export default function Loading() {
             sampler={null}
             notes={new Set()}
             isFullPiano={false}
+            setPlayAlongBuffer={()=>{}}
           />
         </div>
 

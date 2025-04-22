@@ -16,6 +16,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import Link from "next/link";
+import { toast } from "@/hooks/use-toast";
 
 interface TrackProps {
   id: string;
@@ -61,6 +62,26 @@ export default function Track({
     updateVolume(id, newVolume);
   };
 
+  async function downloadStem() {
+    try {
+      const res = await fetch(`/api/audio?projectId=${encodeURIComponent(projectId)}&trackId=${encodeURIComponent(id)}`, {
+        method: 'GET',
+      });
+  
+      if (!res.ok) throw new Error('Failed to fetch audio');
+  
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+  
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${trackName}.mp3`;
+      a.click();
+
+    } catch (error) {
+      toast({title: "Download failed", description: "Something went wrong :/"})
+    }
+  }
   return (
     <div
       className={twMerge(
@@ -153,7 +174,7 @@ export default function Track({
               onSeeking={(e: any) => {
                 onUniversalSeek(e);
               }}
-              onRedrawcomplete={() => setIsRendered(true)} // TODO: SKELETON WHILE LOADING
+              onRedrawcomplete={() => setIsRendered(true)}
               onTimeupdate={(e: any) => onTimeUpdate(e)}
             />
           </div>
@@ -185,6 +206,9 @@ export default function Track({
                     size="icon"
                     className="w-9 h-9 rounded-full group"
                     variant="outline"
+                    onClick={()=>{
+                      downloadStem();
+                    }}
                   >
                     <MusicNote className="invert-0 group-hover:invert" />
                   </Button>

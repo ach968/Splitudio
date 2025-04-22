@@ -21,6 +21,9 @@ import {
 } from "@/components/ui/tooltip";
 import EditorNav from "@/components/editor-nav";
 import { Project, Track as TrackInterface } from "@/types/firestore";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { Link } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 interface TrackState {
   ws: any;
@@ -111,6 +114,27 @@ export default function Editor({project, tracks} : {project: Project, tracks: Tr
       };
     });
   };
+
+  async function downloadOriginalMp3() {
+    try {
+      const res = await fetch(`/api/audio?projectId=${encodeURIComponent(projectId)}`, {
+        method: 'GET',
+      });
+  
+      if (!res.ok) throw new Error('Failed to fetch audio');
+  
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+  
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${PROJECTNAME}.mp3`;
+      a.click();
+      
+    } catch (error) {
+      toast({title: "Download failed", description: "Something went wrong :/"})
+    }
+  }
 
   const updateTrackVolume = (id: string, newVolume: number) => {
     if (focused != null && focused != id) {
@@ -551,24 +575,41 @@ export default function Editor({project, tracks} : {project: Project, tracks: Tr
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-
+                  
+                  
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="w-7 h-7 group"
-                          // TODO: On click
-                        >
-                          <SettingsSVG className="invert-0 group-hover:invert" />
-                        </Button>
+                        <Dialog>
+                          <DialogTrigger>
+                            <Button
+                            size="icon"
+                            variant="ghost"
+                            className="w-7 h-7 group"
+                            >
+                              <SettingsSVG className="invert-0 group-hover:invert" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogTitle>
+                              <h3
+                              className="text-xl"
+                              >Settings</h3>
+                            </DialogTitle>
+                            <p
+                            onClick={()=>downloadOriginalMp3()}
+                            className="text-neutral-700 underline hover:cursor-pointer"
+                            >Download original mp3
+                            </p>
+                          </DialogContent>
+                        </Dialog>                        
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Settings</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
+                  
                 </div>
               </div>
             </div>
