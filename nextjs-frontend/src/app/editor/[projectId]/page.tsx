@@ -52,7 +52,7 @@ export default async function Page({ params } : any) {
 
   // Check if we need to split stems
   if(!project.trackIds) {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
     await fetch(
       `${baseUrl}/api/register_project`,
