@@ -1,13 +1,11 @@
 
-import { cookies, headers } from 'next/headers';
+import { cookies } from 'next/headers';
 import { Storage } from "@google-cloud/storage";
 import { Midi } from "@tonejs/midi";
 import { redirect } from 'next/navigation';
-import PlayWrapper from '@/components/midi-display/playwrapper';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
-import { CloudFile, Project } from '@/types/firestore';
-import { fetchCloudFiles } from '@/lib/utils';
-import { collection, doc, getDocs } from 'firebase/firestore';
+import { Project } from '@/types/firestore';
+import Play from '@/components/midi-display/play';
 
 
 export default async function Page({params} : any) {
@@ -58,12 +56,8 @@ export default async function Page({params} : any) {
 
   // Compare the UIDs
   if (project.isPublic == false && decoded.uid !== projectOwnerUid) {
-    console.log(decoded.uid)
-    console.log(projectOwnerUid)
     return redirect("/projects");
   }
-
-  
 
   // ID check passed, we are good to download / start conversion
 
@@ -108,9 +102,9 @@ export default async function Page({params} : any) {
 
   const [buffer] = await storage.bucket(bucketName).file(midiPath).download();
 
-  const midi = new Midi(buffer);
-  // const path = getPath("bababooey", "https://storage.cloud.google.com/splitudio-19e91.firebasestorage.app/projects/bababooey/no_vocals.mp3");
-  // const midi = await getMidiData("projects/bababooey/no_vocals_basic_pitch.mid");
+  // const midi = new Midi(buffer);
+
+  const midi = await Midi.fromUrl("http://localhost:3000/twinkle.midi")
 
   // bring out the complex stuff we need
   const duration = midi.tracks[0].duration;
@@ -118,5 +112,5 @@ export default async function Page({params} : any) {
   // get rid of complex objects so next can pass ts
   const data = JSON.parse(JSON.stringify(midi));
 
-  return <PlayWrapper midiData={data} duration={duration} />
+  return <Play midiData={data} duration={duration} />
 }

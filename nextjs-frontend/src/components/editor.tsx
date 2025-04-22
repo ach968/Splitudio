@@ -20,9 +20,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import EditorNav from "@/components/editor-nav";
-import { useParams } from "next/navigation";
-import { getProject } from "@/lib/utils";
-import { Project } from "@/types/firestore";
+import { Project, Track as TrackInterface } from "@/types/firestore";
 
 interface TrackState {
   ws: any;
@@ -31,50 +29,39 @@ interface TrackState {
 
 const trackList = [
   {
-    id: "track-id-1",
-    fileUrl: "/vocals.wav",
-    trackName: "Vocal",
+    trackName: "Vocals",
     waveColor: "#fb2c36",
     className: "border-red-400 shadow-[0px_0px_50px_#fb2c3633]",
   },
   {
-    id: "track-id-2",
-    fileUrl: "/drums.wav",
-    trackName: "Drums",
+    trackName: "Piano",
     waveColor: "#f97316",
     className: "border-orange-500 shadow-[0px_0px_50px_#f9731633]",
   },
   {
-    id: "track-id-3",
-    fileUrl: "/bass.wav",
-    trackName: "Bass",
+    trackName: "Guitar",
     waveColor: "#facc15",
     className: "border-yellow-400 shadow-[0px_0px_50px_#facc1533]",
   },
   {
-    id: "track-id-4",
-    fileUrl: "/other.wav",
-    trackName: "Guitar",
+    trackName: "Bass",
     waveColor: "#4ade80",
     className: "border-green-400 shadow-[0px_0px_50px_#4ade8033]",
   },
   {
-    id: "track-id-5",
-    fileUrl: "/vocals.wav",
-    trackName: "Piano",
+    trackName: "Drums",
     waveColor: "#60a5fa",
     className: "border-blue-400 shadow-[0px_0px_50px_#60a5fa33]",
   },
   {
-    id: "track-id-6",
-    fileUrl: "/drums.wav",
     trackName: "Other",
     waveColor: "#a78bfa",
     className: "border-violet-400 shadow-[0px_0px_50px_#a78bfa33]",
   },
 ];
 
-export default function Editor({project} : {project: Project}) {
+export default function Editor({project, tracks} : {project: Project, tracks: TrackInterface[]}) {
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [trackStates, setTrackStates] = useState<Record<string, TrackState>>({});
   const [currentTime, setCurrentTime] = useState(0);
@@ -86,7 +73,7 @@ export default function Editor({project} : {project: Project}) {
   const [focused, setFocused] = useState<string | null>(null);
 
   // This is all for highlighting a section
-  const MINWIDTH = 2;
+  const MINWIDTH = 1;
   const [isSelecting, setIsSelecting] = useState(false);
   const [start, setStart] = useState<number | null>(null);
   const [end, setEnd] = useState<number | null>(null);
@@ -106,10 +93,6 @@ export default function Editor({project} : {project: Project}) {
   const PROJECTNAME = project.pName;
   const FILENAME = project.fileName;
   
-  useEffect(()=>{
-    console.log(project)
-  },[])
-
   useEffect(() => {
     if (containerRef.current && wrapperRef.current) {
       const containerRect = wrapperRef.current?.getBoundingClientRect();
@@ -231,7 +214,7 @@ export default function Editor({project} : {project: Project}) {
   const selectEnd = () => {
     if (!containerRef.current) return;
 
-    var newEnd;
+    let newEnd;
     const ws = Object.values(trackStates).find(({ ws }) => ws)?.ws;
     if (ws) {
       newEnd = ws.getCurrentTime();
@@ -247,7 +230,7 @@ export default function Editor({project} : {project: Project}) {
   };
 
   const onTimeUpdate = (e: any) => {
-    var curr = e.media.currentTime;
+    const curr = e.media.currentTime;
     if (manualSelecting == true) {
       setEnd(curr);
     }
@@ -374,7 +357,6 @@ export default function Editor({project} : {project: Project}) {
       <div className="w-screen flex h-screen bg-black">
         <div className="flex flex-col justify-start w-full h-full">
           <EditorNav
-            pauseCallback={onUniversalPause}
             projectName={PROJECTNAME}
             projectId={projectId}
           ></EditorNav>
@@ -382,9 +364,11 @@ export default function Editor({project} : {project: Project}) {
           <div className="mt-20 mb-3 flex w-full justify-center">
             <div className="container px-5">
               <div className=" flex gap-3 place-items-baseline">
-                <p className="text-2xl lg:text-3xl font-semibold text-white truncate">
+                <p
+                className="text-2xl lg:text-3xl font-semibold text-white truncate">
                   {PROJECTNAME}
                 </p>
+                
                 <p className="text-base text-neutral-400 truncate">
                   / {FILENAME}
                 </p>
@@ -414,29 +398,33 @@ export default function Editor({project} : {project: Project}) {
                   waveformOffset={waveformOffset}
                   minWidth={MINWIDTH}
                 />
+                {trackList.map(({ trackName, waveColor, className }) => {
+                  const matchedTrack = tracks.find((t) =>
+                    t.instrument.toLowerCase() === trackName.toLowerCase()
+                  );
 
-                {trackList.map((track) => (
-                  <Track
-                    projectId={projectId}
-                    key={track.id}
-                    id={track.id}
-                    className={track.className}
-                    fileUrl={track.fileUrl}
-                    trackName={track.trackName}
-                    waveColor={track.waveColor}
-                    registerWaveSurfer={registerWaveSurfer}
-                    onUniversalSeek={onUniversalSeek}
-                    setIsPlaying={setIsPlaying}
-                    volume={
-                      trackStates[track.id] ? trackStates[track.id].volume : 1
-                    }
-                    updateVolume={updateTrackVolume}
-                    focused={focused}
-                    setFocused={setFocusedLayer}
-                    waveformContainerRef={containerRef} // Sets container ref on the waveform
-                    onTimeUpdate={onTimeUpdate}
-                  />
-                ))}
+                  if (!matchedTrack) return null;
+
+                  return (
+                    <Track
+                      key={matchedTrack.trackId}
+                      projectId={projectId}
+                      id={matchedTrack.trackId}
+                      className={className}
+                      trackName={trackName}
+                      waveColor={waveColor}
+                      registerWaveSurfer={registerWaveSurfer}
+                      onUniversalSeek={onUniversalSeek}
+                      setIsPlaying={setIsPlaying}
+                      volume={trackStates[matchedTrack.trackId]?.volume ?? 1}
+                      updateVolume={updateTrackVolume}
+                      focused={focused}
+                      setFocused={setFocusedLayer}
+                      waveformContainerRef={containerRef}
+                      onTimeUpdate={onTimeUpdate}
+                    />
+                  );
+                })}
               </div>
             </div>
           </div>

@@ -4,10 +4,11 @@ import { Button } from "./ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { useEffect, useState } from "react";
-import { getProject, storeProject } from "@/lib/utils";
+import { storeProject } from "@/lib/utils";
 import { Project } from "@/types/firestore";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "./authContext";
+import { redirect } from "next/navigation";
 
 export default function Share({
   projectId,
@@ -23,15 +24,25 @@ export default function Share({
   const user = useAuth();
   
   useEffect(()=>{
-    getProject(projectId).then((project)=>{
-      if(project == undefined) return;
-      setProject(project)
-      setShared(project.isPublic);
-    }).finally(()=>setDisabled(false))
+    fetch("get_project", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        pid: projectId
+      })
+    }).catch((err)=>{
+      redirect("/");
+    }).then(res=>res.json()).then((p)=>{
+      if(p == undefined) return;
+      setProject(p);
+      setShared(p.isPublic);
+    }).finally(()=>setDisabled(false));
   }, [])
 
   const enableShare = (status: boolean) => {
-    var prev = shared;
+    const prev = shared;
     setShared(status);
     setDisabled(true);
 

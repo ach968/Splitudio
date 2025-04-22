@@ -50,7 +50,7 @@ export default function Upload() {
 
   useEffect(()=>{
     if(user?.uid)
-      getCustomer((user.uid)).then((customer: Customer | undefined)=>{
+      getCustomer().then((customer: Customer | undefined)=>{
         if(!customer) return;
           if(customer.subscriptionStatus == "active") setIsPremiumUser(true); 
       })
@@ -86,6 +86,7 @@ export default function Upload() {
   const handleFiles = async (files: FileList) => {
     try {
       setUploadProgress(0);
+
       if (files.length !== 1) {
         toast({
           title: "ERROR",
@@ -173,10 +174,6 @@ export default function Upload() {
           };
 
           try {
-            toast({
-              title: "Uploading",
-              description: "Uploading ...",
-            });
             await storeCloudFile(newProject.pid, cloudFile);
             
           } catch(error: any) {
@@ -188,35 +185,10 @@ export default function Upload() {
             setUploadProgress(null);
             setFileName(null);
           }
-          try{
-            toast({
-              title: "Splitting your song ...",
-            });
-            await fetch(
-              "/api/register_project",
-              {
-                method: "POST",
-                body: JSON.stringify({
-                  pid: newProject.pid
-                })
-              }
-            )
-            .then((res) => {
-              if(!res.ok) throw new Error("Internal server error");
-            })
-            .then(()=> {
-              setUploadProgress(null);
-              redirect(`/editor/${newProject.pid}`);
-            })
-          } catch (error: any) {
-            console.error("Failed to split song", error);
-            toast({
-              title: "ERROR",
-              description: "Failed to split your song: " + error.message,
-            });
-            setUploadProgress(null);
-            setFileName(null);
-          }
+
+          setTimeout(()=>{
+            redirect(`/editor/${newProject.pid}`);
+          }, 300)
         }
       );
     } catch (err: any) {
@@ -266,6 +238,25 @@ export default function Upload() {
 
   // Open file explorer when clicking the drop area
   const handleClick = () => {
+    
+    // WARM UP FUNCTIONS
+    try{
+      fetch("https://us-central1-splitudio-19e91.cloudfunctions.net/demucs_stem_splitting", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.parse(JSON.stringify({}))
+      });
+      fetch("https://us-central1-splitudio-19e91.cloudfunctions.net/mp3_to_midi", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.parse(JSON.stringify({}))
+      });
+    }
+    catch(err) {
+      // Do nothing
+    }
+    
+
     fileInputRef.current?.click();
   };
 

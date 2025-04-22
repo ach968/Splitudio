@@ -1,6 +1,5 @@
 "use client";
 
-import Logo from "@/components/logo";
 import Footer from "@/components/footer";
 import Topbar from "@/components/topbar";
 import Hero from "@/components/home/hero";

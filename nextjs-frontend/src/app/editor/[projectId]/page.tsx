@@ -1,8 +1,8 @@
 import Editor from "@/components/editor";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { adminDb, adminAuth } from '@/lib/firebase/admin';
-import { Project } from "@/types/firestore";
+import { Project, Track } from "@/types/firestore";
 
 
 export default async function Page({ params } : any) {
@@ -21,7 +21,7 @@ export default async function Page({ params } : any) {
     fileName: d.fileName,
     isPublic: d.isPublic,
     originalMp3: d.originalMp3,
-    trackIds: d.tracks ?? null,
+    trackIds: d.trackIds,
     createdAt: d.createdAt?.toDate?.() ?? null,
     updatedAt: d.updatedAt?.toDate?.() ?? null,
   };
@@ -44,13 +44,11 @@ export default async function Page({ params } : any) {
     return redirect("/login");
   }
 
-  console.log(decoded.uid)
-  console.log(projectOwnerUid)
-
   // Compare the UIDs
   if (project.isPublic == false && decoded.uid !== projectOwnerUid) {
     return redirect("/projects");
   }
+
 
   // Check if we need to split stems
   if(!project.trackIds) {
@@ -75,9 +73,28 @@ export default async function Page({ params } : any) {
     const updatedProject = newSnap.data() as Project;
     updatedProject.pid = projectId;
 
-    return <Editor project={updatedProject} />
+    updatedProject.updatedAt = undefined;
+    updatedProject.createdAt = undefined;
+
+    const trackDocs = await Promise.all(
+      updatedProject.trackIds!.map(async (trackId: string) => {
+        const trackSnap = await adminDb.doc(`tracks/${trackId}`).get();
+        return {...(trackSnap.data() as Track) };
+      })
+    );
+
+    return <Editor project={updatedProject} tracks={trackDocs} />
   }
 
-  return <Editor project={project} />;
+  const trackDocs = await Promise.all(
+    project.trackIds.map(async (trackId: string) => {
+      const trackSnap = await adminDb.doc(`tracks/${trackId}`).get();
+      return { ...(trackSnap.data() as Track) };
+    })
+  );
+
+  project.updatedAt = undefined;
+  project.createdAt = undefined;
+  return <Editor project={project} tracks={trackDocs} />;
 }
 

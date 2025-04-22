@@ -6,7 +6,7 @@ import { Button } from "./ui/button";
 import { twMerge } from "tailwind-merge";
 import SheetMusic from "@/assets/sheet-music";
 import MusicNote from "@/assets/music-note";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import {
@@ -21,7 +21,6 @@ interface TrackProps {
   id: string;
   projectId: string;
   focused: string | null; // id of the track that is focused
-  fileUrl: string;
   waveColor: string;
   trackName: string;
   className: string;
@@ -38,7 +37,6 @@ interface TrackProps {
 export default function Track({
   id,
   projectId,
-  fileUrl,
   waveColor,
   trackName,
   className,
@@ -205,7 +203,13 @@ export default function Track({
                   variant="outline"
                 >
                   <Link href={`/play/${projectId}/${id}`}>
-                    <p>play midi</p>
+                    <p
+                    onClick={()=>{
+                      setTimeout(()=>{
+                        window.location.href=`/play/${projectId}/${id}`
+                      },50)
+                    }}
+                    >play midi</p>
                   </Link>
                 </Button>
               </TooltipTrigger>

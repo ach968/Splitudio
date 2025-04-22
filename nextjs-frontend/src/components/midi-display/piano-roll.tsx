@@ -44,7 +44,7 @@ export default function PianoRoll({
 
     // Watch for container resizes
     const resizeObserver = new ResizeObserver((entries) => {
-      for (let entry of entries) {
+      for (const entry of entries) {
         setDimensions({
           width: entry.contentRect.width,
           height: entry.contentRect.height,
@@ -74,7 +74,7 @@ export default function PianoRoll({
           return (
             <div
               key={index}
-              className="absolute bg-neutral-200 rounded-sm"
+              className="absolute bg-neutral-200 rounded-sm border-4 border-green-500"
               style={{
                 bottom: bottom,
                 left,
@@ -89,7 +89,7 @@ export default function PianoRoll({
           return (
             <div
               key={index}
-              className="absolute bg-green-500 rounded-sm"
+              className="absolute bg-green-500 rounded-sm border-4 border-neutral-200"
               style={{
                 bottom: bottom,
                 left,
@@ -105,7 +105,7 @@ export default function PianoRoll({
       return (
         <div
           key={index}
-          className="absolute bg-neutral-500 rounded-sm"
+          className="absolute bg-neutral-700 rounded-sm border-4 border-violet-900"
           style={{
             bottom: bottom, // Clip if note starts above window
             left,

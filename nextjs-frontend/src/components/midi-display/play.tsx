@@ -1,7 +1,7 @@
 "use client";
 
 import PianoRoll from "@/components/midi-display/piano-roll";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Midi } from "@tonejs/midi";
 import { Slider } from "../ui/slider";
 import Footer from "../footer";
@@ -15,8 +15,6 @@ import Knob from "./knob";
 import { useMicrophone } from "./use-microphone";
 import MicrophoneSVG from "@/assets/microphone";
 import HeadphoneSVG from "@/assets/headphone";
-import { useMIDIInputs, useMIDINotes } from "@react-midi/hooks";
-import { MIDINote } from "@react-midi/hooks/dist/types";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import LoopSVG from "@/assets/loop";
 import BackwardSVG from "@/assets/backward";
@@ -24,7 +22,7 @@ import PauseSVG from "@/assets/pause";
 import PlaySVG from "@/assets/play";
 import ForwardSVG from "@/assets/forward";
 import SettingsSVG from "@/assets/settings";
-import { MidiNote } from "tone/build/esm/core/type/NoteUnits";
+import {WebMidi} from 'webmidi';
 
 interface Note {
   midi: number; // e.g., 60 for middle C
@@ -53,42 +51,58 @@ export default function Play({
   const MAX_WINDOW_SIZE = 20;
 
   const [playAlong, setPlayAlong] = useState(false);
-  const [micOrMidi, setMicOrMidi] = useState("mic");
-
-  const micEnabled = playAlong && micOrMidi === "mic";
-  const midiEnabled = playAlong && micOrMidi === "midi";
+  const [micOrMidi, setMicOrMidi] = useState("midi");
 
   const { fftData, midiUtils } = useMicrophone();
+
+  const handleNoteOn = (e: any) => {
+    setActiveNotes((prev) => {
+      const updated = new Map(prev);
+      updated.set(e.note.number, e.note);
+      return updated;
+    });
+  };
+  
+  const handleNoteOff = (e: any) => {
+    setActiveNotes((prev) => {
+      const updated = new Map(prev);
+      updated.delete(e.note.number);
+      return updated;
+    });
+  };
+
+  useEffect(() => {
+    let input: any;
+
+    WebMidi.enable()
+      .then(() => {
+        console.log(WebMidi.inputs);
+        input = WebMidi.inputs[0];
+
+        if (!input) return;
+
+        input.addListener("noteon", "all", handleNoteOn);
+
+        input.addListener("noteoff", "all", handleNoteOff);
+      })
+      .catch((err: any) =>
+        console.error("WebMidi could not be enabled.", err)
+      );
     
-  const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
-  const rawMidiNotes = useMIDINotes({ channel: 1 })
+    return () => {
+      if (input) {
+        input.removeListener("noteon", "all", handleNoteOn);
+        input.removeListener("noteoff", "all", handleNoteOff);
+      }
+    };
+  }, []);
+
   const [activeNotes, setActiveNotes] = useState<Map<number, any>>(new Map());
 
   useEffect(()=>{
-    console.log(inputs.length)
-  },[inputs])
-
-  useEffect(()=>{
     console.log(activeNotes)
-  }, [activeNotes])
+  },[activeNotes])
 
-  useEffect(()=>{
-    console.log(rawMidiNotes)
-
-    setActiveNotes((prev) => {
-      const r = new Map(prev);
-
-      rawMidiNotes.forEach((n) => {
-        if(n.velocity > 0)
-          r.set(n.note, n)
-        else 
-          r.delete(n.note)
-      })
-
-      return r;
-    })
-
-  }, [rawMidiNotes])
 
   // Calculate what notes are visible in the time window
   const notes = noteWindow(midiData, currentTime, WINDOW_SIZE);
@@ -210,7 +224,7 @@ export default function Play({
         ) &&
         Math.abs(note.time - currentTime) < TOLERANCE
       ) {
-        if (playAlong == false)
+        if (playAlong == false || playAlong == true)
           sampler.current?.triggerAttackRelease(
             note.name,
             (note.duration * 1/playbackSpeedRef.current),
@@ -295,7 +309,7 @@ export default function Play({
         const id = `${note.name}-${note.time}-${note.duration}-${note.midi}`;
         
         activeNotes.forEach((obj)=>{
-          if(obj.note == note.midi && obj.velocity > 0) {
+          if(obj.number == note.midi) {
             newPlayAlongBuffer.set(id, true);
           }
         })
@@ -304,12 +318,12 @@ export default function Play({
       activeNotes.forEach((obj) => {
         // Check if there's already an entry for this MIDI note in the buffer.
         const exists = Array.from(newPlayAlongBuffer.keys()).some((key) =>
-          key.endsWith(`-${obj.note}`)
+          key.endsWith(`-${obj.number}`)
         );
 
         if (!exists) { 
           // Add with the correct state.
-          newPlayAlongBuffer.set(`unknown-0-0-${obj.note}`, false);
+          newPlayAlongBuffer.set(`unknown-0-0-${obj.number}`, false);
         }
       });
       console.log(newPlayAlongBuffer)
@@ -365,7 +379,8 @@ export default function Play({
 
   return (
     <section>
-      <EditorNav projectId="id" projectName="Untitled Project" pauseCallback={pause} />
+      <EditorNav/>
+      
       <div className="flex flex-col w-full min-h-screen h-screen bg-black text-white p-6">
         <div
           className="w-full h-full overflow-y-auto"
@@ -381,7 +396,7 @@ export default function Play({
           />
         </div>
 
-        <div className="w-full h-20">
+        <div className="w-full h-32">
           <Piano
             notes={buffer}
             playAlongBuffer={playAlongBuffer}
@@ -434,7 +449,7 @@ export default function Play({
                     })}
                     size="icon" 
                     variant="ghost" 
-                    className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
+                    className="flex items-center pt-5 justify-center text-lg p-3 w-[12px] h-[12px]">
                       -
                     </Button>
                        
@@ -636,24 +651,6 @@ export default function Play({
           </div>
         </div>
       </div>
-      {/* {
-            fftData && fftData.length &&
-            <LineChart
-            // xAxis={[{ data: [fftData.map((_, i) => i)].splice(0, 100)}]}
-            yAxis={[{ min: 0, max: 255 }]}
-            series={[
-                {
-                    data: [...fftData!].splice(0, 500),
-                    area:false,
-                    showMark: false,
-                    stack: "total"
-                },
-            ]}
-            width={900}
-            height={300}
-            skipAnimation
-            />
-        } */}
 
       <Footer />
     </section>

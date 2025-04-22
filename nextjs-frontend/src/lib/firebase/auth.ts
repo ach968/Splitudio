@@ -3,7 +3,6 @@ import {
   signInWithPopup,
   onAuthStateChanged as _onAuthStateChanged,
   signOut as _signOut,
-  signInWithEmailAndPassword as _signInWithEmailAndPassword,
   UserCredential,
   User,
   NextOrObserver,
@@ -17,7 +16,6 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { app, auth } from "@/lib/firebase/firebase";
-import { Customer } from "@/types/firestore";
 
 const db = getFirestore(app);
 

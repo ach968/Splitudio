@@ -33,9 +33,9 @@ export default function Piano({
 
   // Encoded:
   // ${note.name}-${note.time}-${note.duration}-${note.midi}
-  var activeMidis: Set<number> = new Set();
-  var upcomingMidis: Set<number> = new Set();
-  var playingMidis: Set<number> = new Set();
+  let activeMidis: Set<number> = new Set();
+  let upcomingMidis: Set<number> = new Set();
+  let playingMidis: Set<number> = new Set();
 
   // Always calculate activeMidis
   activeMidis = new Set(
@@ -66,10 +66,10 @@ export default function Piano({
       return `linear-gradient(to bottom, #DD7DDFAA, #E1CD86AA, #BBCB92AA, #71C2EFAA, #3BFFFFAA, #DD7DDFAA), ${baseColor}`;
     } else {
       // playAlong == true
-      var ret;
+      let ret;
 
       if (upcomingMidis.has(midi)) {
-        ret = `linear-gradient(to bottom, #fde047, transparent), ${baseColor}`;
+        ret = `linear-gradient(to bottom, #fb923c, transparent), ${baseColor}`;
       }
       if (upcomingMidis.has(midi) && playingMidis.has(midi)) {
         ret = `linear-gradient(to bottom, #22c55e, transparent), ${baseColor}`;
@@ -88,8 +88,6 @@ export default function Piano({
     if (playAlong == false) {
       if (activeMidis.has(midi)) {
         return "0 -5px 10px #F87BFF33, 0 -10px 15px #FB92CF44, 0 -15px 20px #FFDD9B55, 0 -20px 25px #C2F0B166, 0 -25px 30px #2FD8FE77";
-      } else {
-        return "";
       }
     } else {
       // playAlong == true
@@ -105,7 +103,7 @@ export default function Piano({
 
     // Watch for container resizes
     const resizeObserver = new ResizeObserver((entries) => {
-      for (let entry of entries) {
+      for (const entry of entries) {
         setDimensions({
           width: entry.contentRect.width,
         });
@@ -119,15 +117,18 @@ export default function Piano({
   return (
     <div
       ref={containerRef}
-      className="relative bg-black"
-      style={{ width: "100%", height: "100%" }}
+      className="relative bg-white"
+      style={{ 
+        width: "100%", 
+        height: "100%" 
+      }}
     >
       {Array.from({ length: KEY_COUNT }, (_, idx) => {
         const midi = MIN_MIDI + idx;
         return (
           <div
             key={midi}
-            className="absolute h-full border-black border rounded-sm hover:cursor-pointer select-none"
+            className="absolute rounded-b-md hover:cursor-pointer select-none"
             onPointerDown={() => {
               sampler?.triggerAttack(midi, undefined, 5);
             }}
@@ -135,6 +136,7 @@ export default function Piano({
               sampler?.triggerRelease(midi);
             }}
             style={{
+              height: isBlackKey(midi) ? "70%" : "100%",
               left: idx * KEY_WIDTH,
               width: KEY_WIDTH,
               background: getKeyColor(midi),

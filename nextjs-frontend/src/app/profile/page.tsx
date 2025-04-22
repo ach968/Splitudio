@@ -1,7 +1,5 @@
 "use client";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Footer from "@/components/footer";
@@ -20,7 +18,7 @@ export default function Profile() {
 
   useEffect(()=>{
     if(user.loading == false && user.uid) {
-      getCustomer(user.uid).then((customer : Customer | undefined)=>{
+      getCustomer().then((customer : Customer | undefined)=>{
         if(!customer) return;
 
         setCus(customer);
@@ -91,7 +89,7 @@ export default function Profile() {
                       // Placeholder, pls make the server do this
                       onClick={()=>{
                         setCus((prev) =>{
-                          var newcus = {...prev} as Customer
+                          const newcus = {...prev} as Customer
                           if(newcus.uid){
                             newcus.subscriptionStatus = "active"
                           }
@@ -129,7 +127,7 @@ export default function Profile() {
                     // Placeholder, pls make the server do this
                     onClick={()=>{
                       setCus((prev) =>{
-                        var newcus = {...prev} as Customer
+                        const newcus = {...prev} as Customer
                         if(newcus.uid){
                           newcus.subscriptionStatus = "none"
                         }

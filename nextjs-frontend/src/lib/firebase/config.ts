@@ -8,11 +8,14 @@ const config = {
 };
 
 // When deployed, there are quotes that need to be stripped
-Object.keys(config).forEach((key) => {
-  const configValue = config[key] + "";
-  if (configValue.charAt(0) === '"') {
-    config[key] = configValue.substring(1, configValue.length - 1);
-  }
-});
+const sanitizedConfig = Object.fromEntries(
+  Object.entries(config).map(([key, value]) => {
+    const stringVal = String(value);
+    if (stringVal.startsWith('"') && stringVal.endsWith('"')) {
+      return [key, stringVal.slice(1, -1)];
+    }
+    return [key, stringVal];
+  })
+);
 
-export const firebaseConfig = config;
+export const firebaseConfig = sanitizedConfig;

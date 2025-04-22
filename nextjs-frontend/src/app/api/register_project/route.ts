@@ -1,19 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
 import { v4 as uuidv4 } from "uuid";
-import { Project } from "@/types/firestore";
+import { Track } from "@/types/firestore";
 
 // Assume this function triggers the Cloud Function and returns an array of paths
-async function runStemSplitter(projectId: string): Promise<string[]> {
+async function runStemSplitter(projectId: string, gcsPath: string): Promise<string[]> {
   const response = await fetch("https://us-central1-splitudio-19e91.cloudfunctions.net/demucs_stem_splitting", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ project_id: projectId })
+    body: JSON.stringify({ project_id: projectId, gcs_path: gcsPath })
   });
 
   if (!response.ok) {
-    console.log(response.statusText)
-    console.log(await response.json())
     throw new Error("Failed to split stems");
   }
 
@@ -22,6 +20,9 @@ async function runStemSplitter(projectId: string): Promise<string[]> {
 }
 
 export async function POST(req: NextRequest) {
+
+  console.log("REGISTERING PROJECT")
+
   const { pid } = await req.json();
 
   if (!pid) {
@@ -43,8 +44,9 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Trigger Firebase Function to get stem paths
-    const stemPaths = await runStemSplitter(pid); 
-
+    const stemPaths = await runStemSplitter(pid, `projects/${pid}/${projectData.fileName}`) 
+    console.log("INNER FIERBASE FUNCTION RETURNS")
+    
     // 3. For each stem, create a Track document
     const trackIds: string[] = [];
 
@@ -52,17 +54,22 @@ export async function POST(req: NextRequest) {
       const trackId = uuidv4();
       const trackRef = adminDb.doc(`tracks/${trackId}`);
 
-      const trackRecord = {
+      // Extract instrument name
+      const parts = stemPath.split("/");
+      const fileName = parts[parts.length - 1];
+      const instrument = fileName.replace(/\.[^/.]+$/, "");
+
+      const trackRecord: Track = {
+        instrument: instrument,
         trackId: trackId,
         stemPath: stemPath,
-        midiPath: undefined,
-        sheetMusicPath: undefined,
       };
 
-      await trackRef.set(trackRecord);
+      await trackRef.set(trackRecord)
       trackIds.push(trackId);
     }
 
+    
     // 4. Update the project with trackIds
     await projectRef.update({
       trackIds: trackIds,
@@ -72,7 +79,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, trackIds });
   } catch (err: any) {
-    console.error("Error in /api/register_project:", err);
-    return NextResponse.json({ error: err.message || "Internal error" }, { status: 500 });
+    console.log(err)
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

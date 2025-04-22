@@ -1,5 +1,4 @@
-import { User } from "firebase/auth";
-import { FieldValue, serverTimestamp, Timestamp } from "firebase/firestore";
+import { FieldValue, Timestamp } from "firebase/firestore";
 
 export interface CloudFile { 
   fid: string; 
@@ -24,9 +23,10 @@ export interface Project {
 
 export interface Track {
   trackId: string;
+  instrument: string
   stemPath?: string // PATH TO SPLIT MP3 STEM
   midiPath?: string // PATH TO MIDI
-  sheetMusicPath: string // PATH TO SHEET MUSIC
+  sheetMusicPath?: string // PATH TO SHEET MUSIC
 }
 
 export interface Customer {

@@ -25,15 +25,14 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import Share from "./share-dialog-header";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import EnterSVG from "@/assets/enter";
 import { Button } from "./ui/button";
-import Topbar from "./topbar";
 import EditorNav from "./editor-nav";
 import { Project } from "@/types/firestore";
 import { FieldValue, Timestamp } from "firebase/firestore";
-import { deleteProject, storeProject } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { storeProject } from "@/lib/utils";
 
 export default function Projects({
   initialProjects,
@@ -71,7 +70,6 @@ export default function Projects({
   // used to autofocus rename Input field because react DOM is stupid
   const inputElement = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
-    console.log("renaming:" + renaming);
     if (renaming && inputElement.current != null) {
       setTimeout(() => {
         inputElement.current?.focus();
@@ -88,7 +86,7 @@ export default function Projects({
   // Create a sorted copy based on the active sort:
   // If dateDown is not null, sort by updatedAt.
   // Else if alphabeticalDown is not null, sort by pName.
-  let sortedProjects = [...filteredProjects];
+  const sortedProjects = [...filteredProjects];
   if (dateDown !== null) {
     sortedProjects.sort((a, b) => {
       const dateA = new Date(toMillis(a.updatedAt));
@@ -122,7 +120,7 @@ export default function Projects({
 
       projects.forEach((p)=>{
         if(p.pid === projectId) {
-          var toUpdate: Project = {...p};
+          const toUpdate: Project = {...p};
           toUpdate.pName = newName
           storeProject(toUpdate)
         }
@@ -132,7 +130,6 @@ export default function Projects({
     } catch (error) {
       toast({title: "Error", description: "Could not rename project"})
     } finally {
-      
       setRenaming(null);
       setNewName("");
     }
@@ -141,13 +138,16 @@ export default function Projects({
   function handleDeleteProject(p: Project) {
     setProjects((prev)=>prev.filter((proj) => proj.pid !== p.pid))
 
-    deleteProject(p).catch((err)=> {
+    fetch("/api/delete_project", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pid: p.pid }),
+    }).catch((err)=>{
+      setProjects((prev)=>[...prev, p])
       toast({
         title: "ERROR: Could not delete project.",
         description: err
       });
-
-      setProjects((prev)=>[...prev, p]);
     })
   }
 
