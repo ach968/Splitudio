@@ -42,7 +42,7 @@ const validateFileDuration = (
 
 export default function Upload() {
 
-  const [selectedModel, setSelectedModel] = useState<"6-Stem" | "4-Stem" | "2-Stem">("6-Stem")
+  const [selectedModel, setSelectedModel] = useState<"6-stem" | "4-stem" | "2-stem">("6-stem")
 
   // For drag and drop
   const [dragActive, setDragActive] = useState(false);
@@ -413,13 +413,13 @@ export default function Upload() {
                     <Tooltip>
                       <TooltipTrigger>
                         {
-                          selectedModel == "6-Stem" ?
+                          selectedModel == "6-stem" ?
                           <div className="border border-white bg-neutral-200 rounded-md p-2">
                             <p className="text-black text-sm">6 Stem</p>
                           </div>
                           :
                           <div 
-                          onClick={()=>setSelectedModel("6-Stem")}
+                          onClick={()=>setSelectedModel("6-stem")}
                           className="border border-neutral-500 rounded-md p-2">
                             <p className="text-neutral-400 text-sm">6 Stem</p>
                           </div>
@@ -432,13 +432,13 @@ export default function Upload() {
                     <Tooltip>
                       <TooltipTrigger>
                           {
-                            selectedModel == "4-Stem" ?
+                            selectedModel == "4-stem" ?
                             <div className="border border-white bg-neutral-200 rounded-md p-2">
                               <p className="text-black text-sm">4 Stem (refined)</p>
                             </div>
                             :
                             <div 
-                            onClick={()=>setSelectedModel("4-Stem")}
+                            onClick={()=>setSelectedModel("4-stem")}
                             className="border border-neutral-500 rounded-md p-2">
                               <p className="text-neutral-400 text-sm">4 Stem (refined)</p>
                             </div>
@@ -451,13 +451,13 @@ export default function Upload() {
                     <Tooltip>
                       <TooltipTrigger>
                         {
-                          selectedModel == "2-Stem" ?
+                          selectedModel == "2-stem" ?
                           <div className="border border-white bg-neutral-200 rounded-md p-2">
                             <p className="text-black text-sm">2 Stem</p>
                           </div>
                           :
                           <div 
-                          onClick={()=>setSelectedModel("2-Stem")}
+                          onClick={()=>setSelectedModel("2-stem")}
                           className="border border-neutral-500 rounded-md p-2">
                             <p className="text-neutral-400 text-sm">2 Stem</p>
                           </div>

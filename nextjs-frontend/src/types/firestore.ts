@@ -13,7 +13,7 @@ export interface Project {
   pid: string;
   uid: string | null; 
   pName: string;
-  model: "6-Stem" | "4-Stem" | "2-Stem";
+  model: "6-stem" | "4-stem" | "2-stem";
   createdAt?: FieldValue | Timestamp;
   updatedAt?: FieldValue | Timestamp;
   fileName: string; // filename of original mp3 (displayed in frontend)

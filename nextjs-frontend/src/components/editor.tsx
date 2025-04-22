@@ -424,7 +424,8 @@ export default function Editor({project, tracks} : {project: Project, tracks: Tr
                 />
                 {trackList.map(({ trackName, waveColor, className }) => {
                   const matchedTrack = tracks.find((t) =>
-                    t.instrument.toLowerCase() === trackName.toLowerCase()
+                    t.instrument.toLowerCase() === trackName.toLowerCase() 
+                    || t.instrument=='no_vocals' && trackName=='Other' // Weird thing for 2 stem splitting
                   );
 
                   if (!matchedTrack) return null;
