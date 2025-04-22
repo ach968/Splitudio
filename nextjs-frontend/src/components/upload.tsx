@@ -406,7 +406,7 @@ export default function Upload() {
                 </Tabs>
 
                 <p
-                className="mt-5 text-white font-mono text-lg"
+                className="mt-5 text-white font-mono"
                 >Model:</p>
                 <div className="flex mt-2 gap-2">
                   <TooltipProvider>
@@ -420,7 +420,7 @@ export default function Upload() {
                           :
                           <div 
                           onClick={()=>setSelectedModel("6-Stem")}
-                          className="border border-neutral-600 rounded-md p-2">
+                          className="border border-neutral-500 rounded-md p-2">
                             <p className="text-neutral-400 text-sm">6 Stem</p>
                           </div>
                         }
@@ -439,7 +439,7 @@ export default function Upload() {
                             :
                             <div 
                             onClick={()=>setSelectedModel("4-Stem")}
-                            className="border border-neutral-600 rounded-md p-2">
+                            className="border border-neutral-500 rounded-md p-2">
                               <p className="text-neutral-400 text-sm">4 Stem (refined)</p>
                             </div>
                           }
@@ -458,7 +458,7 @@ export default function Upload() {
                           :
                           <div 
                           onClick={()=>setSelectedModel("2-Stem")}
-                          className="border border-neutral-600 rounded-md p-2">
+                          className="border border-neutral-500 rounded-md p-2">
                             <p className="text-neutral-400 text-sm">2 Stem</p>
                           </div>
                         }
