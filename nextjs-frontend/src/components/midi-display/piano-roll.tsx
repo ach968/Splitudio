@@ -16,6 +16,7 @@ interface PianoRollProps {
   isFullPiano: boolean;
   playAlong: boolean;
   playAlongBuffer: Map<string, boolean>;
+  playTolerance: number
 }
 
 export default function PianoRoll({
@@ -25,6 +26,8 @@ export default function PianoRoll({
   isFullPiano,
   playAlong,
   playAlongBuffer,
+  playTolerance
+  
 }: PianoRollProps) {
   // init constants
   const MIN_MIDI = isFullPiano ? 21 : 36;
@@ -139,9 +142,26 @@ export default function PianoRoll({
       ref={containerRef}
       className="relative border border-neutral-800 bg-neutral-950 overflow-y-clip w-full h-full"
     >
+      {/* {
+        playAlong == true && 
+        <div className="absolute z-50"
+        style={{
+          top: dimensions.height/4,
+          right: dimensions.width/9
+        }}>
+          <h1 
+          className="text-5xl lg:text-7xl font-mono font-black 
+          tracking-tighter header-gradient mt-6 rotate-12"
+          style={{
+            opacity: 0.2
+          }}
+          >HITS 0</h1>
+        </div>
+      } */}
+
       {/* Render falling note blocks */}
       {notes.map((note, index) => createNote(note, index))}
-
+    
       {/* Show lines for note alignment */}
       {Array.from({ length: KEY_COUNT }).map((_, idx) => (
         <div
@@ -155,6 +175,19 @@ export default function PianoRoll({
           }}
         />
       ))}
+
+      {/* Render play tolerance */}
+      {
+        playAlong == true &&
+        <div className="absolute w-full h-1 bg-blue-400"
+        style={{
+          bottom: playTolerance * TIME_SCALE
+        }}>
+
+        </div>
+      }
+
+      
     </div>
   );
 }

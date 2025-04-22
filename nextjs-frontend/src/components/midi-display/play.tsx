@@ -50,6 +50,8 @@ export default function Play({
   const [WINDOW_SIZE, setWindowSize] = useState<number>(3);
   const MAX_WINDOW_SIZE = 20;
 
+  const [PLAY_TOLERANCE, setPlayTolerance] = useState(0.3);
+
   const [playAlong, setPlayAlong] = useState(false);
   const [micOrMidi, setMicOrMidi] = useState("midi");
 
@@ -260,7 +262,7 @@ export default function Play({
 
   // Similar to buffer, but used for playing along.
   const [playAlongBuffer, setPlayAlongBuffer] = useState(new Map<string, boolean>());
-  const PLAY_TOLERANCE = 0.3;
+  
 
   // Here is where we check if the user is playing along
   useEffect(() => {
@@ -326,7 +328,7 @@ export default function Play({
           newPlayAlongBuffer.set(`unknown-0-0-${obj.number}`, false);
         }
       });
-      console.log(newPlayAlongBuffer)
+      
       setPlayAlongBuffer(newPlayAlongBuffer); 
     }
   }, [currentTime, playAlong, micOrMidi, activeNotes]);
@@ -392,7 +394,9 @@ export default function Play({
             windowDuration={WINDOW_SIZE}
             isFullPiano={isFullPiano}
             playAlong={playAlong}
+            playTolerance={PLAY_TOLERANCE}
             playAlongBuffer={playAlongBuffer}
+            
           />
         </div>
 
@@ -403,6 +407,7 @@ export default function Play({
             isFullPiano={isFullPiano}
             sampler={sampler.current}
             playAlong={playAlong}
+            setPlayAlongBuffer={setPlayAlongBuffer}
           ></Piano>
         </div>
 
@@ -437,7 +442,7 @@ export default function Play({
                   <span 
                   onClick={()=>setWindowSize(3)}
                   className="font-mono text-xs truncate hover:cursor-pointer">
-                    Zoom:&nbsp;{WINDOW_SIZE.toFixed(2)}s
+                    Zoom:&nbsp;{WINDOW_SIZE.toFixed(1)}s
                   </span>
                   <div className="flex flex-row gap-1 w-full">
                     <Button 
@@ -445,7 +450,7 @@ export default function Play({
                       if(prev+2 > MAX_WINDOW_SIZE) {
                         return MAX_WINDOW_SIZE
                       }
-                      return prev+2
+                      return Number((prev+2).toFixed(1))
                     })}
                     size="icon" 
                     variant="ghost" 
@@ -457,8 +462,8 @@ export default function Play({
                     className="w-full"
                     min={0.5}
                     max={MAX_WINDOW_SIZE}
-                    step={0.01}
-                    value={[MAX_WINDOW_SIZE + 0.5 - WINDOW_SIZE]}
+                    step={0.1}
+                    value={[Number((MAX_WINDOW_SIZE + 0.5 - WINDOW_SIZE).toFixed(1))]}
                     onValueChange={([e]) => {
                       const inverted = MAX_WINDOW_SIZE + 0.5 - e;
                       setWindowSize(inverted)
@@ -470,7 +475,7 @@ export default function Play({
                       if(prev-2 < 0.5) {
                         return 0.5
                       }
-                      return prev-2
+                      return Number((prev-2).toFixed(1))
                     })}
                     size="icon" 
                     variant="ghost" 
@@ -489,7 +494,10 @@ export default function Play({
                   </span>
                   <div className="flex flex-row gap-1 w-full">
                     <Button 
-                    onClick={()=>playbackSpeedRef.current = playbackSpeedRef.current - 0.2}
+                    onClick={()=>{
+                      playbackSpeedRef.current = playbackSpeedRef.current - 0.2
+                      if(playbackSpeedRef.current < 0.1) playbackSpeedRef.current = 0.1 
+                    }}
                     size="icon" 
                     variant="ghost" 
                     className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
@@ -500,13 +508,16 @@ export default function Play({
                       className="w-full"
                       min={0.1}
                       max={2}
-                      step={0.01}
+                      step={0.1}
                       value={[playbackSpeedRef.current]}
                       onValueChange={(e) => playbackSpeedRef.current = e[0]}
                     ></Slider>
 
                     <Button
-                    onClick={()=>playbackSpeedRef.current = playbackSpeedRef.current + 0.2}
+                    onClick={()=>{
+                      playbackSpeedRef.current = playbackSpeedRef.current + 0.2
+                      if(playbackSpeedRef.current > 2) playbackSpeedRef.current = 2
+                    }}
                     size="icon" 
                     variant="ghost" 
                     className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
@@ -514,6 +525,57 @@ export default function Play({
                     </Button>
                   </div>
                 </div>
+
+
+                {
+                  playAlong &&
+                  <div className="flex flex-col gap-1 border border-neutral-500 rounded-md p-2 w-[150px] items-center">
+                    <span
+                    onClick={()=>playbackSpeedRef.current = 1} 
+                    className="font-mono text-xs truncate hover:cursor-pointer">
+                      Approach&nbsp;Rate:&nbsp;{PLAY_TOLERANCE.toFixed(1)}s
+                    </span>
+                    <div className="flex flex-row gap-1 w-full">
+                      <Button 
+                      onClick={()=>{
+                        setPlayTolerance((prev)=>{
+                          let ret = prev - 0.2
+                          if(ret < 0.2) return 0.2
+                          return  Number(ret.toFixed(1));
+                        })
+                      }}
+                      size="icon" 
+                      variant="ghost" 
+                      className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
+                        -
+                      </Button>   
+                          
+                      <Slider
+                        className="w-full"
+                        min={0.2}
+                        max={1}
+                        step={0.1}
+                        value={[PLAY_TOLERANCE]}
+                        onValueChange={(e) => setPlayTolerance(e[0])}
+                      ></Slider>
+
+                      <Button
+                      onClick={()=>{
+                        setPlayTolerance((prev)=>{
+                          let ret = prev + 0.2
+                          if(ret > 1) return 1
+                          return  Number(ret.toFixed(1));
+                        })
+                      }}
+                      size="icon" 
+                      variant="ghost" 
+                      className="flex items-center justify-center text-lg p-3 w-[12px] h-[12px]">
+                        +
+                      </Button>
+                    </div>
+                  </div>
+                }
+                
               </div>
               
               <div className="flex justify-center gap-3">

@@ -112,27 +112,5 @@ export default function Product() {
       </div>
     </motion.div>
 
-
-    {/* Waves on the left and right sides */}
-    <motion.img 
-    style={{
-      opacity: waveOpacity
-    }}
-    className="hidden lg:block absolute rotate-[90deg] scale-x-[-1] -top-72
-    min-h-[1500px] overflow-clip
-    -left-[500px] lg:-left-[600px] xl:-left-[800px]
-    waveform-mask pointer-events-none"
-    src="/waveform.svg" alt="Waveform" width={1800} height={1800} />
-    
-    <motion.img 
-    className="hidden lg:block absolute rotate-[90deg] -top-72
-    min-h-[1500px] overflow-clip
-    -right-[400px] lg:-right-[500px] xl:-right-[700px]
-    waveform-mask pointer-events-none"
-    style={{
-      opacity: waveOpacity
-    }}
-    src="/waveform.svg" alt="Waveform" width={1800} height={1800} />
-
   </motion.section>;
 }

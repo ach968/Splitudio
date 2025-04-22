@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { PolySynth, Synth, SynthOptions } from "tone";
 
 function isBlackKey(midi: number): boolean {
@@ -14,6 +14,7 @@ interface PianoProps {
   sampler: PolySynth<Synth<SynthOptions>> | null;
   playAlong: boolean;
   playAlongBuffer: Map<string, boolean>;
+  setPlayAlongBuffer: Dispatch<SetStateAction<Map<string, boolean>>>
 }
 
 export default function Piano({
@@ -22,6 +23,7 @@ export default function Piano({
   sampler,
   playAlong,
   playAlongBuffer,
+  setPlayAlongBuffer
 }: PianoProps) {
   // init constants
   const MIN_MIDI = isFullPiano ? 21 : 36;
@@ -130,10 +132,11 @@ export default function Piano({
             key={midi}
             className="absolute rounded-b-md hover:cursor-pointer select-none"
             onPointerDown={() => {
-              sampler?.triggerAttack(midi, undefined, 5);
+              sampler?.triggerAttack(midi, undefined, 2);
             }}
             onPointerUp={() => {
               sampler?.triggerRelease(midi);
+              
             }}
             style={{
               height: isBlackKey(midi) ? "70%" : "100%",
