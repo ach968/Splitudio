@@ -11,7 +11,7 @@ import tempfile
 load_dotenv()
 
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=print, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
 
@@ -61,7 +61,7 @@ def mp3_to_midi(req: https_fn.Request) -> https_fn.Response:
         temp_mp3_path = os.path.join(
             temp_dir, mp3_file_name
         )  # Correct path for download
-        logging.info(f"Downloading MP3 file from GCS to: {temp_mp3_path}")
+        print(f"Downloading MP3 file from GCS to: {temp_mp3_path}")
 
         blob = bucket.blob(mp3_file_path)
         blob.download_to_filename(temp_mp3_path)

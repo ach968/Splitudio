@@ -3,6 +3,8 @@ import tempfile
 from firebase_functions import https_fn
 from flask import jsonify
 import logging
+
+import torch
 from utils.bucket_upload import upload_to_storage
 import os
 from dotenv import load_dotenv
@@ -10,9 +12,7 @@ from demucs.separate import main
 from google.cloud import storage
 
 load_dotenv()
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=print, format="%(asctime)s - %(levelname)s - %(message)s")
 
 
 @https_fn.on_request(memory=32768, cpu=8, timeout_sec=540)
@@ -37,12 +37,25 @@ def demucs_stem_splitting(req: https_fn.Request) -> https_fn.Response:
         _, temp_path = tempfile.mkstemp()
         blob.download_to_filename(temp_path)
 
-        logging.info(f"Downloaded file from GCS: {gcs_path} to {temp_path}")
-
+        print(f"Downloaded file from GCS: {gcs_path} to {temp_path}")
+        print(torch.cuda.is_available())
         # Perform audio separation using Demucs
         output_dir = tempfile.mkdtemp()
         # creates unique temporary directory for this thread
-        main(["-n", "htdemucs_6s", "--mp3", "--out", output_dir, temp_path])
+        main(
+            [
+                "-n",
+                "htdemucs_6s",
+                "--device",
+                "cuda",
+                "--mp3",
+                "--mp3-preset",
+                "7",
+                "--out",
+                output_dir,
+                temp_path,
+            ]
+        )
 
         # Collect separated files and upload them to Google Cloud Storage
         uploaded_files = []
@@ -52,11 +65,11 @@ def demucs_stem_splitting(req: https_fn.Request) -> https_fn.Response:
         htdemucs_dir = os.path.join(output_dir, "htdemucs_6s")  # /tmp/tmp_****/htdemucs
         inner_dir_name = os.listdir(htdemucs_dir)[0]  # tmp_****
         inner_pathname = os.path.join(htdemucs_dir, inner_dir_name)
-        logging.info(f"Separated files located at: {inner_pathname}")
+        print(f"Separated files located at: {inner_pathname}")
 
         for filename in os.listdir(inner_pathname):
             if filename.endswith(".mp3"):
-                logging.info(f"Processing file: {filename}")
+                print(f"Processing file: {filename}")
                 success = upload_to_storage(
                     filename, bucket_name, inner_pathname, project_id
                 )
@@ -72,7 +85,7 @@ def demucs_stem_splitting(req: https_fn.Request) -> https_fn.Response:
         try:
             os.remove(temp_path)
             shutil.rmtree(output_dir)
-            logging.info("Temporary files cleaned up successfully.")
+            print("Temporary files cleaned up successfully.")
         except Exception as cleanup_error:
             logging.error(f"Error cleaning up temporary files: {cleanup_error}")
 
