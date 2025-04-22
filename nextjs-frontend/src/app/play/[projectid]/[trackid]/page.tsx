@@ -1,11 +1,10 @@
 
-import { cookies, headers } from 'next/headers';
+import { cookies } from 'next/headers';
 import { Storage } from "@google-cloud/storage";
 import { Midi } from "@tonejs/midi";
 import { redirect } from 'next/navigation';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
-import { CloudFile, Project } from '@/types/firestore';
-import { collection, doc, getDocs } from 'firebase/firestore';
+import { Project } from '@/types/firestore';
 import Play from '@/components/midi-display/play';
 
 

@@ -6,7 +6,7 @@ import { Button } from "./ui/button";
 import { twMerge } from "tailwind-merge";
 import SheetMusic from "@/assets/sheet-music";
 import MusicNote from "@/assets/music-note";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import {

@@ -50,7 +50,7 @@ export default function Upload() {
 
   useEffect(()=>{
     if(user?.uid)
-      getCustomer((user.uid)).then((customer: Customer | undefined)=>{
+      getCustomer().then((customer: Customer | undefined)=>{
         if(!customer) return;
           if(customer.subscriptionStatus == "active") setIsPremiumUser(true); 
       })
@@ -86,6 +86,7 @@ export default function Upload() {
   const handleFiles = async (files: FileList) => {
     try {
       setUploadProgress(0);
+
       if (files.length !== 1) {
         toast({
           title: "ERROR",
@@ -237,6 +238,25 @@ export default function Upload() {
 
   // Open file explorer when clicking the drop area
   const handleClick = () => {
+    
+    // WARM UP FUNCTIONS
+    try{
+      fetch("https://us-central1-splitudio-19e91.cloudfunctions.net/demucs_stem_splitting", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.parse(JSON.stringify({}))
+      });
+      fetch("https://us-central1-splitudio-19e91.cloudfunctions.net/mp3_to_midi", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.parse(JSON.stringify({}))
+      });
+    }
+    catch(err) {
+      // Do nothing
+    }
+    
+
     fileInputRef.current?.click();
   };
 

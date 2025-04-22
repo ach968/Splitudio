@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { useEffect, useState } from "react";
-import { getProject, storeProject } from "@/lib/utils";
+import { storeProject } from "@/lib/utils";
 import { Project } from "@/types/firestore";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "./authContext";
@@ -42,7 +42,7 @@ export default function Share({
   }, [])
 
   const enableShare = (status: boolean) => {
-    var prev = shared;
+    const prev = shared;
     setShared(status);
     setDisabled(true);
 

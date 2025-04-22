@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
 import { v4 as uuidv4 } from "uuid";
-import { Project, Track } from "@/types/firestore";
+import { Track } from "@/types/firestore";
 
 // Assume this function triggers the Cloud Function and returns an array of paths
 async function runStemSplitter(projectId: string, gcsPath: string): Promise<string[]> {

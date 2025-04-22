@@ -106,7 +106,7 @@ export function useMicrophone() {
       // const freq = midiToFreq(midi);
       // const bin = freqToBin(freq);
 
-      var max = 0;
+      let max = 0;
       for(let i = binStart; i<binEnd; i++) {
         max = Math.max(max, fftData[i])
       }

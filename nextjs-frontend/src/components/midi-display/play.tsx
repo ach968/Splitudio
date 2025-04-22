@@ -1,7 +1,7 @@
 "use client";
 
 import PianoRoll from "@/components/midi-display/piano-roll";
-import { useEffect, useContext, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Midi } from "@tonejs/midi";
 import { Slider } from "../ui/slider";
 import Footer from "../footer";
@@ -51,15 +51,9 @@ export default function Play({
   const MAX_WINDOW_SIZE = 20;
 
   const [playAlong, setPlayAlong] = useState(false);
-  const [micOrMidi, setMicOrMidi] = useState("mic");
-
-  const micEnabled = playAlong && micOrMidi === "mic";
-  const midiEnabled = playAlong && micOrMidi === "midi";
+  const [micOrMidi, setMicOrMidi] = useState("midi");
 
   const { fftData, midiUtils } = useMicrophone();
-    
-  // const { input, inputs, selectInput, selectedInputId } = useMIDIInputs();
-  // const rawMidiNotes = useMIDINotes({ channel: 1 })
 
   const handleNoteOn = (e: any) => {
     setActiveNotes((prev) => {

@@ -11,7 +11,7 @@ import Share from "@/components/share-dialog-header";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import Link from "next/link";
 import { twMerge } from "tailwind-merge";
-import { redirect, usePathname, useRouter } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "./authContext";
 import Logo from "./logo";

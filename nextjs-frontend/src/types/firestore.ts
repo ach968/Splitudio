@@ -1,5 +1,4 @@
-import { User } from "firebase/auth";
-import { FieldValue, serverTimestamp, Timestamp } from "firebase/firestore";
+import { FieldValue, Timestamp } from "firebase/firestore";
 
 export interface CloudFile { 
   fid: string; 

@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { twMerge } from "tailwind-merge";
 
 interface WaveformHighlightProps {
   start: number | null; // start px
@@ -39,7 +38,7 @@ export function WaveformHighlight({
     const OldRange = OldMax - OldMin;
     if (OldRange == 0) var NewValue = NewMin;
     else {
-      var NewRange = NewMax - NewMin;
+      const NewRange = NewMax - NewMin;
       var NewValue = ((OldValue - OldMin) * NewRange) / OldRange + NewMin;
     }
     return NewValue;

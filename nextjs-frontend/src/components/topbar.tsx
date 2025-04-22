@@ -2,13 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { useAuth } from "./authContext";
 import { twMerge } from "tailwind-merge";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, navigationMenuTriggerStyle } from "./ui/navigation-menu";
 import { NavigationMenuList } from "@radix-ui/react-navigation-menu";
 import Logo from "@/components/logo";
-import { ClassNames } from "@emotion/react";
 
 export default function Topbar() {
   const pathname = usePathname();

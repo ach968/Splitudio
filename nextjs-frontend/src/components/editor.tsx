@@ -20,7 +20,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import EditorNav from "@/components/editor-nav";
-import { useParams } from "next/navigation";
 import { Project, Track as TrackInterface } from "@/types/firestore";
 
 interface TrackState {
@@ -94,7 +93,6 @@ export default function Editor({project, tracks} : {project: Project, tracks: Tr
   const PROJECTNAME = project.pName;
   const FILENAME = project.fileName;
   
-
   useEffect(() => {
     if (containerRef.current && wrapperRef.current) {
       const containerRect = wrapperRef.current?.getBoundingClientRect();
@@ -216,7 +214,7 @@ export default function Editor({project, tracks} : {project: Project, tracks: Tr
   const selectEnd = () => {
     if (!containerRef.current) return;
 
-    var newEnd;
+    let newEnd;
     const ws = Object.values(trackStates).find(({ ws }) => ws)?.ws;
     if (ws) {
       newEnd = ws.getCurrentTime();
@@ -232,7 +230,7 @@ export default function Editor({project, tracks} : {project: Project, tracks: Tr
   };
 
   const onTimeUpdate = (e: any) => {
-    var curr = e.media.currentTime;
+    const curr = e.media.currentTime;
     if (manualSelecting == true) {
       setEnd(curr);
     }
@@ -366,9 +364,11 @@ export default function Editor({project, tracks} : {project: Project, tracks: Tr
           <div className="mt-20 mb-3 flex w-full justify-center">
             <div className="container px-5">
               <div className=" flex gap-3 place-items-baseline">
-                <p className="text-2xl lg:text-3xl font-semibold text-white truncate">
+                <p
+                className="text-2xl lg:text-3xl font-semibold text-white truncate">
                   {PROJECTNAME}
                 </p>
+                
                 <p className="text-base text-neutral-400 truncate">
                   / {FILENAME}
                 </p>
