@@ -1,16 +1,14 @@
 import Editor from "@/components/editor";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { adminDb, adminAuth } from '@/lib/firebase/admin';
+import { adminDb, adminAuth } from "@/lib/firebase/admin";
 import { Project, Track } from "@/types/firestore";
 
-
-export default async function Page({ params } : any) {
-
+export default async function Page({ params }: any) {
   const { projectId } = await params;
 
   const snap = await adminDb.doc(`projects/${projectId}`).get();
-  if (!snap.exists) redirect('/projects');
+  if (!snap.exists) redirect("/projects");
 
   const d = snap.data() as any;
 
@@ -26,13 +24,14 @@ export default async function Page({ params } : any) {
     updatedAt: d.updatedAt?.toDate?.() ?? null,
   };
 
-  if(project.uid == undefined || project.uid == "" || project.uid == null) redirect("/projects")
-  
+  if (project.uid == undefined || project.uid == "" || project.uid == null)
+    redirect("/projects");
+
   // Get the project's owner
   const projectOwnerUid: string = project.uid;
-  
+
   // Get the logged in user's cookies
-  const token = ((await cookies()).get("session")?.value);
+  const token = (await cookies()).get("session")?.value;
   if (!token) {
     return redirect("/login");
   }
@@ -49,26 +48,24 @@ export default async function Page({ params } : any) {
     return redirect("/projects");
   }
 
-
   // Check if we need to split stems
-  if(!project.trackIds) {
+  if (!project.trackIds) {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-
-    await fetch(
-      `${baseUrl}/api/register_project`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          pid: project.pid
-        })
+    console.log("baseUrl", baseUrl);
+    await fetch(`${baseUrl}/api/register_project`, {
+      method: "POST",
+      body: JSON.stringify({
+        pid: project.pid,
+      }),
+    }).then((res) => {
+      if (!res.ok) {
+        console.log("Error registering project", res);
+        redirect("/projects");
       }
-    )
-    .then((res) => {
-      if(!res.ok) redirect("/projects");
-    })
+    });
 
     const newSnap = await adminDb.doc(`projects/${projectId}`).get();
-    if (!newSnap.exists) redirect('/projects');
+    if (!newSnap.exists) redirect("/projects");
 
     const updatedProject = newSnap.data() as Project;
     updatedProject.pid = projectId;
@@ -79,11 +76,11 @@ export default async function Page({ params } : any) {
     const trackDocs = await Promise.all(
       updatedProject.trackIds!.map(async (trackId: string) => {
         const trackSnap = await adminDb.doc(`tracks/${trackId}`).get();
-        return {...(trackSnap.data() as Track) };
+        return { ...(trackSnap.data() as Track) };
       })
     );
 
-    return <Editor project={updatedProject} tracks={trackDocs} />
+    return <Editor project={updatedProject} tracks={trackDocs} />;
   }
 
   const trackDocs = await Promise.all(
@@ -97,4 +94,3 @@ export default async function Page({ params } : any) {
   project.createdAt = undefined;
   return <Editor project={project} tracks={trackDocs} />;
 }
-
