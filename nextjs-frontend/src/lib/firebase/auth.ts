@@ -58,12 +58,12 @@ async function storeUser(userCredential: UserCredential) {
     );
   }
 
-  // 1.5 ) For demo purposes, clone projects from splitudio
+  // 1.5 ) For demo purposes, clone projects from splitudio account
   if(process.env.DEMO == "true") {
     await fetch("/api/demo_load_projects", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sourceUserId: 'bT81EPNBtPcxqsZAM7m8fHpzDpo2' , targetUserId: user.uid }),
+      body: JSON.stringify({ sourceUserId: '5QTYUdsZIwhOJezBWZcdr3CwRKM2' , targetUserId: user.uid }),
     });
   }
   
