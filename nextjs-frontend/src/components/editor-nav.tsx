@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
+
 import Share from "@/components/share-dialog-header";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import Link from "next/link";
@@ -18,6 +12,7 @@ import Logo from "./logo";
 import ProfileSVG from "@/assets/profile-svg";
 import LogoutSVG from "@/assets/logout-svg";
 import { Button } from "./ui/button";
+import Image from "next/image";
 
 export default function EditorNav({
   projectId,
@@ -30,7 +25,7 @@ export default function EditorNav({
   const [isSharing, setIsSharing] = useState(false);
 
   const { user, loading } = useAuth();
-  
+
   const path = usePathname();
 
   // REDIRECT TO HOME PAGE IF NOT LOGGED IN
@@ -113,7 +108,13 @@ export default function EditorNav({
             <Button 
             variant={pathname.endsWith("/profile") ? "secondary" : "ghost"} className="group p-2">
               <p className="hidden sm:block">Profile</p>
-              <ProfileSVG className={twMerge("group-hover:invert", pathname.endsWith("/profile") && "invert")}></ProfileSVG>
+              {
+                user?.photoURL ?
+                <img className="w-6 h-6 rounded-full object-cover group-hover:brightness-90 transition-all" src={user.photoURL} alt="user photo"></img> 
+                :
+                <ProfileSVG className={twMerge("group-hover:invert", pathname.endsWith("/profile") && "invert", "h-6 w-6")}></ProfileSVG>
+              }
+              
             </Button>
           </Link>
 

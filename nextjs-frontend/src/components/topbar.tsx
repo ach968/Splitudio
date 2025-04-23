@@ -41,16 +41,6 @@ export default function Topbar() {
               Pricing
             </p>
           </Link>
-          <Link href="/about">
-            <p
-              className={twMerge(
-                pathname === "/projects" && "text-white",
-                "hover:cursor-pointer hover:text-white hover:underline"
-              )}
-            >
-              About
-            </p>
-          </Link>
         </div>
         
 
@@ -95,7 +85,12 @@ export default function Topbar() {
                 <Button 
                 variant={pathname.endsWith("/profile") ? "secondary" : "ghost"} className="group p-2">
                   <p className="hidden sm:block">Profile</p>
-                  <ProfileSVG className={twMerge("group-hover:invert", pathname.endsWith("/profile") && "invert")}></ProfileSVG>
+                  {
+                    user?.photoURL ?
+                    <img className="w-6 h-6 rounded-full object-cover group-hover:brightness-90 transition-all" src={user.photoURL} alt="user photo"></img> 
+                    :
+                    <ProfileSVG className={twMerge("group-hover:invert", pathname.endsWith("/profile") && "invert", "h-6 w-6")}></ProfileSVG>
+                  }
                 </Button>
               </Link>
 

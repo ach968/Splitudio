@@ -42,7 +42,28 @@ export default function Profile() {
           transition={{ duration: 0.5 }}
           className="container mt-20 flex justify-center items-center"
         >
-          <div className="w-full max-w-[700px] px-3 lg:px-5">
+          <div className="w-full max-w-[700px] px-3 lg:px-5 flex flex-col gap-3">
+            {user == null ?
+              <></>
+              :
+              <>
+                <div className="border gap-7 flex flex-col p-6 rounded-lg border-neutral-500 bg-black">
+                  <h1 className="text-2xl font-semibold text-white">
+                    Hi,{" "}{user.user?.displayName}
+                  </h1>
+                  <div className="text-neutral-400">
+                    <p>
+                      <span className="text-white">Email:{" "}</span>
+                      <span>{user.user?.email}</span>
+                    </p>
+                  </div>
+                </div>
+              </>
+            
+            }
+            
+
+            {/* Subscription Box */}
             <div className="border gap-7 flex flex-col p-6 rounded-lg border-neutral-500 bg-black">
               {cus==null ?
                 // Loading 
@@ -70,7 +91,7 @@ export default function Profile() {
                 <>
                   <div className="flex flex-col gap-1">
                     <p className="text-white text-2xl font-semibold">
-                      Subscription
+                      Your Subscription
                     </p>
                     <p className="text-neutral-400">
                       Your current subscription plan is{" "}
@@ -112,7 +133,7 @@ export default function Profile() {
                 <>
                   <div>
                     <p className="text-white text-2xl font-semibold">
-                      Subscription
+                      Your Subscription
                     </p>
                     <p className="text-neutral-400">
                       Your current subscription plan is <PremiumText />. You
