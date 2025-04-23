@@ -44,6 +44,7 @@ export default function Play({
   const [currentTime, setCurrentTime] = useState(0);
   const [isFullPiano, setIsFullPiano] = useState(true); // minMidi 21 : 36, maxMidi 108 : 96
   const playbackSpeedRef = useRef(1);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
 
   const pianoRollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -504,8 +505,9 @@ export default function Play({
                   <div className="flex flex-row gap-1 w-full">
                     <Button 
                     onClick={()=>{
-                      playbackSpeedRef.current = playbackSpeedRef.current - 0.2
-                      if(playbackSpeedRef.current < 0.1) playbackSpeedRef.current = 0.1 
+                      const newSpeed = Math.max(0.1, playbackSpeed - 0.2);
+                      setPlaybackSpeed(newSpeed);
+                      playbackSpeedRef.current = newSpeed; 
                     }}
                     size="icon" 
                     variant="ghost" 
@@ -518,14 +520,19 @@ export default function Play({
                       min={0.1}
                       max={2}
                       step={0.1}
-                      value={[playbackSpeedRef.current]}
-                      onValueChange={(e) => playbackSpeedRef.current = e[0]}
+                      value={[playbackSpeed]}
+                      onValueChange={([val]) => {
+                        playbackSpeedRef.current = val
+                        setPlaybackSpeed(val);
+                        
+                      }}
                     ></Slider>
 
                     <Button
                     onClick={()=>{
-                      playbackSpeedRef.current = playbackSpeedRef.current + 0.2
-                      if(playbackSpeedRef.current > 2) playbackSpeedRef.current = 2
+                      const newSpeed = Math.min(2, playbackSpeed + 0.2);
+                      setPlaybackSpeed(newSpeed);
+                      playbackSpeedRef.current = newSpeed;
                     }}
                     size="icon" 
                     variant="ghost" 
