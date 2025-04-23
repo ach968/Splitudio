@@ -20,6 +20,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebase/firebase";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "./ui/tooltip";
+import { Button } from "./ui/button";
 
 const validateFileDuration = (
   file: File,
@@ -387,68 +388,63 @@ export default function Upload() {
 
                 <p
                 className="mt-5 text-white font-mono"
-                >Model:</p>
+                >Select Model:</p>
                 <div className="flex mt-2 gap-2">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        {
-                          selectedModel == "6-stem" ?
-                          <div className="border border-white bg-neutral-200 rounded-md p-2">
-                            <p className="text-black text-sm">6 Stem</p>
-                          </div>
-                          :
-                          <div 
-                          onClick={()=>setSelectedModel("6-stem")}
-                          className="border border-neutral-500 rounded-md p-2">
-                            <p className="text-neutral-400 text-sm">6 Stem</p>
-                          </div>
-                        }
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Vocal, drums, bass, guitar, piano, and other</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger>
-                          {
-                            selectedModel == "4-stem" ?
-                            <div className="border border-white bg-neutral-200 rounded-md p-2">
-                              <p className="text-black text-sm">4 Stem (refined)</p>
-                            </div>
-                            :
-                            <div 
-                            onClick={()=>setSelectedModel("4-stem")}
-                            className="border border-neutral-500 rounded-md p-2">
-                              <p className="text-neutral-400 text-sm">4 Stem (refined)</p>
-                            </div>
-                          }
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Vocal, drums, bass, and other. This model has the best split quality!</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        {
-                          selectedModel == "2-stem" ?
-                          <div className="border border-white bg-neutral-200 rounded-md p-2">
-                            <p className="text-black text-sm">2 Stem</p>
-                          </div>
-                          :
-                          <div 
-                          onClick={()=>setSelectedModel("2-stem")}
-                          className="border border-neutral-500 rounded-md p-2">
-                            <p className="text-neutral-400 text-sm">2 Stem</p>
-                          </div>
-                        }
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Vocal & instrumental</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {
+                    selectedModel == "6-stem" ?
+                    <Button
+                    variant="secondary" 
+                    className="border border-white rounded-md p-2">
+                      <p className="text-black text-sm">6 Stem</p>
+                    </Button>
+                    :
+                    <Button 
+                    onClick={()=>setSelectedModel("6-stem")}
+                    className="border border-neutral-500 rounded-md p-2">
+                      <p className="text-neutral-400 text-sm">6 Stem</p>
+                    </Button>
+                  }
+                  {
+                    selectedModel == "4-stem" ?
+                    <Button
+                    variant="secondary" 
+                    className="rounded-md border border-white p-2">
+                      <p className="text-black text-sm">4 Stem (refined)</p>
+                    </Button>
+                    :
+                    <Button 
+                    onClick={()=>setSelectedModel("4-stem")}
+                    className="border border-neutral-500 rounded-md p-2">
+                      <p className="text-neutral-400 text-sm">4 Stem (refined)</p>
+                    </Button>
+                  }
+                  {
+                    selectedModel == "2-stem" ?
+                    <Button 
+                    variant="secondary" 
+                    className="rounded-md border border-white p-2">
+                      <p className="text-black text-sm">2 Stem</p>
+                    </Button>
+                    :
+                    <Button 
+                    onClick={()=>setSelectedModel("2-stem")}
+                    className="border border-neutral-500 rounded-md p-2">
+                      <p className="text-neutral-400 text-sm">2 Stem</p>
+                    </Button>
+                  }
                 </div>
+
+                <div className="mt-3 font-mono text-sm text-neutral-400">
+                  {
+                    selectedModel == '6-stem' ?
+                    <p>Vocal, drums, bass, guitar, piano, and other</p>
+                    : selectedModel == '4-stem' ? 
+                    <p>Vocal, drums, bass, and other. This model has the best split quality!</p>
+                    :
+                    <p>Vocal & instrumental</p>
+                  }
+                </div>
+                
               </motion.div>
             </div>
           </div>
