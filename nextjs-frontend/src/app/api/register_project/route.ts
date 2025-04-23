@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
 import { v4 as uuidv4 } from "uuid";
 import { Track } from "@/types/firestore";
+import { FieldValue } from "firebase-admin/firestore";
 
 // This function triggers the Cloud Function and returns an array of paths
 async function runStemSplitter(projectId: string, gcsPath: string, model: string): Promise<string[]> {
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
     await projectRef.update({
       trackIds: trackIds,
       originalMp3: projectData ? `projects/${pid}/${projectData.fileName}` : "",
-      updatedAt: new Date(),
+      updatedAt: FieldValue.serverTimestamp(),
     });
 
     return NextResponse.json({ success: true, trackIds });
