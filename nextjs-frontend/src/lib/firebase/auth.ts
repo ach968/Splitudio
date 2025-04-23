@@ -46,6 +46,16 @@ async function storeUser(userCredential: UserCredential) {
       createdAt: serverTimestamp(),
       lastLoginAt: serverTimestamp(),
     });
+
+    // 1.5 ) For demo purposes, new accounts will clone projects from splitudio account
+    if(process.env.DEMO == "true") {
+      await fetch("/api/demo_load_projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sourceUserId: '5QTYUdsZIwhOJezBWZcdr3CwRKM2' , targetUserId: user.uid }),
+      });
+    }
+
   } else {
     await setDoc(
       userDocRef,
@@ -58,14 +68,7 @@ async function storeUser(userCredential: UserCredential) {
     );
   }
 
-  // 1.5 ) For demo purposes, clone projects from splitudio account
-  if(process.env.DEMO == "true") {
-    await fetch("/api/demo_load_projects", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sourceUserId: '5QTYUdsZIwhOJezBWZcdr3CwRKM2' , targetUserId: user.uid }),
-    });
-  }
+  
   
   // 2) Hit backend API to ensure customer document exists
   const idToken = await user.getIdToken();
