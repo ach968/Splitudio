@@ -7,6 +7,9 @@ import { twMerge } from "tailwind-merge";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, navigationMenuTriggerStyle } from "./ui/navigation-menu";
 import { NavigationMenuList } from "@radix-ui/react-navigation-menu";
 import Logo from "@/components/logo";
+import ProfileSVG from "@/assets/profile-svg";
+import { Button } from "./ui/button";
+import LogoutSVG from "@/assets/logout-svg";
 
 export default function Topbar() {
   const pathname = usePathname();
@@ -51,8 +54,9 @@ export default function Topbar() {
         </div>
         
 
-        <NavigationMenu>
+        
             {user==null ?
+            <NavigationMenu>
             <NavigationMenuList className="flex flex-row gap-1">
               <NavigationMenuItem>
                 <Link href="/signup" legacyBehavior passHref>
@@ -73,45 +77,35 @@ export default function Topbar() {
                 </Link>
               </NavigationMenuItem>
             </NavigationMenuList>
+            </NavigationMenu>
             :
-            <NavigationMenuList className="flex flex-row gap-1">
-              <NavigationMenuItem>
-                <Link href="/projects" legacyBehavior passHref>
-                  <NavigationMenuLink
-                    className={twMerge(
-                      navigationMenuTriggerStyle(),
-                      "bg-black text-white border border-white hover:bg-white hover:scale-[1.03] transition-all"
-                    )}
-                  >
-                    <p className="text-sm">Studio</p>
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link href="/profile" legacyBehavior passHref>
-                  <NavigationMenuLink
-                    className={twMerge(
-                      navigationMenuTriggerStyle(),
-                      pathname.startsWith("/profile") &&
-                        "bg-white text-black hover:bg-white/80"
-                    )}
-                  >
-                    <p className="text-sm">Profile</p>
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link href="/logout" legacyBehavior passHref>
-                  <NavigationMenuLink
-                    className={navigationMenuTriggerStyle()}
-                  >
-                    <p className="text-sm">Logout</p>
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-            }
-        </NavigationMenu>
+            <div className="flex gap-1">
+              <Link href="/projects" legacyBehavior passHref>
+                <Button
+                variant={pathname.endsWith("/profile") ? "secondary" : "ghost"}
+                className="bg-black text-white border border-white hover:bg-white">
+                  <p className="text-sm">
+                    <span className="hidden sm:inline">Enter&nbsp;</span>
+                    Studio
+                  </p>
+                </Button>
+              </Link>
+                
+              <Link href="/profile" legacyBehavior passHref>
+                <Button 
+                variant={pathname.endsWith("/profile") ? "secondary" : "ghost"} className="group p-2">
+                  <p className="hidden sm:block">Profile</p>
+                  <ProfileSVG className={twMerge("group-hover:invert", pathname.endsWith("/profile") && "invert")}></ProfileSVG>
+                </Button>
+              </Link>
+
+              <Link href="/logout" legacyBehavior passHref>
+                <Button variant="ghost" className="group p-2">
+                  <LogoutSVG className="group-hover:invert"></LogoutSVG>
+                </Button>
+              </Link>
+            </div>
+          }
       </div>
     </nav>
   );

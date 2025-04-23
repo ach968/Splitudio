@@ -110,9 +110,10 @@ export default function EditorNav({
         
         <div className="flex gap-1">
           <Link href="/profile" legacyBehavior passHref>
-            <Button variant="ghost" className="group p-2">
-              <p className="font-semibold hidden sm:block">Profile</p>
-              <ProfileSVG className="group-hover:invert"></ProfileSVG>
+            <Button 
+            variant={pathname.endsWith("/profile") ? "secondary" : "ghost"} className="group p-2">
+              <p className="hidden sm:block">Profile</p>
+              <ProfileSVG className={twMerge("group-hover:invert", pathname.endsWith("/profile") && "invert")}></ProfileSVG>
             </Button>
           </Link>
 
