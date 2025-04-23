@@ -36,7 +36,7 @@ export default function AuthPage() {
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="container pt-28 flex flex-col justify-center items-center"
+            className="container px-3 pt-28 flex flex-col justify-center items-center"
           >
             <h1 className="text-2xl font-bold text-white mb-6">Log in</h1>
 

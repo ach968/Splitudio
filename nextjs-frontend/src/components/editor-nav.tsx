@@ -15,6 +15,9 @@ import { redirect, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "./authContext";
 import Logo from "./logo";
+import ProfileSVG from "@/assets/profile-svg";
+import LogoutSVG from "@/assets/logout-svg";
+import { Button } from "./ui/button";
 
 export default function EditorNav({
   projectId,
@@ -104,32 +107,21 @@ export default function EditorNav({
             </Link>
           )}
         </div>
-        <NavigationMenu>
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <Link href="/profile" legacyBehavior passHref>
-                <NavigationMenuLink
-                  className={twMerge(
-                    navigationMenuTriggerStyle(),
-                    pathname.startsWith("/profile") &&
-                      "bg-white text-black hover:bg-white/80"
-                  )}
-                >
-                  <p className="text-sm">Profile</p>
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <Link href="/logout" legacyBehavior passHref>
-                <NavigationMenuLink
-                  className={navigationMenuTriggerStyle()}
-                >
-                  <p className="text-sm">Logout</p>
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+        
+        <div className="flex gap-1">
+          <Link href="/profile" legacyBehavior passHref>
+            <Button variant="ghost" className="group p-2">
+              <p className="font-semibold hidden sm:block">Profile</p>
+              <ProfileSVG className="group-hover:invert"></ProfileSVG>
+            </Button>
+          </Link>
+
+          <Link href="/logout" legacyBehavior passHref>
+            <Button variant="ghost" className="group p-2">
+              <LogoutSVG className="group-hover:invert"></LogoutSVG>
+            </Button>
+          </Link>
+        </div>
       </div>
     </nav>
   );

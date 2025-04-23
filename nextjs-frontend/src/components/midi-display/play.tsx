@@ -343,9 +343,18 @@ export default function Play({
   const previousTimeRef = useRef<number | null>(null);
 
   const animate = (time: number) => {
+
     if (previousTimeRef.current != null && isPlayingRef.current) {
       const delta = (time - previousTimeRef.current) / 1000; // convert to seconds
-      setCurrentTime((prev) => prev + delta * playbackSpeedRef.current);
+      setCurrentTime((prev) => {
+        const nextTime = prev + delta * playbackSpeedRef.current
+        if (nextTime >= duration) {
+          pause();
+          return duration;
+        }
+
+        return nextTime;
+      });
     }
     previousTimeRef.current = time;
     requestRef.current = requestAnimationFrame(animate);

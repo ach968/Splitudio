@@ -311,7 +311,7 @@ export default function Upload() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <Tabs defaultValue="upload" className="w-[700px]">
+                <Tabs defaultValue="upload" className="w-full md:w-[700px] sm:w-[600px] ">
                   <TabsList className="flex w-full bg-transparent justify-start border-neutral-500 border-b-2 rounded-none p-0 m-0">
                     <TabsTrigger
                       disabled={uploadProgress != null}
@@ -321,12 +321,12 @@ export default function Upload() {
                       <p className="text-base leading-7 mx-2">Upload</p>
                     </TabsTrigger>
                     <TabsTrigger
-                      disabled={uploadProgress != null}
+                      disabled={true}
                       className="data-[state=active]:bg-transparent data-[state=active]:text-white border-b-2 data-[state=active]:border-white border-neutral-500 rounded-none"
                       value="youtube-link"
 
                     >
-                      <p className="text-base leading-7 mx-2">Youtube Link</p>
+                      <p className="text-base leading-7 mx-2">Youtube Link (disabled)</p>
                     </TabsTrigger>
                   </TabsList>
                   <TabsContent value="upload" className="pt-7">
@@ -337,7 +337,7 @@ export default function Upload() {
                       onDragLeave={handleDragLeave}
                       onDrop={handleDrop}
                       className={twMerge(
-                        "hover:cursor-pointer flex flex-col gap-3 w-full h-[300px] rounded-xl border-2 border-dashed border-neutral-500 justify-center items-center transition-colors",
+                        "hover:cursor-pointer flex flex-col gap-3 w-full h-[300px] rounded-xl border-2 border-dashed border-neutral-500 justify-center items-center px-5 transition-colors",
                         dragActive ? "bg-neutral-900" : "bg-black"
                       )}
                     >
@@ -362,7 +362,7 @@ export default function Upload() {
                         </p>
                       )}
                       {uploadProgress != null && (
-                        <div className="w-full max-w-[400px] mt-4">
+                        <div className="w-full max-w-[300px] sm:max-w-[400px] mt-4">
                           <Progress value={uploadProgress}></Progress>
                         </div>
                       )}
@@ -381,26 +381,6 @@ export default function Upload() {
                         className="hidden"
                         onChange={handleFileInputChange}
                       />
-                    )}
-                  </TabsContent>
-                  <TabsContent value="youtube-link" className="pt-7">
-                    <div className="relative flex flex-row items-center">
-                      <YoutubeSVG className="h-7 w-7 absolute left-2" />
-                      <Input
-                        ref={inputRef}
-                        className="pl-11 border-neutral-500 text-white"
-                        placeholder="https://www.youtube.com/..."
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleLink(inputRef.current!.value);
-                          }
-                        }}
-                      />
-                    </div>
-                    {uploadProgress != null && (
-                      <div className="w-full mt-4">
-                        <Progress value={uploadProgress}></Progress>
-                      </div>
                     )}
                   </TabsContent>
                 </Tabs>

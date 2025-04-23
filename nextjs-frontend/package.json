@@ -36,6 +36,7 @@
     "firebase-admin": "^13.2.0",
     "firebase-tools": "^14.0.0",
     "framer-motion": "^12.5.0",
+    "html-to-image": "^1.11.13",
     "lucide-react": "^0.475.0",
     "midi-player-js": "^2.0.16",
     "motion": "^12.5.0",

@@ -57,7 +57,7 @@ export default function Topbar() {
               <NavigationMenuItem>
                 <Link href="/signup" legacyBehavior passHref>
                   <NavigationMenuLink
-                    className={navigationMenuTriggerStyle()}
+                    className={twMerge(navigationMenuTriggerStyle(), "px-2 sm:px-3")}
                   >
                     <p className="text-sm">Signup</p>
                   </NavigationMenuLink>
@@ -66,7 +66,7 @@ export default function Topbar() {
               <NavigationMenuItem>
                 <Link href="/login" legacyBehavior passHref>
                   <NavigationMenuLink
-                    className={navigationMenuTriggerStyle()}
+                    className={twMerge(navigationMenuTriggerStyle(), "px-2 sm:px-3")}
                   >
                     <p className="text-sm">Login</p>
                   </NavigationMenuLink>
@@ -83,7 +83,7 @@ export default function Topbar() {
                       "bg-black text-white border border-white hover:bg-white hover:scale-[1.03] transition-all"
                     )}
                   >
-                    <p className="text-sm">Enter Studio</p>
+                    <p className="text-sm">Studio</p>
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>

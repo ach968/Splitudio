@@ -1,5 +1,6 @@
-export default function Logo() {
 
+export default function Logo() {
+  
   return (
     <div className="group flex flex-col items-center justify-center w-[460px] h-[180px]">
       <div className="opacity-0 group-hover:opacity-100 items-center justify-center transition-all duration-500 text-transparent
