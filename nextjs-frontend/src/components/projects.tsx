@@ -179,7 +179,7 @@ export default function Projects({
                 >
                   <SearchSVG className="h-5 w-5 absolute left-2"></SearchSVG>
                   <Input
-                    className="pl-9 border-neutral-500 text-white"
+                    className="pl-9 border-neutral-500 text-white focus-visible:border-white"
                     placeholder="Search..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -325,7 +325,7 @@ export default function Projects({
                                   <div className="relative flex items-center">
                                     <Input
                                       ref={inputElement}
-                                      className="border-neutral-400 w-[200px] text-white pr-10"
+                                      className="border border-white w-[200px] text-white pr-10"
                                       autoFocus
                                       value={newName}
                                       onChange={(e) =>
