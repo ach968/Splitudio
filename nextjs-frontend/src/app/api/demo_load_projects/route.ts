@@ -25,6 +25,9 @@ async function clone_projects(
   // 2. Iterate and clone each project
   for (const projDoc of sourceProjectsSnap.docs) {
     const projectData = projDoc.data() as Project;
+
+    console.log(projectData);
+
     const newPid = uuidv4();
 
     // Clone tracks
@@ -88,6 +91,8 @@ export async function POST(req: NextRequest) {
       sourceUserId,
       targetUserId
     );
+
+
     return NextResponse.json({ success: true, newPids });
   } catch (err: any) {
     console.error("Error in deposit_projects:", err);

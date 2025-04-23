@@ -58,6 +58,15 @@ async function storeUser(userCredential: UserCredential) {
     );
   }
 
+  // 1.5 ) For demo purposes, clone projects from splitudio
+  if(process.env.DEMO == "true") {
+    await fetch("/api/demo_load_projects", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sourceUserId: 'bT81EPNBtPcxqsZAM7m8fHpzDpo2' , targetUserId: user.uid }),
+    });
+  }
+  
   // 2) Hit backend API to ensure customer document exists
   const idToken = await user.getIdToken();
 
