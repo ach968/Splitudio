@@ -1,7 +1,6 @@
 # Splitudio - Interactive Audio to MIDI and Sheet Music Converter   
 
 **Splitudio** is a web application designed to help users split audio files into individual stems (such as vocals, drums, bass, and other instruments) using Facebook's [demucs](https://github.com/facebookresearch/demucs) stem splitting models. 
----
 
 ## Features
 
