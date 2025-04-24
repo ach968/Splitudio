@@ -458,7 +458,7 @@ export default function Editor({project, tracks} : {project: Project, tracks: Tr
           <div className=" flex w-full justify-center">
             <div className="container lg:px-5 px-3">
               <div className="relative border-b border-neutral-700 block py-1 min-h-7 w-full gap-2">
-                <div className="absolute left-0 top-1/2 transform -translate-y-1/2 pl-4">
+                <div className="hidden sm:block absolute left-0 top-1/2 transform -translate-y-1/2 pl-4">
                   <p className="text-white text-sm font-mono">
                     {formatTime(currentTime)} / {formatTime(trackLength)}
                   </p>
