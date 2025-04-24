@@ -14,7 +14,7 @@ export default function Product() {
     offset: ["start end", "end center"]
   });
 
-  const mainFade = useTransform(mainScroll.scrollYProgress, [0,0.1,0.9,1], [0.5,1,1,0])
+  const mainFade = useTransform(mainScroll.scrollYProgress, [0,0.1,0.8,1], [0.3,1,1,-1])
 
 
   const scroll = useScroll({
@@ -26,8 +26,9 @@ export default function Product() {
   const step1Opacity = useTransform(scroll.scrollYProgress, [0,1/7,2/7,3/7,4/7,5/7,6/7,1], [1,1,0,0,0,0,0,0])
   const step2Opacity = useTransform(scroll.scrollYProgress, [0,1/7,2/7,3/7,4/7,5/7,6/7,1], [0,0,0,1,1,0,0,0])
   const step3Opacity = useTransform(scroll.scrollYProgress, [0,1/7,2/7,3/7,4/7,5/7,6/7,1], [0,0,0,0,0,0,1,1])
-  const waveOpacity = useTransform(scroll.scrollYProgress, [0, 1/4, 3/4, 1], [0.3, 1, 1, 0.3])
+
   return <motion.section
+  id="features"
   initial={{
     opacity: 0,
   }}
@@ -42,7 +43,7 @@ export default function Product() {
     opacity: mainFade
   }}
   ref={containerRef} 
-  className="bg-black min-h-[1500px] mt-28 md:mt-72 px-5 w-full select-none flex flex-col md:pt-7 items-center relative justify-start mb-48 overflow-x-clip">
+  className="bg-black min-h-[1700px] mt-28 md:mt-72 px-5 w-full select-none flex flex-col md:pt-7 items-center relative justify-start mb-28 overflow-x-clip">
     <motion.div
     style={{
       opacity: step1Opacity
@@ -62,8 +63,8 @@ export default function Product() {
           We isolate vocals, drums, bass, and more with precision. Our AI model handles the heavy lifting—so you can focus on having fun.
         </p>
       </div>
-      <div className="md:max-w-[700px] xl:max-w-[900px] saturate-150 mt-10 select-none">
-        <Image className="md:max-h-[50vh] w-auto pointer-events-none" src={tracksImage} alt="editor demo image"></Image>
+      <div className="w-full md:max-w-[700px] xl:max-w-[900px] saturate-150 mt-10 select-none">
+        <Image className="object-contain w-full max-h-[50vh] pointer-events-none" src={tracksImage} alt="editor demo image"></Image>
       </div>
     </motion.div>
 
@@ -85,11 +86,11 @@ export default function Product() {
           Listen to them in-browser or download and create your own arrangements.
         </p>
       </div>
-      <div className="md:max-w-[700px] xl:max-w-[900px] saturate-150 mt-10 select-none">
-        <Image className="md:max-h-[50vh] w-auto pointer-events-none" src={listenImage} alt="editor demo image"></Image>
+      <div className="w-full md:max-w-[700px] xl:max-w-[900px] saturate-150 mt-10 select-none">
+        <Image className="object-contain w-full max-h-[50vh] pointer-events-none" src={listenImage} alt="midi player demo image"></Image>
       </div>
     </motion.div>
-
+    
     <motion.div 
     style={{
       opacity: step3Opacity
@@ -107,8 +108,9 @@ export default function Product() {
           Whether you're using a MIDI keyboard or playing with your instrument into the microphone, take your practice to the next level by playing along with your tracks in real time.
         </p>
       </div>
-      <div className="md:max-w-[700px] xl:max-w-[900px] saturate-150 mt-10 select-none">
-        <Image className="md:max-h-[50vh] w-auto pointer-events-none" src={playImage} alt="editor demo image"></Image>
+      <div className="w-full md:max-w-[700px] xl:max-w-[900px] saturate-150 mt-10 select-none">
+        
+        <Image className="object-contain max-h-[50vh] w-full pointer-events-none" src={playImage} alt="playalong demo image"></Image>
       </div>
     </motion.div>
 

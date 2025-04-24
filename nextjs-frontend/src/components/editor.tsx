@@ -595,8 +595,17 @@ export default function Editor({project, tracks} : {project: Project, tracks: Tr
                             <DialogTitle>
                               <h3
                               className="text-xl"
-                              >Settings</h3>
+                              >Quick Guide</h3>
                             </DialogTitle>
+                            
+                            <div className="flex flex-col gap-1">
+                              <p>Click on a track to seek.</p>
+                              <p>Click and drag to select a section (enable looping).</p>
+                              <p>Left arrow to seek backwards.</p>
+                              <p>Right arrow to seek forwards.</p>
+                              <p>Space to pause/play.</p>
+                            </div>
+
                             <p
                             onClick={()=>downloadOriginalMp3()}
                             className="text-neutral-700 underline hover:cursor-pointer"
@@ -606,7 +615,7 @@ export default function Editor({project, tracks} : {project: Project, tracks: Tr
                         </Dialog>                        
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Settings</p>
+                        <p>Quick Guide</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

@@ -7,11 +7,12 @@ export default function Footer() {
     <footer className="bg-black py-10 flex text-sm w-full text-[#BCBCBC] justify-center text-center">
       <div className="container">
         <nav className="flex flex-col md:flex-row md:justify-center gap-6 mt-6">
-          <Link href="/home">About</Link>
-          <Link href="/home">Features</Link>
+          <Link href="/#features">Home</Link>
           <Link href="/pricing">Pricing</Link>
+          <Link href="/projects">Projects</Link>
           <Link href="/editor">Editor</Link>
-          <Link href="/help">Help</Link>
+          <Link href="/profile">Profile</Link>
+
         </nav>
         <div className="mt-6">
           Made By{" "}

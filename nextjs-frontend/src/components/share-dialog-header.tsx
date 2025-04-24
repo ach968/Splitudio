@@ -94,7 +94,7 @@ export default function Share({
           <div className="flex gap-3 items-center">
           <Switch
             disabled={true}
-            checked={true}
+            checked={shared}
             id="enable-sharing"
           />
           <Label htmlFor="enable-sharing">Enable Sharing</Label>
