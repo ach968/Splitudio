@@ -28,6 +28,9 @@ Go to [https://splitudio-iota.vercel.app/](https://splitudio-iota.vercel.app/) i
 
 - Once processing is complete, preview or download each stem individually.
 
+### Sample song:
+Want a quick showcase of Splitudio capabilities? Here is a popular song split entirely using the app: [check it out](https://splitudio-iota.vercel.app//editor/f59c2e12-1f1d-4ff4-98e3-68ef354ef520).
+
 ---
 
 ## Technologies Used
